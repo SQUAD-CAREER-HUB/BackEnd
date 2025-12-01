@@ -1,0 +1,6 @@
+spring:
+  profiles:
+    default: dev-env
+    group:
+      dev-env: dev, swagger
+      prod-env: prod, swagger
