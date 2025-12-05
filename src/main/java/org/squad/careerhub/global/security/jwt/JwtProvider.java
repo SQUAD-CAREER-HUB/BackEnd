@@ -72,15 +72,15 @@ public class JwtProvider {
             getClaimsFromToken(token);
             return true;
         } catch (SignatureException e) {
-            log.warn("Invalid JWT signature, 유효하지 않는 JWT 서명 입니다. Token: {}", token);
+            log.warn("Invalid JWT signature, 유효하지 않는 JWT 서명 입니다. Token prefix: {}", maskToken(token));
         } catch (MalformedJwtException e) {
-            log.warn("Invalid JWT malformed, 잘못된 형식의 JWT 입니다. Token: {}", token);
+            log.warn("Invalid JWT malformed, 잘못된 형식의 JWT 입니다. Token prefix: {}", maskToken(token));
         } catch (ExpiredJwtException e) {
-            log.warn("Expired JWT, 만료된 JWT 입니다. Token: {}", token);
+            log.warn("Expired JWT, 만료된 JWT 입니다. Token prefix: {}", maskToken(token));
         } catch (UnsupportedJwtException e) {
-            log.warn("Unsupported JWT, 지원되지 않는 JWT 입니다. Token: {}", token);
+            log.warn("Unsupported JWT, 지원되지 않는 JWT 입니다. Token prefix: {}", maskToken(token));
         } catch (IllegalArgumentException e) {
-            log.warn("JWT claims is empty, 잘못된 JWT 입니다. Token: {}", token);
+            log.warn("JWT claims is empty, 잘못된 JWT 입니다. Token prefix: {}", maskToken(token));
         }
         return false;
     }
@@ -124,6 +124,13 @@ public class JwtProvider {
                 .build()
                 .parseSignedClaims(token)
                 .getPayload();
+    }
+
+    private String maskToken(String token) {
+        if (token == null || token.length() < 20) {
+            return "***";
+        }
+        return token.substring(0, 10) + "..." + token.substring(token.length() - 5);
     }
 
 }
