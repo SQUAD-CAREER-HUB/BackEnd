@@ -18,8 +18,6 @@ public class JobPostingController extends JobPostingDocsController {
     public ResponseEntity<JobPostingExtractResponse> getJobPosting(
         @RequestParam("url") String url
     ) {
-        // TODO: 나중에 실제 서비스 로직 붙이기
-        // 지금은 Swagger 테스트용으로 항상 예시 응답만 반환
-        return ResponseEntity.ok(JobPostingExtractResponse.sample());
+        return ResponseEntity.ok(JobPostingExtractResponse.mock());
     }
 }
