@@ -3,6 +3,8 @@ package org.squad.careerhub.domain.schedule.controller.dto;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalDateTime;
 import lombok.Builder;
+import org.squad.careerhub.domain.schedule.repository.InterviewType;
+import org.squad.careerhub.domain.schedule.service.dto.InterviewScheduleUpdateParamRequest;
 
 @Schema(description = "면접 일정 수정 요청 DTO (PATCH – 부분 수정)")
 @Builder
@@ -33,4 +35,13 @@ public record InterviewScheduleUpdateRequest(
     )
     String onlineLink
 ) {
+    public InterviewScheduleUpdateParamRequest toParam() {
+        return InterviewScheduleUpdateParamRequest.of(
+            name,
+            InterviewType.valueOf(type),
+            datetime,
+            location,
+            onlineLink
+        );
+    }
 }

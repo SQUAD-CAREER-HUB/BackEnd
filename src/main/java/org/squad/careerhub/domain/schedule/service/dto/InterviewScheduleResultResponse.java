@@ -4,7 +4,7 @@ import java.time.LocalDateTime;
 import lombok.Builder;
 
 @Builder
-public record InterviewScheduleInfo(
+public record InterviewScheduleResultResponse(
     Long id,
     Long applicationId,
     String company,

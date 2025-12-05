@@ -5,7 +5,7 @@ import lombok.Builder;
 import org.squad.careerhub.domain.schedule.repository.InterviewType;
 
 @Builder
-public record InterviewScheduleCreateCommand(
+public record InterviewScheduleCreateParamRequest(
     Long memberId,
     Long applicationId,
     String name,
@@ -14,7 +14,7 @@ public record InterviewScheduleCreateCommand(
     String location,
     String onlineLink
 ) {
-    public static InterviewScheduleCreateCommand of(
+    public static InterviewScheduleCreateParamRequest of(
         Long memberId,
         Long applicationId,
         String name,
@@ -23,7 +23,7 @@ public record InterviewScheduleCreateCommand(
         String location,
         String onlineLink
     ) {
-        return new InterviewScheduleCreateCommand(
+        return new InterviewScheduleCreateParamRequest(
             memberId,
             applicationId,
             name,
