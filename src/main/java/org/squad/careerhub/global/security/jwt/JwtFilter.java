@@ -59,7 +59,7 @@ public class JwtFilter extends OncePerRequestFilter {
 
         // 토큰이 존재하지만 유효하지 않은 경우
         String token = tokenOpt.get();
-        if (!jwtProvider.isValidateToken(token)) {
+        if (!jwtProvider.isTokenValid(token)) {
             sendErrorResponse(response);
             return;
         }

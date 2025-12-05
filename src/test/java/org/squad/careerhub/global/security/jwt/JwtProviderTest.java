@@ -41,7 +41,7 @@ class JwtProviderTest {
         var tokens = jwtProvider.createTokens(1L, Role.ROLE_MEMBER);
 
         // when
-        boolean result = jwtProvider.isValidateToken(tokens.accessToken());
+        boolean result = jwtProvider.isTokenValid(tokens.accessToken());
 
         // then
         assertThat(result).isTrue();
@@ -55,7 +55,7 @@ class JwtProviderTest {
         var tokenWithWrongSignature = tokens.accessToken();
 
         // when - 정상 Provider로 검증
-        boolean result = jwtProvider.isValidateToken(tokenWithWrongSignature);
+        boolean result = jwtProvider.isTokenValid(tokenWithWrongSignature);
 
         // then
         assertThat(result).isFalse();
@@ -67,7 +67,7 @@ class JwtProviderTest {
         var malformedToken = "this.is.not.a.valid.jwt.token";
 
         // when
-        boolean result = jwtProvider.isValidateToken(malformedToken);
+        boolean result = jwtProvider.isTokenValid(malformedToken);
 
         // then
         assertThat(result).isFalse();
@@ -93,7 +93,7 @@ class JwtProviderTest {
                 .compact();
 
         // when
-        boolean result = jwtProvider.isValidateToken(expiredToken);
+        boolean result = jwtProvider.isTokenValid(expiredToken);
 
         // then
         assertThat(result).isFalse();
@@ -107,7 +107,7 @@ class JwtProviderTest {
         var unsupportedToken = "eyJhbGciOiJub25lIn0.eyJzdWIiOiIxMjM0NTY3ODkwIn0.";
 
         // when
-        boolean result = jwtProvider.isValidateToken(unsupportedToken);
+        boolean result = jwtProvider.isTokenValid(unsupportedToken);
 
         // then
         assertThat(result).isFalse();
@@ -119,7 +119,7 @@ class JwtProviderTest {
         var emptyToken = "";
 
         // when
-        boolean result = jwtProvider.isValidateToken(emptyToken);
+        boolean result = jwtProvider.isTokenValid(emptyToken);
 
         // then
         assertThat(result).isFalse();
@@ -128,7 +128,7 @@ class JwtProviderTest {
     @Test
     void 토큰이_NULL이면_false를_반환한다_IllegalArgumentException() {
         // when
-        boolean result = jwtProvider.isValidateToken(null);
+        boolean result = jwtProvider.isTokenValid(null);
 
         // then
         assertThat(result).isFalse();
@@ -154,7 +154,7 @@ class JwtProviderTest {
         TokenResponse tokens = jwtProvider.createTokens(1L, Role.ROLE_MEMBER);
 
         // when
-        boolean result = jwtProvider.isValidateToken(tokens.refreshToken());
+        boolean result = jwtProvider.isTokenValid(tokens.refreshToken());
 
         // then
         assertThat(result).isTrue();
