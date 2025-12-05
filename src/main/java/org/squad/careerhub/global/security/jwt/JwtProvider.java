@@ -85,13 +85,6 @@ public class JwtProvider {
         return false;
     }
 
-    public void validateExpiredToken(Claims claims) {
-        Date expiration = claims.getExpiration();
-        if (expiration.before(new Date())) {
-            throw new ExpiredJwtException(null, claims, "만료된 JWT 입니다.");
-        }
-    }
-
     private String createAccessToken(Long memberId, Role role) {
         Date validity = getTokenExpirationTime(TokenExpiration.ACCESS_TOKEN);
 
