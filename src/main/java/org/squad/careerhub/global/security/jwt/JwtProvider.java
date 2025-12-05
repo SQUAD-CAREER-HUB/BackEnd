@@ -67,7 +67,7 @@ public class JwtProvider {
         );
     }
 
-    public boolean isValidateToken(String token) {
+    public boolean isTokenValid(String token) {
         try {
             getClaimsFromToken(token);
             return true;
