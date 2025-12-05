@@ -1,7 +1,6 @@
 package org.squad.careerhub.domain.application.controller;
 
 import jakarta.validation.Valid;
-import java.time.LocalDate;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
