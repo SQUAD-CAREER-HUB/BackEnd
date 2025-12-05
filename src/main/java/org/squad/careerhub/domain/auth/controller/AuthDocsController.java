@@ -16,7 +16,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.squad.careerhub.domain.auth.controller.dto.ReissueTokenRequest;
-import org.squad.careerhub.domain.auth.controller.dto.TokenResponse;
+import org.squad.careerhub.global.security.jwt.dto.TokenResponse;
 import org.squad.careerhub.global.swagger.ApiExceptions;
 
 @Tag(name = "Auth", description = "인증 관련 API 문서")
