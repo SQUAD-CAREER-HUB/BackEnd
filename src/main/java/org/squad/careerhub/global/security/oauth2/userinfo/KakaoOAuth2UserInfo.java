@@ -1,42 +1,76 @@
 package org.squad.careerhub.global.security.oauth2.userinfo;
+
 import java.util.Map;
+import java.util.Optional;
+import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
+import org.squad.careerhub.domain.member.entity.SocialProvider;
 
 public class KakaoOAuth2UserInfo implements OAuth2UserInfo {
 
-    private final Map<String, Object> kakaoProfile;
-    private final String email;
-    private final String socialId;
+    private final Map<String, Object> attributes;
+    private final Map<String, Object> kakaoAccount;
+    private final Map<String, Object> profile;
 
     public KakaoOAuth2UserInfo(Map<String, Object> attributes) {
-        this.socialId = attributes.get("id").toString();
-        Map<String, Object> kakaoAccount = (Map<String, Object>) attributes.get("kakao_account");
-        this.email = kakaoAccount.get("email").toString();
-        this.kakaoProfile = (Map<String, Object>) kakaoAccount.get("profile");
+        validateAttributes(attributes);
+
+        this.attributes = attributes;
+        this.kakaoAccount = extractKakaoAccount(attributes);
+        this.profile = extractProfile(kakaoAccount);
     }
 
     @Override
     public String getProvider() {
-        return "KAKAO";
-    }
-
-    @Override
-    public String getProfileUrl() {
-        return kakaoProfile.get("profile_image_url").toString();
+        return SocialProvider.KAKAO.name();
     }
 
     @Override
     public String getSocialId() {
-        return socialId;
+        return  Optional.ofNullable(attributes.get("id"))
+                .map(Object::toString)
+                .orElseThrow(() -> new OAuth2AuthenticationException("Kakao 사용자 ID를 찾을 수 없습니다."));
     }
 
     @Override
     public String getEmail() {
-        return email;
+        return Optional.ofNullable(kakaoAccount.get("email"))
+                .map(Object::toString)
+                .orElseThrow(() -> new OAuth2AuthenticationException("Kakao 이메일 정보를 찾을 수 없습니다. 이메일 제공 동의가 필요합니다."));
     }
 
     @Override
     public String getNickname() {
-        return kakaoProfile.get("nickname").toString();
+        return Optional.ofNullable(profile.get("nickname"))
+                .map(Object::toString)
+                .orElseThrow(() -> new OAuth2AuthenticationException("Kakao 닉네임 정보를 찾을 수 없습니다. 프로필 제공 동의가 필요합니다."));
+    }
+
+    @Override
+    public String getProfileUrl() {
+        return Optional.ofNullable(profile.get("profile_image_url"))
+                .map(Object::toString)
+                .filter(url -> !url.isBlank())
+                .orElse("default_profile_image_url"); // TODO: 추후 기본 프로필 이미지 URL 설정
+    }
+
+    private void validateAttributes(Map<String, Object> attributes) {
+        if (attributes == null || attributes.isEmpty()) {
+            throw new OAuth2AuthenticationException("Kakao 응답이 비어있습니다.");
+        }
+    }
+
+    private Map<String, Object> extractKakaoAccount(Map<String, Object> attributes) {
+        return Optional.ofNullable(attributes.get("kakao_account"))
+                .filter(Map.class::isInstance)
+                .map(obj -> (Map<String, Object>) obj)
+                .orElseThrow(() -> new OAuth2AuthenticationException("Kakao 계정 정보를 찾을 수 없습니다."));
+    }
+
+    private Map<String, Object> extractProfile(Map<String, Object> kakaoAccount) {
+        return Optional.ofNullable(kakaoAccount.get("profile"))
+                .filter(Map.class::isInstance)
+                .map(obj -> (Map<String, Object>) obj)
+                .orElseThrow(() -> new OAuth2AuthenticationException("Kakao 프로필 정보를 찾을 수 없습니다."));
     }
 
 }

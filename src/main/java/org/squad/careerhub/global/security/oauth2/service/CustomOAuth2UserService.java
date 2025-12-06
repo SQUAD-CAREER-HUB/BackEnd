@@ -42,8 +42,8 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
             log.warn("[Auth] OAuth2 인증 실패: {}", ex.getMessage());
             throw ex;
         } catch (Exception ex) {
-            log.warn("[Auth] OAuth2 사용자 정보 처리 중 예외 발생", ex);
-            throw new InternalAuthenticationServiceException(ex.getMessage(), ex.getCause());
+            log.warn("[Auth] OAuth2 사용자 정보 처리 중 예외 발생: {} ", ex.getMessage(), ex);
+            throw new OAuth2AuthenticationException("소셜 로그인 처리 중 오류가 발생했습니다.");
         }
     }
 
