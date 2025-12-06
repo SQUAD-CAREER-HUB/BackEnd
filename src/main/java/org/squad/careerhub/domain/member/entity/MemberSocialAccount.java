@@ -15,7 +15,7 @@ import lombok.NoArgsConstructor;
 @Embeddable
 public class MemberSocialAccount {
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String email;
 
     @Column(nullable = false)

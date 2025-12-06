@@ -20,7 +20,7 @@ public class Member extends BaseEntity {
     @Embedded
     private MemberSocialAccount socialAccount;
 
-    @Column(nullable = false)
+    @Column(length = 30, nullable = false)
     private String nickname;
 
     @Column(nullable = false)
