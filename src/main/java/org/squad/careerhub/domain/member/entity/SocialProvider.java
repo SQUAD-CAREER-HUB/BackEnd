@@ -1,10 +1,9 @@
 package org.squad.careerhub.domain.member.entity;
 
-public enum Role {
+public enum SocialProvider {
 
-    ROLE_MEMBER,
-    ROLE_ADMIN,
+    GOOGLE,
+    KAKAO,
 
     ;
-
 }
