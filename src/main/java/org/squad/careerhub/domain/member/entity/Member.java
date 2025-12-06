@@ -27,19 +27,24 @@ public class Member extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private Role role;
 
+    @Column(nullable = false)
+    private String profileImageUrl;
+
     private String refreshToken;
 
     public static Member create(
             String email,
             SocialProvider provider,
             String socialId,
-            String nickname
+            String nickname,
+            String profileImageUrl
     ) {
         Member member = new Member();
 
         member.nickname = requireNonNull(nickname);
         member.socialAccount = MemberSocialAccount.create(email, provider, socialId);
         member.role = Role.ROLE_MEMBER;
+        member.profileImageUrl = requireNonNull(profileImageUrl);
         member.refreshToken = null;
 
         return member;
