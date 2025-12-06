@@ -14,6 +14,9 @@ public enum ErrorStatus {
     NOT_FOUND        (404, "요청한 리소스를 찾을 수 없습니다."),
     DUPLICATE        (409, "이미 존재하는 리소스입니다."),
 
+    // MEMBER
+    NOT_FOUND_MEMBER (404, "회원을 찾을 수 없습니다."),
+
     // JWT
     INVALID_TOKEN        (401, "유효하지 않은 JWT 토큰입니다."),
     INVALID_SOCIAL_TOKEN (401, "유효하지 않은 소셜 토큰입니다."),
