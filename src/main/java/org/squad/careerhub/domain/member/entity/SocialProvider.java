@@ -1,6 +1,7 @@
 package org.squad.careerhub.domain.member.entity;
 
 import org.squad.careerhub.global.error.CareerHubException;
+import org.squad.careerhub.global.error.ErrorStatus;
 
 public enum SocialProvider {
 
@@ -15,7 +16,7 @@ public enum SocialProvider {
                 return provider;
             }
         }
-        throw new CareerHubException("Unsupported OAuth type: " + type);
+        throw new CareerHubException(ErrorStatus.UNSUPPORTED_OAUTH_PROVIDER);
     }
 
 }
