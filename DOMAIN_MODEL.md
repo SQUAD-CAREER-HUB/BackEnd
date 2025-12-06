@@ -29,12 +29,13 @@
 ### 행위
 
 - `static create()` : 회원 생성
-- `updateInfo()`:  회원 정보를 수정한다.
+- `updateProfile()`:  회원 정보를 수정한다.
 - `updateRefreshToken()`: JWT 리프레쉬 토큰 업데이트
+- `clearRefreshToken()`: JWT 리프레쉬 토큰 초기화
 
 ### 규칙
-- 닉네임은 중복을 허용하지 않는다.
 - 이메일은 중복을 허용하지 않는다.
+- 닉네임은 최대 30글자를 허용한다.
 
 ---
 
@@ -44,6 +45,9 @@
 - `email`: 소셜 이메일
 - `provider`: 소셜 제공자
 - `socialId`: 소셜 제공 ID
+
+### 행위
+- `static create()` : 소셜 계정 생성
 
 ---
 
