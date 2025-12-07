@@ -13,14 +13,19 @@ public record MemberProfileUpdateRequest(
     @Schema(description = "닉네임", example = "careerhub_dev")
     @NotBlank(message = "닉네임은 필수 입력 값입니다.")
     @Size(max = 30, message = "닉네임은 최대 30자까지 입력 가능합니다.")
-    String nickname
+    String nickname,
+
+    @Size(max = 400, message = "프로필이미지 url 길이는 400까지 입니다.")
+    @NotBlank(message = "프로필이미지는 필수입니다.(기본이미지 또는 설정 이미지)")
+    String profileImageUrl
 
 ) {
 
     public MemberProfileUpdateParamRequest toParam (Long memberId) {
         return MemberProfileUpdateParamRequest.of(
             memberId,
-            nickname
+            nickname,
+            profileImageUrl
         );
     }
 }

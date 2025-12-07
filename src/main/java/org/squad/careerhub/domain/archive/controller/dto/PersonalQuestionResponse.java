@@ -50,6 +50,7 @@ public record PersonalQuestionResponse(
             .build();
     }
 
+
     public static PersonalQuestionResponse mock() {
         return PersonalQuestionResponse.builder()
             .id(10L)
