@@ -1,7 +1,6 @@
 package org.squad.careerhub.domain.notification.service.dto;
 
 import lombok.Builder;
-import org.squad.careerhub.domain.notification.entity.NotificationToken;
 
 @Builder
 public record NotificationTokenParamRequest(

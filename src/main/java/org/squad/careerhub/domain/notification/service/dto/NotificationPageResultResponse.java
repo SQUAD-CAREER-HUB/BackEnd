@@ -1,7 +1,6 @@
 package org.squad.careerhub.domain.notification.service.dto;
 
 import java.util.List;
-import javax.management.remote.NotificationResult;
 import lombok.Builder;
 
 @Builder

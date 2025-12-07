@@ -2,10 +2,8 @@ package org.squad.careerhub.domain.notification.controller.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
-import javax.management.remote.NotificationResult;
 import lombok.Builder;
 import org.squad.careerhub.domain.notification.service.dto.NotificationPageResultResponse;
-import org.squad.careerhub.domain.notification.service.dto.NotificationResultResponse;
 
 @Schema(description = "알림 목록 페이지 응답 DTO (커서 기반 페이지네이션)")
 @Builder
