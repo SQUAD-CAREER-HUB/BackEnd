@@ -15,7 +15,7 @@ public class SwaggerGroupConfig {
     public GroupedOpenApi appApi() {
         return GroupedOpenApi.builder()
                 .group("1. App API")
-                .pathsToMatch("/v1/**")
+                .pathsToMatch("/v1/**", "/oauth2/**")
                 .pathsToExclude("/v1/admin/**")
                 .addOperationCustomizer(swaggerCustomizer)
                 .build();
