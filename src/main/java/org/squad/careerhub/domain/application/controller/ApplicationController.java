@@ -36,6 +36,12 @@ public class ApplicationController extends ApplicationDocsController {
             @Valid @RequestBody ApplicationCreateRequest request,
             @LoginMember Long memberId
     ) {
+        applicationService.createApplication(
+                request.toNewJobPosting(),
+                request.toNewApplicationInfo(),
+                memberId
+        );
+
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
