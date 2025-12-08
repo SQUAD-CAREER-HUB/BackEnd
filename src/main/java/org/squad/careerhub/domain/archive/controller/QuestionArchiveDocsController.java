@@ -67,7 +67,8 @@ public abstract class QuestionArchiveDocsController {
                 schema = @Schema(implementation = PersonalQuestionCreateRequest.class)
             )
         )
-        PersonalQuestionCreateRequest request
+        PersonalQuestionCreateRequest request,
+        Long memberId
     );
 
     @Operation(
@@ -118,7 +119,8 @@ public abstract class QuestionArchiveDocsController {
             example = "20",
             required = false
         )
-        Integer size
+        Integer size,
+        Long memberId
     );
 
     @Operation(
@@ -153,7 +155,8 @@ public abstract class QuestionArchiveDocsController {
             required = true,
             example = "10"
         )
-        Long questionId
+        Long questionId,
+        Long memberId
     );
 
     @Operation(
@@ -208,6 +211,7 @@ public abstract class QuestionArchiveDocsController {
                 schema = @Schema(implementation = PersonalQuestionUpdateRequest.class)
             )
         )
-        PersonalQuestionUpdateRequest request
+        PersonalQuestionUpdateRequest request,
+        Long memberId
     );
 }

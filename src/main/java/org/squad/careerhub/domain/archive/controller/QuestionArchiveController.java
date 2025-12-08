@@ -18,6 +18,7 @@ import org.squad.careerhub.domain.archive.controller.dto.PersonalQuestionPageRes
 import org.squad.careerhub.domain.archive.controller.dto.PersonalQuestionResponse;
 import org.squad.careerhub.domain.archive.controller.dto.PersonalQuestionUpdateRequest;
 import org.squad.careerhub.domain.archive.service.QuestionArchiveService;
+import org.squad.careerhub.global.annotation.LoginMember;
 
 @RestController
 @RequestMapping("/v1/applications/{applicationId}/questions")
@@ -30,7 +31,8 @@ public class QuestionArchiveController extends QuestionArchiveDocsController {
     @PostMapping
     public ResponseEntity<PersonalQuestionResponse> registerPersonalQuestion(
         @PathVariable Long applicationId,
-        @Valid @RequestBody PersonalQuestionCreateRequest request
+        @Valid @RequestBody PersonalQuestionCreateRequest request,
+        @LoginMember Long memberId
     ) {
         return ResponseEntity.status(HttpStatus.CREATED)
             .body(PersonalQuestionResponse.mock());
@@ -41,7 +43,8 @@ public class QuestionArchiveController extends QuestionArchiveDocsController {
     public ResponseEntity<PersonalQuestionPageResponse> getPersonalQuestions(
         @PathVariable Long applicationId,
         @RequestParam(required = false) Long lastCursorId,
-        @RequestParam(required = false, defaultValue = "20") Integer size
+        @RequestParam(required = false, defaultValue = "20") Integer size,
+        @LoginMember Long memberId
     ) {
 
         return ResponseEntity.ok(PersonalQuestionPageResponse.mock());
@@ -51,7 +54,8 @@ public class QuestionArchiveController extends QuestionArchiveDocsController {
     @DeleteMapping("/{questionId}")
     public ResponseEntity<Void> deletePersonalQuestion(
         @PathVariable Long applicationId,
-        @PathVariable Long questionId
+        @PathVariable Long questionId,
+        @LoginMember Long memberId
     ) {
         return ResponseEntity.noContent().build();
     }
@@ -61,7 +65,8 @@ public class QuestionArchiveController extends QuestionArchiveDocsController {
     public ResponseEntity<PersonalQuestionResponse> updatePersonalQuestion(
         @PathVariable Long applicationId,
         @PathVariable Long questionId,
-        @Valid @RequestBody PersonalQuestionUpdateRequest request
+        @Valid @RequestBody PersonalQuestionUpdateRequest request,
+        @LoginMember Long memberId
     ) {
         return ResponseEntity.ok(PersonalQuestionResponse.updateMock());
     }
