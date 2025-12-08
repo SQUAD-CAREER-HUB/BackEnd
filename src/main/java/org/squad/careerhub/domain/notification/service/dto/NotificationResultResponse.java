@@ -14,16 +14,4 @@ public record NotificationResultResponse(
     boolean read,
     LocalDateTime createdAt
 ) {
-//    public static NotificationResult from(Notification entity) {
-//        return NotificationResult.builder()
-//            .notificationId(entity.getId())
-//            .type(entity.getType().name())
-//            .title(entity.getTitle())
-//            .message(entity.getMessage())
-//            .targetType(entity.getTargetType().name())
-//            .targetId(entity.getTargetId())
-//            .read(entity.isRead())
-//            .createdAt(entity.getCreatedAt())
-//            .build();
-//    }
 }

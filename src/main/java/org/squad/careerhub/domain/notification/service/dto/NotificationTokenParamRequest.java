@@ -29,15 +29,4 @@ public record NotificationTokenParamRequest(
             .appVersion(appVersion)
             .build();
     }
-
-//    public NotificationToken toEntity() {
-//        return NotificationToken.builder()
-//            .memberId(memberId)
-//            .fcmToken(fcmToken)
-//            .deviceId(deviceId)
-//            .deviceType(deviceType)
-//            .osVersion(osVersion)
-//            .appVersion(appVersion)
-//            .build();
-//    }
 }
