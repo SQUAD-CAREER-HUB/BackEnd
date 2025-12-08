@@ -43,7 +43,7 @@ public abstract class MemberDocsController {
         ErrorStatus.UNAUTHORIZED_ERROR,
         ErrorStatus.INTERNAL_SERVER_ERROR
     })
-    public abstract ResponseEntity<MemberProfileResponse> getMyProfile();
+    public abstract ResponseEntity<MemberProfileResponse> getMyProfile(Long memberId);
 
     @Operation(
         summary = "마이 프로필 수정 - [JWT O]",
@@ -78,7 +78,8 @@ public abstract class MemberDocsController {
                 schema = @Schema(implementation = MemberProfileUpdateRequest.class)
             )
         )
-        MemberProfileUpdateRequest request
+        MemberProfileUpdateRequest request,
+        Long memberId
     );
 
     @Operation(
@@ -119,7 +120,8 @@ public abstract class MemberDocsController {
             example = "20",
             required = false
         )
-        Integer size
+        Integer size,
+        Long memberId
     );
 
     @Operation(
@@ -140,5 +142,5 @@ public abstract class MemberDocsController {
         ErrorStatus.FORBIDDEN_DELETE,   // 실제 enum 이름에 맞게 조정
         ErrorStatus.INTERNAL_SERVER_ERROR
     })
-    public abstract ResponseEntity<Void> withdraw();
+    public abstract ResponseEntity<Void> withdraw(Long memberId);
 }

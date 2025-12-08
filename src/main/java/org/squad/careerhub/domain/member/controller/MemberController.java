@@ -14,6 +14,7 @@ import org.squad.careerhub.domain.member.controller.dto.MemberActivityPageRespon
 import org.squad.careerhub.domain.member.controller.dto.MemberProfileResponse;
 import org.squad.careerhub.domain.member.controller.dto.MemberProfileUpdateRequest;
 import org.squad.careerhub.domain.member.service.MemberService;
+import org.squad.careerhub.global.annotation.LoginMember;
 
 @RequiredArgsConstructor
 @RestController
@@ -24,14 +25,15 @@ public class MemberController extends MemberDocsController {
 
     @Override
     @GetMapping("/profile")
-    public ResponseEntity<MemberProfileResponse> getMyProfile() {
+    public ResponseEntity<MemberProfileResponse> getMyProfile(@LoginMember Long memberId) {
         return ResponseEntity.ok(MemberProfileResponse.mock());
     }
 
     @Override
     @PatchMapping("/profile")
     public ResponseEntity<MemberProfileResponse> updateMyProfile(
-        @Valid @RequestBody MemberProfileUpdateRequest request
+        @Valid @RequestBody MemberProfileUpdateRequest request,
+        @LoginMember Long memberId
     ) {
         return ResponseEntity.ok(MemberProfileResponse.mock());
     }
@@ -40,7 +42,8 @@ public class MemberController extends MemberDocsController {
     @GetMapping("/activities")
     public ResponseEntity<MemberActivityPageResponse> getMyActivities(
         @RequestParam(value = "lastCursorId", required = false) Long lastCursorId,
-        @RequestParam(value = "size", required = false, defaultValue = "20") Integer size
+        @RequestParam(value = "size", required = false, defaultValue = "20") Integer size,
+        @LoginMember Long memberId
     ) {
 
         return ResponseEntity.ok(MemberActivityPageResponse.mock());
@@ -48,7 +51,7 @@ public class MemberController extends MemberDocsController {
 
     @Override
     @PostMapping("/withdrawal")
-    public ResponseEntity<Void> withdraw() {
+    public ResponseEntity<Void> withdraw(@LoginMember Long memberId) {
         return ResponseEntity.noContent().build();
     }
 }
