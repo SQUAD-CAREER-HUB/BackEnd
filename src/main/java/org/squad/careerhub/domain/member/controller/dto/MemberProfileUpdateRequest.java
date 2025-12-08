@@ -15,8 +15,9 @@ public record MemberProfileUpdateRequest(
     @Size(max = 30, message = "닉네임은 최대 30자까지 입력 가능합니다.")
     String nickname,
 
-    @Size(max = 400, message = "프로필이미지 url 길이는 400까지 입니다.")
+    @Schema(description = "프로필 이미지 url", example = "https://placehold.co/400")
     @NotBlank(message = "프로필이미지는 필수입니다.(기본이미지 또는 설정 이미지)")
+    @Size(max = 400, message = "프로필이미지 url 길이는 400까지 입니다.")
     String profileImageUrl
 
 ) {
