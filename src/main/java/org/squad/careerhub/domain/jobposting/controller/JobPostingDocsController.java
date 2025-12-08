@@ -47,6 +47,7 @@ public abstract class JobPostingDocsController {
             required = true,
             example = "https://www.wanted.co.kr/wd/323219"
         )
-        String url
+        String url,
+        Long memberId
     );
 }

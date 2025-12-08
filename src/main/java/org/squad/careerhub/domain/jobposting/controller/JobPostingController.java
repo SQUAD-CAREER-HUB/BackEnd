@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.squad.careerhub.domain.jobposting.controller.dto.JobPostingExtractResponse;
+import org.squad.careerhub.global.annotation.LoginMember;
 
 @RestController
 @RequestMapping("/v1/job-postings")
@@ -16,7 +17,9 @@ public class JobPostingController extends JobPostingDocsController {
     @Override
     @GetMapping
     public ResponseEntity<JobPostingExtractResponse> getJobPosting(
-        @RequestParam("url") String url
+        @RequestParam("url") String url,
+        @LoginMember Long memberId
+
     ) {
         return ResponseEntity.ok(JobPostingExtractResponse.mock());
     }
