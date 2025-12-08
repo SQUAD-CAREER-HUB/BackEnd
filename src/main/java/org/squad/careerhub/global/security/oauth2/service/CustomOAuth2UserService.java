@@ -50,12 +50,12 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
     private OAuth2User authenticateOAuth2User(OAuth2UserRequest userRequest, OAuth2User oauth2User) {
         // OAuth2 제공자 타입 추출 (google, kakao 등)
         String providerName = extractProviderName(userRequest);
-        SocialProvider oauthType = SocialProvider.from(providerName);
+        SocialProvider provider = SocialProvider.from(providerName);
 
         // 제공자별 사용자 정보 파싱
-        OAuth2UserInfo userInfo = OAuth2UserInfoFactory.create(oauthType, oauth2User.getAttributes());
+        OAuth2UserInfo userInfo = OAuth2UserInfoFactory.create(provider, oauth2User.getAttributes());
 
-        Member member = findOrCreateMember(userInfo, oauthType);
+        Member member = findOrCreateMember(userInfo, provider);
 
         return new CustomOAuth2Member(member, oauth2User.getAttributes());
     }
@@ -70,7 +70,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         return optionalMember.orElseGet(() -> memberManager.create(
                 Member.create(
                         userInfo.getEmail(),
-                        SocialProvider.from(userInfo.getProvider()),
+                        provider,
                         userInfo.getSocialId(),
                         userInfo.getNickname(),
                         userInfo.getProfileUrl()
