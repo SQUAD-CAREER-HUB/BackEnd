@@ -27,7 +27,7 @@ public record InterviewScheduleCreateRequest(
         implementation = InterviewType.class
     )
     @NotNull(message = "면접 유형은 필수 값입니다.")
-    String type,
+    InterviewType type,
 
     @Schema(
         description = "면접 일시 (ISO8601, LocalDateTime)",
@@ -51,7 +51,7 @@ public record InterviewScheduleCreateRequest(
             memberId,
             applicationId,
             name,
-            InterviewType.valueOf(type),
+            type,
             datetime,
             location,
             onlineLink
