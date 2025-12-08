@@ -38,7 +38,6 @@ public record MemberActivityPageResponse(
             .build();
     }
 
-
     public static MemberActivityPageResponse mock() {
         MemberActivityResponse a1 = MemberActivityResponse.mock();
 
