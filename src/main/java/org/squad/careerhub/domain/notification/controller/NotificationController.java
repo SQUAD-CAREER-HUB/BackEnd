@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.squad.careerhub.domain.notification.controller.dto.NotificationPageResponse;
 import org.squad.careerhub.domain.notification.controller.dto.NotificationTokenRequest;
 import org.squad.careerhub.domain.notification.service.NotificationService;
+import org.squad.careerhub.global.annotation.LoginMember;
 
 @RequiredArgsConstructor
 @RestController
@@ -28,7 +29,8 @@ public class NotificationController extends NotificationDocsController {
     @GetMapping
     public ResponseEntity<NotificationPageResponse> getNotifications(
         @RequestParam(value = "lastCursorId", required = false) Long lastCursorId,
-        @RequestParam(value = "size", required = false, defaultValue = "20") Integer size
+        @RequestParam(value = "size", required = false, defaultValue = "20") Integer size,
+        @LoginMember Long memberId
     ) {
         return ResponseEntity.ok(NotificationPageResponse.mock());
     }
@@ -37,7 +39,8 @@ public class NotificationController extends NotificationDocsController {
     @Override
     @PatchMapping("/{notificationId}/read")
     public ResponseEntity<Void> readNotification(
-        @PathVariable("notificationId") Long notificationId
+        @PathVariable("notificationId") Long notificationId,
+        @LoginMember Long memberId
     ) {
         return ResponseEntity.noContent().build();
     }
@@ -45,7 +48,8 @@ public class NotificationController extends NotificationDocsController {
     @Override
     @PostMapping("/tokens")
     public ResponseEntity<Void> registerNotificationToken(
-        @Valid @RequestBody NotificationTokenRequest request
+        @Valid @RequestBody NotificationTokenRequest request,
+        @LoginMember Long memberId
     ) {
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
@@ -53,7 +57,8 @@ public class NotificationController extends NotificationDocsController {
     @Override
     @DeleteMapping("/tokens/{tokenId}")
     public ResponseEntity<Void> deleteNotificationToken(
-        @PathVariable("tokenId") Long tokenId
+        @PathVariable("tokenId") Long tokenId,
+        @LoginMember Long memberId
     ) {
         return ResponseEntity.noContent().build();
     }

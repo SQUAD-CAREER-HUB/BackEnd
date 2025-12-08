@@ -60,7 +60,8 @@ public abstract class NotificationDocsController {
             example = "20",
             required = false
         )
-        Integer size
+        Integer size,
+        Long memberId
     );
 
     @Operation(
@@ -87,7 +88,8 @@ public abstract class NotificationDocsController {
             required = true,
             example = "101"
         )
-        Long notificationId
+        Long notificationId,
+        Long memberId
     );
 
 
@@ -118,7 +120,8 @@ public abstract class NotificationDocsController {
                 schema = @Schema(implementation = NotificationTokenRequest.class)
             )
         )
-        NotificationTokenRequest request
+        NotificationTokenRequest request,
+        Long memberId
     );
 
 
@@ -146,6 +149,7 @@ public abstract class NotificationDocsController {
             required = true,
             example = "10"
         )
-        Long tokenId
+        Long tokenId,
+        Long memberId
     );
 }
