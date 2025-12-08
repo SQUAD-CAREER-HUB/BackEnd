@@ -12,10 +12,6 @@ import org.squad.careerhub.domain.schedule.service.dto.InterviewScheduleCreatePa
 @Builder
 public record InterviewScheduleCreateRequest(
 
-    @Schema(description = "지원 카드 ID", example = "1")
-    @NotNull(message = "지원 카드 ID는 필수 값입니다.")
-    Long applicationId,
-
     @Schema(description = "면접 이름 (예: 1차 실무 면접)", example = "1차 실무 면접")
     @NotBlank(message = "면접 이름은 필수 값입니다.")
     String name,

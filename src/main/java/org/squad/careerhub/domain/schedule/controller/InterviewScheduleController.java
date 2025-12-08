@@ -1,5 +1,6 @@
 package org.squad.careerhub.domain.schedule.controller;
 
+import jakarta.validation.Valid;
 import java.time.LocalDate;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -18,6 +19,7 @@ import org.squad.careerhub.domain.schedule.controller.dto.InterviewSchedulePageR
 import org.squad.careerhub.domain.schedule.controller.dto.InterviewScheduleResponse;
 import org.squad.careerhub.domain.schedule.controller.dto.InterviewScheduleUpdateRequest;
 import org.squad.careerhub.domain.schedule.service.InterviewScheduleService;
+import org.squad.careerhub.global.annotation.LoginMember;
 
 @RestController
 @RequestMapping("/v1/interviews")
@@ -25,46 +27,56 @@ import org.squad.careerhub.domain.schedule.service.InterviewScheduleService;
 public class InterviewScheduleController extends InterviewScheduleDocsController {
 
     @Override
-    @PostMapping
+    @PostMapping("/v1/applications/{applicationId}/interviews")
     public ResponseEntity<InterviewScheduleResponse> createInterview(
-        @RequestBody InterviewScheduleCreateRequest request
+        @PathVariable Long applicationId,
+        @Valid @RequestBody InterviewScheduleCreateRequest request,
+        @LoginMember Long memberId
     ) {
         return ResponseEntity.status(201).body(InterviewScheduleResponse.mock());
     }
 
     @Override
-    @PatchMapping("/{interviewId}")
+    @PatchMapping("/v1/interviews/{interviewId}")
     public ResponseEntity<InterviewScheduleResponse> updateInterview(
         @PathVariable Long interviewId,
-        @RequestBody InterviewScheduleUpdateRequest request
+        @Valid @RequestBody InterviewScheduleUpdateRequest request,
+        @LoginMember Long memberId
     ) {
         return ResponseEntity.ok(InterviewScheduleResponse.mock());
     }
 
     @Override
-    @DeleteMapping("/{interviewId}")
-    public ResponseEntity<Void> deleteInterview(@PathVariable Long interviewId) {
+    @DeleteMapping("/v1/interviews/{interviewId}")
+    public ResponseEntity<Void> deleteInterview(
+        @PathVariable Long interviewId,
+        @LoginMember Long memberId
+    ) {
         return ResponseEntity.noContent().build();
     }
 
     @Override
-    @GetMapping
+    @GetMapping("/v1/interviews")
     public ResponseEntity<InterviewSchedulePageResponse> getInterviews(
         @RequestParam(required = false) Long applicationId,
-        @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
-        @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to,
+        @RequestParam(required = false)
+        @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
+        @RequestParam(required = false)
+        @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to,
         @RequestParam(required = false) Long lastCursorId,
-        @RequestParam(required = false, defaultValue = "20") Integer size
+        @RequestParam(required = false, defaultValue = "20") Integer size,
+        @LoginMember Long memberId
     ) {
         return ResponseEntity.ok(InterviewSchedulePageResponse.mock());
     }
 
     @Override
-    @GetMapping("/upcoming")
+    @GetMapping("/v1/interviews/upcoming")
     public ResponseEntity<InterviewSchedulePageResponse> getUpcomingInterviews(
         @RequestParam(required = false, defaultValue = "7") Integer days,
         @RequestParam(required = false) Long lastCursorId,
-        @RequestParam(required = false, defaultValue = "20") Integer size
+        @RequestParam(required = false, defaultValue = "20") Integer size,
+        @LoginMember Long memberId
     ) {
         return ResponseEntity.ok(InterviewSchedulePageResponse.mock());
     }
