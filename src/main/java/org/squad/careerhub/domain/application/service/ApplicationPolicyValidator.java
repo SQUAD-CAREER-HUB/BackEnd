@@ -2,6 +2,7 @@ package org.squad.careerhub.domain.application.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 import org.squad.careerhub.domain.application.entity.ApplicationStatus;
 import org.squad.careerhub.domain.application.service.dto.NewApplicationInfo;
 import org.squad.careerhub.global.error.CareerHubException;
@@ -14,7 +15,7 @@ public class ApplicationPolicyValidator {
     // 지원서 생성 시 기타 전형 진행 중일 때만 메모 작성 가능
     public void validateMemoRule(NewApplicationInfo newApplicationInfo) {
         if (
-                !newApplicationInfo.memo().isEmpty() &&
+                StringUtils.hasText(newApplicationInfo.memo()) &&
                 !newApplicationInfo.applicationStatus().equals(ApplicationStatus.WAITING_FOR_ETC)
         ) {
             throw new CareerHubException(ErrorStatus.INVALID_MEMO_RULE);
