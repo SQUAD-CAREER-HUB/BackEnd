@@ -5,7 +5,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 import java.time.LocalDateTime;
-import org.squad.careerhub.domain.schedule.repository.InterviewType;
+import org.squad.careerhub.domain.schedule.enums.InterviewType;
 import org.squad.careerhub.domain.schedule.service.dto.InterviewScheduleCreateParamRequest;
 
 @Schema(description = "면접 일정 생성 요청 DTO")
@@ -23,7 +23,7 @@ public record InterviewScheduleCreateRequest(
     @Schema(
         description = "면접 유형",
         example = "TECH",
-        allowableValues = {"TECH", "FIT", "EXEC", "TASK", "TEST", "OTHER"},
+        allowableValues = {"TECH", "FIT", "EXECUTIVE", "TASK", "TEST", "OTHER"},
         implementation = InterviewType.class
     )
     @NotNull(message = "면접 유형은 필수 값입니다.")

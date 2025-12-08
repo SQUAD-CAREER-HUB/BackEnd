@@ -1,7 +1,7 @@
 package org.squad.careerhub.domain.schedule.service.dto;
 
 import java.time.LocalDateTime;
-import org.squad.careerhub.domain.schedule.repository.InterviewType;
+import org.squad.careerhub.domain.schedule.enums.InterviewType;
 
 public record InterviewScheduleUpdateParamRequest(
     String name,

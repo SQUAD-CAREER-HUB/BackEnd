@@ -4,7 +4,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import java.time.LocalDateTime;
 import lombok.Builder;
-import org.squad.careerhub.domain.schedule.repository.InterviewType;
+import org.squad.careerhub.domain.schedule.enums.InterviewType;
 import org.squad.careerhub.domain.schedule.service.dto.InterviewScheduleUpdateParamRequest;
 
 @Schema(description = "면접 일정 수정 요청 DTO (PATCH – 부분 수정)")
@@ -17,10 +17,10 @@ public record InterviewScheduleUpdateRequest(
     @Schema(
         description = "면접 유형",
         example = "TECH",
-        allowableValues = {"TECH", "FIT", "EXEC", "TASK", "OTHER"}
+        allowableValues = {"TECH", "FIT", "EXECUTIVE", "TASK", "TEST", "OTHER"}
     )
     @NotBlank(message = "면접 유형은 필수 입력값입니다.")
-    String type,
+    InterviewType type,
 
     @Schema(
         description = "면접 일시 (ISO8601, LocalDateTime)",
@@ -43,7 +43,7 @@ public record InterviewScheduleUpdateRequest(
     public InterviewScheduleUpdateParamRequest toParam() {
         return InterviewScheduleUpdateParamRequest.of(
             name,
-            InterviewType.valueOf(type),
+            type,
             datetime,
             location,
             onlineLink
