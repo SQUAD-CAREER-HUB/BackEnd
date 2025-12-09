@@ -19,8 +19,8 @@ import org.squad.careerhub.domain.community.interviewreview.controller.dto.Revie
 import org.squad.careerhub.domain.community.interviewreview.controller.dto.ReviewReportRequest;
 import org.squad.careerhub.domain.community.interviewreview.controller.dto.ReviewUpdateRequest;
 import org.squad.careerhub.domain.community.interviewreview.entity.SortType;
-import org.squad.careerhub.domain.community.interviewreview.service.dto.ReviewDetailResponse;
-import org.squad.careerhub.domain.community.interviewreview.service.dto.ReviewPageResponse;
+import org.squad.careerhub.domain.community.interviewreview.service.dto.response.ReviewDetailResponse;
+import org.squad.careerhub.domain.community.interviewreview.service.dto.response.ReviewPageResponse;
 import org.squad.careerhub.global.swagger.ApiExceptions;
 
 @Tag(name = "Review", description = "면접 후기 관련 API 문서")

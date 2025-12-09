@@ -21,4 +21,6 @@ public interface MemberJpaRepository extends JpaRepository<Member, Long> {
             @Param("status") EntityStatus status
     );
 
+    Optional<Member> findByIdAndStatus(Long memberId, EntityStatus entityStatus);
+
 }

@@ -17,7 +17,7 @@ public class MemberReader {
     private final MemberJpaRepository memberJpaRepository;
 
     public Member find(Long memberId) {
-        return memberJpaRepository.findById(memberId)
+        return memberJpaRepository.findByIdAndStatus(memberId, EntityStatus.ACTIVE)
                 .orElseThrow(() -> new CareerHubException(ErrorStatus.NOT_FOUND_MEMBER));
     }
 
