@@ -8,11 +8,12 @@ import lombok.Getter;
 public enum InterviewType {
 
     TECH("기술 면접"),
-    FIT("컬처핏 면접"),
+    FIT("컬처핏/인성 면접"),
     EXECUTIVE("임원 면접"),
-    TASK("과제 전형"),
-    TEST("시험/코딩테스트"),
+    DESIGN("시스템 디자인 면접"),
+    TEST("라이브 코딩 테스트 면접"),
     OTHER("기타");
 
     private final String description;
+
 }

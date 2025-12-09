@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalDateTime;
 import java.util.List;
 import lombok.Builder;
+import org.squad.careerhub.domain.schedule.enums.InterviewType;
 
 @Schema(description = "면접 일정 페이지 응답 DTO (커서 기반 페이지네이션)")
 @Builder
@@ -38,8 +39,7 @@ public record InterviewSchedulePageResponse(
         InterviewScheduleResponse interview1 = InterviewScheduleResponse.builder()
             .id(10L)
             .applicationId(1L)
-            .name("1차 실무 면접")
-            .type("TECH")
+            .type(InterviewType.TECH)
             .datetime(LocalDateTime.parse("2025-12-10T19:00:00"))
             .location("서울 강남구 OO빌딩 3층 회의실")
             .onlineLink("https://zoom.us/j/123456789")
@@ -51,8 +51,8 @@ public record InterviewSchedulePageResponse(
         InterviewScheduleResponse interview2 = InterviewScheduleResponse.builder()
             .id(11L)
             .applicationId(1L)
-            .name("2차 컬처핏 면접")
-            .type("FIT")
+            .type(InterviewType.OTHER)
+            .typeDetail("대표님 면접")
             .datetime(LocalDateTime.parse("2025-12-15T15:00:00"))
             .location("온라인")
             .onlineLink("https://meet.google.com/abcd-efgh-ijk")

@@ -3,6 +3,7 @@ package org.squad.careerhub.domain.schedule.service.dto;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalDateTime;
 import lombok.Builder;
+import org.squad.careerhub.domain.schedule.enums.InterviewType;
 
 @Schema(description = "면접 일정 응답 DTO")
 @Builder
@@ -14,15 +15,18 @@ public record InterviewScheduleResponse(
     @Schema(description = "지원 카드 ID", example = "1")
     Long applicationId,
 
-    @Schema(description = "면접 이름", example = "1차 실무 면접")
-    String name,
-
     @Schema(
         description = "면접 유형",
         example = "TECH",
-        allowableValues = {"TECH", "FIT", "EXEC", "TASK", "TEST", "OTHER"}
+        allowableValues = {"TECH", "FIT", "EXECUTIVE", "DESIGN", "TEST", "OTHER"}
     )
-    String type,
+    InterviewType type,
+
+    @Schema(
+        description = "기타 면접 유형 상세 (type= OTHER 일 때만 사용)",
+        example = "인성 + 기술 면접"
+    )
+    String typeDetail,
 
     @Schema(
         description = "면접 일시 (ISO8601, LocalDateTime)",
@@ -56,8 +60,8 @@ public record InterviewScheduleResponse(
     public static InterviewScheduleResponse of(
         Long id,
         Long applicationId,
-        String name,
-        String type,
+        InterviewType type,
+        String typeDetail,
         LocalDateTime datetime,
         String location,
         String onlineLink,
@@ -68,8 +72,8 @@ public record InterviewScheduleResponse(
         return InterviewScheduleResponse.builder()
             .id(id)
             .applicationId(applicationId)
-            .name(name)
             .type(type)
+            .typeDetail(typeDetail)
             .datetime(datetime)
             .location(location)
             .onlineLink(onlineLink)
@@ -83,8 +87,7 @@ public record InterviewScheduleResponse(
         return InterviewScheduleResponse.builder()
             .id(10L)
             .applicationId(1L)
-            .name("1차 실무 면접")
-            .type("TECH")
+            .type(InterviewType.TECH)
             .datetime(LocalDateTime.parse("2025-12-10T19:00:00"))
             .location("서울 강남구 OO빌딩 3층 회의실")
             .onlineLink("https://zoom.us/j/123456789")
