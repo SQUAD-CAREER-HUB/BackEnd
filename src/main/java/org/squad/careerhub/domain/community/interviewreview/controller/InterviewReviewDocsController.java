@@ -93,7 +93,7 @@ public abstract class InterviewReviewDocsController {
                 String query,
 
                 @Parameter(
-                        description = "정렬 기준 (NEWEST: 최신순, LIKE_DESC: 추천순)",
+                        description = "정렬 기준 (NEWEST: 최신순, OLDEST: 오래된순)",
                         example = "NEWEST",
                         required = true
                 )
