@@ -27,9 +27,8 @@ public abstract class InterviewScheduleDocsController {
         summary = "면접 일정 등록 - [JWT O]",
         description = """
                     ### 특정 지원 카드에 연동되는 면접 일정을 생성합니다.
-                    - Endpoint: **POST /v1/applications/{applicationId}/interviews**
                     - 지원 카드 ID(applicationId)로 연동됩니다.
-                    - 면접 유형(type)은 TECH/FIT/EXEC/TASK/TEST/OTHER 등을 사용할 수 있습니다.
+                    - 면접 유형(type)은 TECH/FIT/EXECUTIVE/DESIGN/TEST/OTHER 등을 사용할 수 있습니다.
                     - datetime은 ISO8601(LocalDateTime) 포맷을 사용합니다.
                     """,
         security = {@SecurityRequirement(name = "Bearer")}
@@ -71,9 +70,7 @@ public abstract class InterviewScheduleDocsController {
         summary = "면접 일정 수정 - [JWT O]",
         description = """
                     ### 기존 면접 일정을 부분 수정합니다.
-                    - Endpoint: **PATCH /v1/interviews/{interviewId}**
                     - 전달된 필드만 수정됩니다. (PATCH)
-                    - 면접 일정 변경 시 캘린더/알림과 동기화가 필요합니다. (서버 구현 시 고려)
                     """,
         security = {@SecurityRequirement(name = "Bearer")}
     )
@@ -113,8 +110,6 @@ public abstract class InterviewScheduleDocsController {
         summary = "면접 일정 삭제 - [JWT O]",
         description = """
                     ### 면접 일정을 삭제합니다.
-                    - Endpoint: **DELETE /v1/interviews/{interviewId}**
-                    - 연동된 캘린더 이벤트도 함께 삭제됩니다. (서버 구현 시 고려)
                     """,
         security = {@SecurityRequirement(name = "Bearer")}
     )
@@ -140,7 +135,6 @@ public abstract class InterviewScheduleDocsController {
         summary = "면접 일정 조회 (페이지네이션) - [JWT O]",
         description = """
                 ### 조건에 따라 면접 일정을 커서 기반 페이지네이션으로 조회합니다.
-                - Endpoint: **GET /v1/interviews**
                 - applicationId(지원 카드 ID)로 특정 카드의 면접만 조회할 수 있습니다.
                 - from/to(YYYY-MM-DD)로 날짜 범위를 필터링할 수 있습니다.
                 - lastCursorId가 없으면 첫 페이지를 조회합니다.
@@ -203,7 +197,6 @@ public abstract class InterviewScheduleDocsController {
         summary = "다가오는 면접 일정 조회 (페이지네이션) - [JWT O]",
         description = """
                 ### N일 이내에 예정된 면접 일정을 조회합니다.
-                - Endpoint: **GET /v1/interviews/upcoming**
                 - days 파라미터를 지정하지 않으면 기본 7일 이내 면접을 조회합니다.
                 - 결과는 커서 기반 페이지네이션 형식으로 반환됩니다.
                 """,

@@ -26,7 +26,7 @@ import org.squad.careerhub.global.annotation.LoginMember;
 public class InterviewScheduleController extends InterviewScheduleDocsController {
 
     @Override
-    @PostMapping("/{applicationId}/interviews")
+    @PostMapping("applications/{applicationId}/interviews")
     public ResponseEntity<InterviewScheduleResponse> createInterview(
         @PathVariable Long applicationId,
         @Valid @RequestBody InterviewScheduleCreateRequest request,
@@ -36,7 +36,7 @@ public class InterviewScheduleController extends InterviewScheduleDocsController
     }
 
     @Override
-    @PatchMapping("/{applicationId}/interviews/{interviewId}")
+    @PatchMapping("applications/{applicationId}/interviews/{interviewId}")
     public ResponseEntity<InterviewScheduleResponse> updateInterview(
         @PathVariable Long applicationId,
         @PathVariable Long interviewId,
@@ -47,7 +47,7 @@ public class InterviewScheduleController extends InterviewScheduleDocsController
     }
 
     @Override
-    @DeleteMapping("/{applicationId}/interviews/{interviewId}")
+    @DeleteMapping("applications/{applicationId}/interviews/{interviewId}")
     public ResponseEntity<Void> deleteInterview(
         @PathVariable Long applicationId,
         @PathVariable Long interviewId,
@@ -57,7 +57,7 @@ public class InterviewScheduleController extends InterviewScheduleDocsController
     }
 
     @Override
-    @GetMapping("/{applicationId}/interviews")
+    @GetMapping("applications/{applicationId}/interviews")
     public ResponseEntity<InterviewSchedulePageResponse> getInterviews(
         @PathVariable Long applicationId,
         @RequestParam(required = false)

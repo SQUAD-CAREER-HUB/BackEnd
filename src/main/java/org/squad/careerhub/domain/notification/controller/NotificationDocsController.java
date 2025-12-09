@@ -24,7 +24,6 @@ public abstract class NotificationDocsController {
         summary = "알림 목록 조회 (커서 기반 페이지네이션) - [JWT O]",
         description = """
                 ### 로그인한 사용자의 알림 목록을 조회합니다.
-                - Endpoint: `GET /v1/notifications`
                 - Query 파라미터
                   - `lastCursorId`: 마지막으로 조회한 알림 ID (optional)
                   - `size`: 페이지 크기 (optional, default = 20)
@@ -68,7 +67,6 @@ public abstract class NotificationDocsController {
         summary = "알림 읽음 처리 - [JWT O]",
         description = """
                 ### 특정 알림을 읽음 처리합니다.
-                - Endpoint: `PATCH /v1/notifications/{notificationId}/read`
                 - 자신의 알림이 아닐 경우 403 Forbidden 응답이 내려가도록 구현합니다.
                 """,
         security = {@SecurityRequirement(name = "Bearer")}
@@ -97,7 +95,6 @@ public abstract class NotificationDocsController {
         summary = "FCM 토큰 등록 - [JWT O]",
         description = """
                 ### 로그인한 사용자의 FCM 토큰을 등록/갱신합니다.
-                - Endpoint: `POST /v1/notifications/tokens`
                 - 동일 회원 + deviceId 조합으로 이미 토큰이 있다면 갱신하도록 구현할 수 있습니다.
                 """,
         security = {@SecurityRequirement(name = "Bearer")}
@@ -129,7 +126,6 @@ public abstract class NotificationDocsController {
         summary = "FCM 토큰 삭제 - [JWT O]",
         description = """
                 ### 로그인한 사용자의 FCM 토큰을 삭제합니다.
-                - Endpoint: `DELETE /v1/notifications/tokens/{tokenId}`
                 - 다른 사용자의 토큰을 삭제하려 할 경우 403 Forbidden 이 내려가도록 구현합니다.
                 """,
         security = {@SecurityRequirement(name = "Bearer")}

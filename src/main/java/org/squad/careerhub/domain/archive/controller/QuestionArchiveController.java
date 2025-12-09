@@ -21,14 +21,54 @@ import org.squad.careerhub.domain.archive.service.QuestionArchiveService;
 import org.squad.careerhub.global.annotation.LoginMember;
 
 @RestController
-@RequestMapping("/v1/applications/{applicationId}/questions")
+@RequestMapping("/v1")
 @RequiredArgsConstructor
 public class QuestionArchiveController extends QuestionArchiveDocsController {
 
     private final QuestionArchiveService questionArchiveService;
 
     @Override
-    @PostMapping
+    @PostMapping("/archive/questions")
+    public ResponseEntity<PersonalQuestionResponse> registerQuestion(
+        @RequestParam(required = false) Long applicationId,
+        @Valid @RequestBody PersonalQuestionCreateRequest request,
+        @LoginMember Long memberId
+    ) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(PersonalQuestionResponse.archiveMock());
+    }
+
+    @Override
+    @GetMapping("/archive/questions")
+    public ResponseEntity<PersonalQuestionPageResponse> getQuestions(
+        @RequestParam(required = false) Long lastCursorId,
+        @RequestParam(required = false, defaultValue = "20") Integer size,
+        @LoginMember Long memberId
+    ) {
+        return ResponseEntity.ok(PersonalQuestionPageResponse.archiveMock());
+    }
+
+    @Override
+    @DeleteMapping("/archive/questions/{questionId}")
+    public ResponseEntity<Void> deleteQuestion(
+        @PathVariable Long questionId,
+        @LoginMember Long memberId
+    ) {
+        return ResponseEntity.noContent().build();
+    }
+
+
+    @Override
+    @PatchMapping("/archive/questions/{questionId}")
+    public ResponseEntity<PersonalQuestionResponse> updateQuestion(
+        @PathVariable Long questionId,
+        @Valid @RequestBody PersonalQuestionUpdateRequest request,
+        @LoginMember Long memberId
+    ) {
+        return ResponseEntity.ok(PersonalQuestionResponse.archiveMock());
+    }
+
+    @Override
+    @PostMapping("/applications/{applicationId}/questions")
     public ResponseEntity<PersonalQuestionResponse> registerPersonalQuestion(
         @PathVariable Long applicationId,
         @Valid @RequestBody PersonalQuestionCreateRequest request,
@@ -39,7 +79,7 @@ public class QuestionArchiveController extends QuestionArchiveDocsController {
     }
 
     @Override
-    @GetMapping
+    @GetMapping("/applications/{applicationId}/questions")
     public ResponseEntity<PersonalQuestionPageResponse> getPersonalQuestions(
         @PathVariable Long applicationId,
         @RequestParam(required = false) Long lastCursorId,
@@ -51,7 +91,7 @@ public class QuestionArchiveController extends QuestionArchiveDocsController {
     }
 
     @Override
-    @DeleteMapping("/{questionId}")
+    @DeleteMapping("/applications/{applicationId}/questions/{questionId}")
     public ResponseEntity<Void> deletePersonalQuestion(
         @PathVariable Long applicationId,
         @PathVariable Long questionId,
@@ -61,7 +101,7 @@ public class QuestionArchiveController extends QuestionArchiveDocsController {
     }
 
     @Override
-    @PatchMapping("/{questionId}")
+    @PatchMapping("/applications/{applicationId}/questions/{questionId}")
     public ResponseEntity<PersonalQuestionResponse> updatePersonalQuestion(
         @PathVariable Long applicationId,
         @PathVariable Long questionId,

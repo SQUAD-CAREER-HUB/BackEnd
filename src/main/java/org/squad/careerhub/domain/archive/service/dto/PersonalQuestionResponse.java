@@ -61,4 +61,15 @@ public record PersonalQuestionResponse(
             .updatedAt(LocalDateTime.of(2025, 11, 30, 19, 10))
             .build();
     }
+
+    public static PersonalQuestionResponse archiveMock() {
+        return PersonalQuestionResponse.builder()
+            .id(10L)
+            .question("이 회사의 백엔드 인프라 구조에 대해 설명해 주세요.")
+            .answer("현재는 MSA 기반으로 전환 중이며, 트래픽이 높은 도메인은 별도 스케일아웃을 적용하고 있습니다.")
+            .fromCommunity(true)
+            .createdAt(LocalDateTime.of(2025, 11, 30, 19, 0))
+            .updatedAt(LocalDateTime.of(2025, 11, 30, 19, 10))
+            .build();
+    }
 }
