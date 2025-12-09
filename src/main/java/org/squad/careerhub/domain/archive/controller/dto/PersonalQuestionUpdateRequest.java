@@ -4,7 +4,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.Builder;
-import org.squad.careerhub.domain.archive.service.dto.PersonalQuestionUpdateParamRequest;
 
 @Schema(description = "개인 면접 질문 수정 요청 DTO (Controller 레이어)")
 @Builder

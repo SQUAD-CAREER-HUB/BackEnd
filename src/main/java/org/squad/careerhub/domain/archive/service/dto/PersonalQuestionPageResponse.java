@@ -1,10 +1,9 @@
-package org.squad.careerhub.domain.archive.controller.dto;
+package org.squad.careerhub.domain.archive.service.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalDateTime;
 import java.util.List;
 import lombok.Builder;
-import org.squad.careerhub.domain.archive.service.dto.PersonalQuestionResultResponse;
 
 @Schema(description = "개인 면접 질문 페이지 응답 DTO (커서 기반 페이지네이션)")
 @Builder
@@ -19,22 +18,6 @@ public record PersonalQuestionPageResponse(
     @Schema(description = "다음 커서 ID (마지막 질문 ID)", example = "25")
     Long nextCursorId
 ) {
-
-    public static PersonalQuestionPageResponse from(
-        List<PersonalQuestionResultResponse> infos,
-        boolean hasNext,
-        Long nextCursorId
-    ) {
-        List<PersonalQuestionResponse> responses = infos.stream()
-            .map(PersonalQuestionResponse::from)
-            .toList();
-
-        return PersonalQuestionPageResponse.builder()
-            .questions(responses)
-            .hasNext(hasNext)
-            .nextCursorId(nextCursorId)
-            .build();
-    }
 
     public static PersonalQuestionPageResponse mock() {
         PersonalQuestionResponse q1 = PersonalQuestionResponse.builder()
@@ -65,4 +48,6 @@ public record PersonalQuestionPageResponse(
             .nextCursorId(11L)
             .build();
     }
+
+
 }

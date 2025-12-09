@@ -3,7 +3,6 @@ package org.squad.careerhub.domain.archive.controller.dto;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Builder;
-import org.squad.careerhub.domain.archive.service.dto.PersonalQuestionCreateParamRequest;
 
 @Schema(description = "개인 면접 질문 등록 요청 DTO")
 @Builder

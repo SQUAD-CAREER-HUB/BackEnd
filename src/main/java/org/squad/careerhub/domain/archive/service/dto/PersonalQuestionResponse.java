@@ -1,9 +1,8 @@
-package org.squad.careerhub.domain.archive.controller.dto;
+package org.squad.careerhub.domain.archive.service.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalDateTime;
 import lombok.Builder;
-import org.squad.careerhub.domain.archive.service.dto.PersonalQuestionResultResponse;
 
 @Schema(description = "개인 면접 질문 단건 응답 DTO")
 @Builder
@@ -36,20 +35,6 @@ public record PersonalQuestionResponse(
     @Schema(description = "수정 일시", example = "2025-12-01T09:30:00")
     LocalDateTime updatedAt
 ) {
-
-    public static PersonalQuestionResponse from(PersonalQuestionResultResponse result) {
-        return PersonalQuestionResponse.builder()
-            .id(result.id())
-            .applicationId(result.applicationId())
-            .interviewQuestionId(result.interviewQuestionId())
-            .question(result.question())
-            .answer(result.answer())
-            .fromCommunity(result.fromCommunity())
-            .createdAt(result.createdAt())
-            .updatedAt(result.updatedAt())
-            .build();
-    }
-
 
     public static PersonalQuestionResponse mock() {
         return PersonalQuestionResponse.builder()
