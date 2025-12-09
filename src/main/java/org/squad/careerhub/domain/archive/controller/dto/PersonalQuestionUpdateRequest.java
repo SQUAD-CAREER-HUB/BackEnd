@@ -25,18 +25,4 @@ public record PersonalQuestionUpdateRequest(
     @NotBlank(message = "답변은 필수 입력값입니다.")
     String answer
 ) {
-
-    public PersonalQuestionUpdateParamRequest toParam(
-        Long memberId,
-        Long applicationId,
-        Long questionId
-    ) {
-        return PersonalQuestionUpdateParamRequest.of(
-            memberId,
-            applicationId,
-            questionId,
-            question,
-            answer
-        );
-    }
 }

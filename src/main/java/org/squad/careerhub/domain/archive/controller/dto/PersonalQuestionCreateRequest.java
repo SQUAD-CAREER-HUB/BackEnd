@@ -29,15 +29,5 @@ public record PersonalQuestionCreateRequest(
     @NotBlank(message = "답변 내용은 필수 값입니다.")
     String answer
 ) {
-
-    public PersonalQuestionCreateParamRequest toParam(Long memberId, Long applicationId) {
-        return PersonalQuestionCreateParamRequest.of(
-            memberId,
-            applicationId,
-            interviewQuestionId,
-            question,
-            answer
-        );
-    }
 }
 

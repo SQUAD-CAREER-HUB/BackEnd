@@ -33,18 +33,6 @@ public record NotificationTokenRequest(
     @NotNull(message = "앱 버전은 필수 값입니다.")
     String appVersion
 ) {
-
-    public NotificationTokenParamRequest toParam(Long memberId) {
-        return NotificationTokenParamRequest.of(
-            memberId,
-            fcmToken,
-            deviceId,
-            deviceType,
-            osVersion,
-            appVersion
-        );
-    }
-
     public static NotificationTokenRequest mock() {
         return NotificationTokenRequest.builder()
             .fcmToken("fcm-token-xxx-yyy-zzz")
