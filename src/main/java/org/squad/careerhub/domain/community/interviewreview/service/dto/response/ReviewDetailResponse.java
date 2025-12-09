@@ -1,4 +1,4 @@
-package org.squad.careerhub.domain.community.interviewreview.service.dto;
+package org.squad.careerhub.domain.community.interviewreview.service.dto.response;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
