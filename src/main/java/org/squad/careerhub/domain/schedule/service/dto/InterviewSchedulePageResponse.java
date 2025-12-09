@@ -1,4 +1,4 @@
-package org.squad.careerhub.domain.schedule.controller.dto;
+package org.squad.careerhub.domain.schedule.service.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalDateTime;

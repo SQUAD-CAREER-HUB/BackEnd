@@ -6,7 +6,6 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 import java.time.LocalDateTime;
 import org.squad.careerhub.domain.schedule.enums.InterviewType;
-import org.squad.careerhub.domain.schedule.service.dto.InterviewScheduleCreateParamRequest;
 
 @Schema(description = "면접 일정 생성 요청 DTO")
 @Builder
@@ -42,15 +41,4 @@ public record InterviewScheduleCreateRequest(
     )
     String onlineLink
 ) {
-    public InterviewScheduleCreateParamRequest toParam(Long memberId) {
-        return InterviewScheduleCreateParamRequest.of(
-            memberId,
-            applicationId,
-            name,
-            type,
-            datetime,
-            location,
-            onlineLink
-        );
-    }
 }

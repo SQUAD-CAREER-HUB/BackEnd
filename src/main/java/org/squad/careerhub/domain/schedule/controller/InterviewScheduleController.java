@@ -15,10 +15,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.squad.careerhub.domain.schedule.controller.dto.InterviewScheduleCreateRequest;
-import org.squad.careerhub.domain.schedule.controller.dto.InterviewSchedulePageResponse;
-import org.squad.careerhub.domain.schedule.controller.dto.InterviewScheduleResponse;
+import org.squad.careerhub.domain.schedule.service.dto.InterviewSchedulePageResponse;
+import org.squad.careerhub.domain.schedule.service.dto.InterviewScheduleResponse;
 import org.squad.careerhub.domain.schedule.controller.dto.InterviewScheduleUpdateRequest;
-import org.squad.careerhub.domain.schedule.service.InterviewScheduleService;
 import org.squad.careerhub.global.annotation.LoginMember;
 
 @RestController

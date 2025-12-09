@@ -5,7 +5,6 @@ import jakarta.validation.constraints.NotBlank;
 import java.time.LocalDateTime;
 import lombok.Builder;
 import org.squad.careerhub.domain.schedule.enums.InterviewType;
-import org.squad.careerhub.domain.schedule.service.dto.InterviewScheduleUpdateParamRequest;
 
 @Schema(description = "면접 일정 수정 요청 DTO (PATCH – 부분 수정)")
 @Builder
@@ -40,13 +39,4 @@ public record InterviewScheduleUpdateRequest(
     @NotBlank(message = "온라인 면접 링크는 필수 입력값입니다.")
     String onlineLink
 ) {
-    public InterviewScheduleUpdateParamRequest toParam() {
-        return InterviewScheduleUpdateParamRequest.of(
-            name,
-            type,
-            datetime,
-            location,
-            onlineLink
-        );
-    }
 }
