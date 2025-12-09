@@ -5,6 +5,6 @@ import org.springframework.stereotype.Service;
 
 @RequiredArgsConstructor
 @Service
-public class JopPostingService {
+public class JobPostingService {
 
 }
