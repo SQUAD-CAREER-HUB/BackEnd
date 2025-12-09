@@ -1,10 +1,9 @@
-package org.squad.careerhub.domain.jobposting.controller.dto;
+package org.squad.careerhub.domain.jobposting.service.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
 import lombok.Builder;
 import org.squad.careerhub.domain.jobposting.enums.JobPostingExtractStatus;
-import org.squad.careerhub.domain.jobposting.service.dto.JobPostingSnapshotResponse;
 
 @Schema(description = "채용 공고 정보 추출 응답 DTO (Controller 레이어)")
 @Builder
@@ -70,19 +69,6 @@ public record JobPostingExtractResponse(
     )
     JobPostingExtractStatus status
 ) {
-
-    public static JobPostingExtractResponse from(JobPostingSnapshotResponse serviceDto) {
-        return JobPostingExtractResponse.builder()
-            .company(serviceDto.company())
-            .position(serviceDto.position())
-            .deadline(serviceDto.deadline())
-            .recruitmentProcess(serviceDto.recruitmentProcess())
-            .mainTasks(serviceDto.mainTasks())
-            .requiredQualifications(serviceDto.requiredQualifications())
-            .preferredQualifications(serviceDto.preferredQualifications())
-            .status(serviceDto.status())
-            .build();
-    }
 
     /**
      * Swagger 예시 응답용 샘플 데이터
