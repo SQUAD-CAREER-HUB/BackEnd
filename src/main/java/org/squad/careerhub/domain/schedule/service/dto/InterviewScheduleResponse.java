@@ -3,6 +3,8 @@ package org.squad.careerhub.domain.schedule.service.dto;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalDateTime;
 import lombok.Builder;
+import org.squad.careerhub.domain.schedule.enums.InterviewResult;
+import org.squad.careerhub.domain.schedule.enums.InterviewStatus;
 import org.squad.careerhub.domain.schedule.enums.InterviewType;
 
 @Schema(description = "면접 일정 응답 DTO")
@@ -48,7 +50,13 @@ public record InterviewScheduleResponse(
         example = "SCHEDULED",
         allowableValues = {"SCHEDULED", "DONE", "CANCELED", "NONAPPEARANCE"}
     )
-    String status,
+    InterviewStatus status,
+
+    @Schema(
+        description = "면접 결과 상태 (PENDING 대기/ PASS 합격/ FAIL 불합격)",
+        example = "PENDING"
+    )
+    InterviewResult result,
 
     @Schema(description = "생성 시각", example = "2025-11-30T21:10:00")
     LocalDateTime createdAt,
@@ -65,7 +73,8 @@ public record InterviewScheduleResponse(
         LocalDateTime datetime,
         String location,
         String onlineLink,
-        String status,
+        InterviewStatus status,
+        InterviewResult result,
         LocalDateTime createdAt,
         LocalDateTime updatedAt
     ) {
@@ -78,6 +87,7 @@ public record InterviewScheduleResponse(
             .location(location)
             .onlineLink(onlineLink)
             .status(status)
+            .result(result)
             .createdAt(createdAt)
             .updatedAt(updatedAt)
             .build();
@@ -91,10 +101,12 @@ public record InterviewScheduleResponse(
             .datetime(LocalDateTime.parse("2025-12-10T19:00:00"))
             .location("서울 강남구 OO빌딩 3층 회의실")
             .onlineLink("https://zoom.us/j/123456789")
-            .status("SCHEDULED")
+            .status(InterviewStatus.DONE)
+            .result(InterviewResult.PASS)
             .createdAt(LocalDateTime.parse("2025-11-30T21:10:00"))
             .updatedAt(LocalDateTime.parse("2025-11-30T21:10:00"))
             .build();
     }
+
 }
 
