@@ -29,7 +29,7 @@ public class InterviewReviewReader {
         List<ReviewSummaryResponse> responses = finalReviews.stream()
                 .map(ReviewSummaryResponse::from)
                 .toList();
-        Long nextCursorId = finalReviews.isEmpty() ? null : finalReviews.getLast().getId();
+        Long nextCursorId = hasNext && !finalReviews.isEmpty() ? finalReviews.getLast().getId() : null;
 
         return new PageResponse<>(responses, hasNext, nextCursorId);
     }
