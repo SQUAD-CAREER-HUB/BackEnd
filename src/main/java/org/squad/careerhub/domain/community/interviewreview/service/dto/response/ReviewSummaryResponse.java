@@ -3,6 +3,7 @@ package org.squad.careerhub.domain.community.interviewreview.service.dto.respons
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalDate;
 import lombok.Builder;
+import org.squad.careerhub.domain.community.interviewreview.entity.InterviewReview;
 
 @Schema(description = "면접 후기 미리보기 응답 DTO")
 @Builder
@@ -26,14 +27,23 @@ public record ReviewSummaryResponse(
         LocalDate createdAt,
 
         @Schema(description = "작성자", example = "kimcoder")
-        String author,
-
-        @Schema(description = "좋아요 수", example = "10")
-        Long likeCount,
-
-        @Schema(description = "댓글 수", example = "5")
-        Long commentCount
+        String author
 ) {
 
+    public static ReviewSummaryResponse from(InterviewReview interviewReview) {
+        return ReviewSummaryResponse.builder()
+                .reviewId(interviewReview.getId())
+                .company(interviewReview.getCompany())
+                .position(interviewReview.getPosition())
+                .interviewType(interviewReview.getInterviewType())
+                .shortContent(
+                        interviewReview.getContent().length() > 100 ?
+                                interviewReview.getContent().substring(0, 100) + "..." :
+                                interviewReview.getContent()
+                )
+                .createdAt(interviewReview.getCreatedAt().toLocalDate())
+                .author(interviewReview.getAuthor().getNickname())
+                .build();
+    }
 
 }
