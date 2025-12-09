@@ -1,19 +1,26 @@
 package org.squad.careerhub.domain.community.interviewreview.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.transaction.annotation.Transactional;
 import org.squad.careerhub.IntegrationTestSupport;
+import org.squad.careerhub.domain.community.interviewquestion.entity.InterviewQuestion;
+import org.squad.careerhub.domain.community.interviewquestion.repository.InterviewQuestionJpaRepository;
+import org.squad.careerhub.domain.community.interviewquestion.service.dto.InterviewQuestionResponse;
 import org.squad.careerhub.domain.community.interviewreview.entity.InterviewReview;
 import org.squad.careerhub.domain.community.interviewreview.entity.SortType;
 import org.squad.careerhub.domain.community.interviewreview.repository.InterviewReviewJpaRepository;
+import org.squad.careerhub.domain.community.interviewreview.service.dto.response.ReviewDetailResponse;
 import org.squad.careerhub.domain.community.interviewreview.service.dto.response.ReviewSummaryResponse;
 import org.squad.careerhub.domain.member.entity.Member;
 import org.squad.careerhub.domain.member.entity.SocialProvider;
 import org.squad.careerhub.domain.member.repository.MemberJpaRepository;
+import org.squad.careerhub.global.error.CareerHubException;
+import org.squad.careerhub.global.error.ErrorStatus;
 import org.squad.careerhub.global.support.Cursor;
 import org.squad.careerhub.global.support.PageResponse;
 
@@ -23,6 +30,7 @@ class InterviewReviewReaderIntegrationTest extends IntegrationTestSupport {
 
     final InterviewReviewReader interviewReviewReader;
     final InterviewReviewJpaRepository interviewReviewJpaRepository;
+    final InterviewQuestionJpaRepository interviewQuestionJpaRepository;
     final MemberJpaRepository memberJpaRepository;
 
     Member member;
@@ -129,6 +137,59 @@ class InterviewReviewReaderIntegrationTest extends IntegrationTestSupport {
         assertThat(response.contents()).isEmpty();
         assertThat(response.hasNext()).isFalse();
         assertThat(response.nextCursorId()).isNull();
+    }
+
+    @Test
+    void 면접_후기를_상세조회_한다() {
+        // given
+        var savedReview = interviewReviewJpaRepository.save(InterviewReview.create(
+                        member,
+                        "카카오",
+                        "백엔드",
+                        "온라인",
+                        "내용1"
+                )
+        );
+        var savedQuestion = interviewQuestionJpaRepository.save(InterviewQuestion.create(savedReview, "질문1"));
+
+        // when
+        ReviewDetailResponse response = interviewReviewReader.findReview(savedReview.getId(), member.getId());
+
+        // then
+        assertThat(response).isNotNull()
+                .extracting(
+                        ReviewDetailResponse::reviewId,
+                        ReviewDetailResponse::company,
+                        ReviewDetailResponse::position,
+                        ReviewDetailResponse::interviewType,
+                        ReviewDetailResponse::content
+                ).containsExactly(
+                        savedReview.getId(),
+                        "카카오",
+                        "백엔드",
+                        "온라인",
+                        "내용1"
+                );
+
+        assertThat(response.interviewQuestions()).hasSize(1);
+        assertThat(response.interviewQuestions().getFirst())
+                .extracting(
+                        InterviewQuestionResponse::questionId,
+                        InterviewQuestionResponse::question
+                ).containsExactly(
+                        savedQuestion.getId(),
+                        savedQuestion.getQuestion()
+                );
+    }
+
+    @Test
+    void 면접이_존재하지_않을_경우_예외를_반환한다() {
+        // when
+        long invalidReviewId = -999L;
+        assertThatThrownBy(() -> interviewReviewReader.findReview(invalidReviewId, member.getId()))
+                .isInstanceOf(CareerHubException.class)
+                .hasMessage(ErrorStatus.NOT_FOUND_REVIEW.getMessage());
+
     }
 
 }

@@ -42,7 +42,7 @@ public class InterviewReviewController extends InterviewReviewDocsController {
 
     @Override
     @GetMapping("/v1/reviews")
-    public ResponseEntity<PageResponse<ReviewSummaryResponse>> getReviews(
+    public ResponseEntity<PageResponse<ReviewSummaryResponse>> findReviews(
             @RequestParam(required = false) String query,
             @RequestParam(defaultValue = "NEWEST") SortType sort,
             @RequestParam(required = false) Long lastReviewId,
@@ -59,11 +59,13 @@ public class InterviewReviewController extends InterviewReviewDocsController {
 
     @Override
     @GetMapping("/v1/reviews/{reviewId}")
-    public ResponseEntity<ReviewDetailResponse> getReview(
+    public ResponseEntity<ReviewDetailResponse> findReview(
             @PathVariable Long reviewId,
             @LoginMember Long memberId
     ) {
-        return ResponseEntity.ok(ReviewDetailResponse.mock());
+        ReviewDetailResponse response = interviewReviewService.findReview(reviewId, memberId);
+
+        return ResponseEntity.ok(response);
     }
 
     @Override

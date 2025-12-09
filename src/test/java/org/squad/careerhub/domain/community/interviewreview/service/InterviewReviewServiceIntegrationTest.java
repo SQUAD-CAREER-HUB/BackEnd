@@ -14,6 +14,7 @@ import org.squad.careerhub.domain.community.interviewreview.service.dto.NewInter
 import org.squad.careerhub.domain.member.entity.Member;
 import org.squad.careerhub.domain.member.entity.SocialProvider;
 import org.squad.careerhub.domain.member.repository.MemberJpaRepository;
+import org.squad.careerhub.global.entity.EntityStatus;
 
 @RequiredArgsConstructor
 @Transactional
@@ -66,7 +67,7 @@ class InterviewReviewServiceIntegrationTest extends IntegrationTestSupport {
                         newReview.content()
                 );
 
-        var interviewQuestionList = interviewQuestionJpaRepository.findByInterviewReviewId(reviewId);
+        var interviewQuestionList = interviewQuestionJpaRepository.findByInterviewReviewIdAndStatus(reviewId, EntityStatus.ACTIVE);
         assertThat(interviewQuestionList).hasSize(interviewQuestions.size());
     }
 
@@ -95,7 +96,7 @@ class InterviewReviewServiceIntegrationTest extends IntegrationTestSupport {
         var interviewReview = interviewReviewJpaRepository.findById(reviewId).orElseThrow();
         assertThat(interviewReview).isNotNull();
 
-        var interviewQuestionList = interviewQuestionJpaRepository.findByInterviewReviewId(reviewId);
+        var interviewQuestionList = interviewQuestionJpaRepository.findByInterviewReviewIdAndStatus(reviewId, EntityStatus.ACTIVE);
         assertThat(interviewQuestionList).isEmpty();
     }
 
