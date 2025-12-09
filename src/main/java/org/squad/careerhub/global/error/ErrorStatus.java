@@ -21,6 +21,9 @@ public enum ErrorStatus {
     INVALID_MEMO_RULE     (400, "지원서 생성 시 기타 전형 진행 중인 경우에만 메모를 작성해야 합니다."),
     NOT_FOUND_APPLICATION (404, "지원서를 찾을 수 없습니다."),
 
+    // OAUTH
+    UNSUPPORTED_OAUTH_PROVIDER (400, "지원하지 않는 OAuth 제공자입니다."),
+
     // JWT
     INVALID_TOKEN        (401, "유효하지 않은 JWT 토큰입니다."),
     INVALID_SOCIAL_TOKEN (401, "유효하지 않은 소셜 토큰입니다."),

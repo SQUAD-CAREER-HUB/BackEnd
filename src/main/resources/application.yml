@@ -6,6 +6,7 @@ spring:
   config:
     import:
       - application-db.yml
+      - application-oauth.yml
   web:
     resources:
       add-mappings: false
