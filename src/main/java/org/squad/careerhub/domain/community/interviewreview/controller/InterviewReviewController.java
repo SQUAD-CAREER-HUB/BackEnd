@@ -17,8 +17,8 @@ import org.squad.careerhub.domain.community.interviewreview.controller.dto.Revie
 import org.squad.careerhub.domain.community.interviewreview.controller.dto.ReviewUpdateRequest;
 import org.squad.careerhub.domain.community.interviewreview.entity.SortType;
 import org.squad.careerhub.domain.community.interviewreview.service.InterviewReviewService;
-import org.squad.careerhub.domain.community.interviewreview.service.dto.ReviewDetailResponse;
-import org.squad.careerhub.domain.community.interviewreview.service.dto.ReviewPageResponse;
+import org.squad.careerhub.domain.community.interviewreview.service.dto.response.ReviewDetailResponse;
+import org.squad.careerhub.domain.community.interviewreview.service.dto.response.ReviewPageResponse;
 import org.squad.careerhub.global.annotation.LoginMember;
 
 @RequiredArgsConstructor
@@ -33,6 +33,8 @@ public class InterviewReviewController extends InterviewReviewDocsController {
             @Valid @RequestBody ReviewCreateRequest request,
             @LoginMember Long memberId
     ) {
+        interviewReviewService.createReview(request.toNewInterviewReview(), request.interviewQuestions(), memberId);
+
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 

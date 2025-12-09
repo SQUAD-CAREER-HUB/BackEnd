@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import java.util.List;
 import lombok.Builder;
+import org.squad.careerhub.domain.community.interviewreview.service.dto.NewInterviewReview;
 
 @Schema(description = "면접 후기 등록 요청 DTO")
 @Builder
@@ -26,7 +27,15 @@ public record ReviewCreateRequest(
         @Schema(description = "면접 후기 내용", example = "면접 과정이 매우 체계적이고 친절했습니다.")
         @NotBlank(message = "면접 후기 내용은 필수 입력 항목 입니다.")
         String content
-
 ) {
+
+    public NewInterviewReview toNewInterviewReview() {
+        return NewInterviewReview.builder()
+                .company(company)
+                .position(position)
+                .interviewType(interviewType)
+                .content(content)
+                .build();
+    }
 
 }
