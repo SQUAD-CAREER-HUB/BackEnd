@@ -1,9 +1,8 @@
-package org.squad.careerhub.domain.member.controller.dto;
+package org.squad.careerhub.domain.member.service.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalDateTime;
 import lombok.Builder;
-import org.squad.careerhub.domain.member.service.dto.MemberProfileResultResponse;
 
 @Schema(description = "회원 프로필 조회 응답 DTO (Controller 레이어)")
 @Builder
@@ -24,14 +23,6 @@ public record MemberProfileResponse(
     )
     LocalDateTime createdAt
 ) {
-
-    public static MemberProfileResponse fromResult(MemberProfileResultResponse result) {
-        return MemberProfileResponse.builder()
-            .memberId(result.memberId())
-            .nickname(result.nickname())
-            .build();
-    }
-
     public static MemberProfileResponse mock() {
         return MemberProfileResponse.builder()
             .memberId(1L)

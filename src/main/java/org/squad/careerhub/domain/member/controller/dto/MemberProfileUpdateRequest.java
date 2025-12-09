@@ -4,7 +4,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.Builder;
-import org.squad.careerhub.domain.member.service.dto.MemberProfileUpdateParamRequest;
 
 @Schema(description = "회원 프로필 수정 요청 DTO (Controller 레이어)")
 @Builder
@@ -22,11 +21,4 @@ public record MemberProfileUpdateRequest(
 
 ) {
 
-    public MemberProfileUpdateParamRequest toParam (Long memberId) {
-        return MemberProfileUpdateParamRequest.of(
-            memberId,
-            nickname,
-            profileImageUrl
-        );
-    }
 }

@@ -1,9 +1,8 @@
-package org.squad.careerhub.domain.member.controller.dto;
+package org.squad.careerhub.domain.member.service.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalDateTime;
 import lombok.Builder;
-import org.squad.careerhub.domain.member.service.dto.MemberActivityResultResponse;
 
 @Schema(description = "회원 최근 활동 단건 응답 DTO")
 @Builder
@@ -42,17 +41,6 @@ public record MemberActivityResponse(
     )
     LocalDateTime createdAt
 ) {
-
-    public static MemberActivityResponse fromResult(MemberActivityResultResponse result) {
-        return MemberActivityResponse.builder()
-            .activityId(result.activityId())
-            .type(result.type())
-            .targetType(result.targetType())
-            .targetId(result.targetId())
-            .createdAt(result.createdAt())
-            .build();
-    }
-
     public static MemberActivityResponse mock() {
         return MemberActivityResponse.builder()
             .activityId(101L)

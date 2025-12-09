@@ -1,10 +1,9 @@
-package org.squad.careerhub.domain.member.controller.dto;
+package org.squad.careerhub.domain.member.service.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.Builder;
-import org.squad.careerhub.domain.member.service.dto.MemberActivityPageResultResponse;
 
 @Schema(description = "회원 최근 활동 페이지 응답 DTO (커서 기반 페이지네이션)")
 @Builder
@@ -25,18 +24,6 @@ public record MemberActivityPageResponse(
     )
     Long nextCursorId
 ) {
-
-    public static MemberActivityPageResponse fromResult(MemberActivityPageResultResponse result) {
-        List<MemberActivityResponse> responses = result.activities().stream()
-            .map(MemberActivityResponse::fromResult)
-            .collect(Collectors.toList());
-
-        return MemberActivityPageResponse.builder()
-            .activities(responses)
-            .hasNext(result.hasNext())
-            .nextCursorId(result.nextCursorId())
-            .build();
-    }
 
     public static MemberActivityPageResponse mock() {
         MemberActivityResponse a1 = MemberActivityResponse.mock();
