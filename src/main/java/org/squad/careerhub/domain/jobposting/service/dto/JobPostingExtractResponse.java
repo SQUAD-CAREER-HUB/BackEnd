@@ -22,6 +22,12 @@ public record JobPostingExtractResponse(
     String deadline,
 
     @Schema(
+        description = "근무지 (근무지 없으면 '-'')",
+        example = "경기 성남시"
+    )
+    String workplace,
+
+    @Schema(
         description = "채용 전형 단계 목록",
         example = "[\"서류\", \"1차 실무 면접\", \"2차 컬처핏\", \"최종 면접\"]"
     )
@@ -79,6 +85,7 @@ public record JobPostingExtractResponse(
             .company("에어스메디컬")
             .position("[SwiftSight] AI Research Scientist")
             .deadline(null)
+            .workplace("경기 성남시")
             .recruitmentProcess(List.of())
             .mainTasks(List.of(
                 "뇌 MRI 등 의료 영상을 대상으로 한 AI 모델을 설계·학습하고 성능을 고도화한다.",
