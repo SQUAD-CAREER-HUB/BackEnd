@@ -4,7 +4,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
-import org.squad.careerhub.domain.notification.service.dto.NotificationTokenParamRequest;
 
 @Schema(description = "FCM 토큰 등록 요청 DTO")
 @Builder

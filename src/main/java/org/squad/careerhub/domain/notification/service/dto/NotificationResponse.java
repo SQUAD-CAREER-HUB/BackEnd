@@ -1,9 +1,10 @@
-package org.squad.careerhub.domain.notification.controller.dto;
+package org.squad.careerhub.domain.notification.service.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalDateTime;
 import lombok.Builder;
-import org.squad.careerhub.domain.notification.service.dto.NotificationResultResponse;
+import org.squad.careerhub.domain.notification.enums.NotificationType;
+import org.squad.careerhub.domain.notification.enums.TargetType;
 
 @Schema(description = "알림 단건 응답 DTO")
 @Builder
@@ -17,12 +18,13 @@ public record NotificationResponse(
         example = "INTERVIEW_REMINDER",
         allowableValues = {
             "INTERVIEW_REMINDER",
+            "TASK_REMINDER",
             "DEADLINE_REMINDER",
             "SYSTEM",
             "COMMUNITY"
         }
     )
-    String type,
+    NotificationType type,
 
     @Schema(description = "알림 제목", example = "[면접 D-1] 네이버 백엔드 면접이 내일 예정되어 있습니다.")
     String title,
@@ -36,9 +38,9 @@ public record NotificationResponse(
     @Schema(
         description = "연결 리소스 유형",
         example = "INTERVIEW",
-        allowableValues = {"APPLICATION", "INTERVIEW", "REVIEW", "OTHER"}
+        allowableValues = {"APPLICATION","TASK", "INTERVIEW", "REVIEW", "OTHER"}
     )
-    String targetType,
+    TargetType targetType,
 
     @Schema(description = "연결 리소스 ID", example = "10")
     Long targetId,
@@ -50,28 +52,13 @@ public record NotificationResponse(
     LocalDateTime createdAt
 ) {
 
-    public static NotificationResponse from (
-        NotificationResultResponse result
-    ) {
-        return NotificationResponse.builder()
-            .notificationId(result.notificationId())
-            .type(result.type())
-            .title(result.title())
-            .message(result.message())
-            .targetType(result.targetType())
-            .targetId(result.targetId())
-            .read(result.read())
-            .createdAt(result.createdAt())
-            .build();
-    }
-
     public static NotificationResponse mock() {
         return NotificationResponse.builder()
             .notificationId(101L)
-            .type("INTERVIEW_REMINDER")
+            .type(NotificationType.INTERVIEW_REMINDER)
             .title("[면접 D-1] 네이버 백엔드 1차 면접이 내일 예정되어 있습니다.")
             .message("2025-12-01 14:00, 네이버 백엔드 1차 면접 일정입니다.")
-            .targetType("INTERVIEW")
+            .targetType(TargetType.INTERVIEW)
             .targetId(10L)
             .read(false)
             .createdAt(LocalDateTime.of(2025, 11, 30, 21, 0, 0))

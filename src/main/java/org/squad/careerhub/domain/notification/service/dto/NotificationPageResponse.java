@@ -1,9 +1,8 @@
-package org.squad.careerhub.domain.notification.controller.dto;
+package org.squad.careerhub.domain.notification.service.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
 import lombok.Builder;
-import org.squad.careerhub.domain.notification.service.dto.NotificationPageResultResponse;
 
 @Schema(description = "알림 목록 페이지 응답 DTO (커서 기반 페이지네이션)")
 @Builder
@@ -19,17 +18,6 @@ public record NotificationPageResponse(
     Long nextCursorId
 ) {
 
-    public static NotificationPageResponse from(NotificationPageResultResponse result) {
-        List<NotificationResponse> items = result.notifications().stream()
-            .map(NotificationResponse::from)
-            .toList();
-
-        return NotificationPageResponse.builder()
-            .notifications(items)
-            .hasNext(result.hasNext())
-            .nextCursorId(result.nextCursorId())
-            .build();
-    }
 
     public static NotificationPageResponse mock() {
         NotificationResponse n1 = NotificationResponse.mock();
