@@ -12,6 +12,7 @@ import java.time.LocalDate;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.squad.careerhub.domain.schedule.controller.dto.InterviewScheduleCreateRequest;
 import org.squad.careerhub.domain.schedule.service.dto.InterviewSchedulePageResponse;
 import org.squad.careerhub.domain.schedule.service.dto.InterviewScheduleResponse;
@@ -92,6 +93,8 @@ public abstract class InterviewScheduleDocsController {
         ErrorStatus.FORBIDDEN_MODIFY
     })
     public abstract ResponseEntity<InterviewScheduleResponse> updateInterview(
+        @Parameter(description = "지원서 ID", required = true, example = "1")
+        Long applicationId,
         @Parameter(description = "면접 ID", required = true, example = "10")
         Long interviewId,
         @RequestBody(
@@ -126,6 +129,8 @@ public abstract class InterviewScheduleDocsController {
         ErrorStatus.FORBIDDEN_DELETE
     })
     public abstract ResponseEntity<Void> deleteInterview(
+        @Parameter(description = "지원서 ID", required = true, example = "1")
+        Long applicationId,
         @Parameter(description = "면접 ID", required = true, example = "10")
         Long interviewId,
         Long memberId
@@ -159,7 +164,7 @@ public abstract class InterviewScheduleDocsController {
     })
     public abstract ResponseEntity<InterviewSchedulePageResponse> getInterviews(
         @Parameter(
-            description = "지원 카드 ID (선택)",
+            description = "지원 카드 ID",
             example = "1"
         )
         Long applicationId,
@@ -191,6 +196,8 @@ public abstract class InterviewScheduleDocsController {
         Integer size,
         Long memberId
     );
+
+
 
     @Operation(
         summary = "다가오는 면접 일정 조회 (페이지네이션) - [JWT O]",

@@ -21,12 +21,12 @@ import org.squad.careerhub.domain.schedule.controller.dto.InterviewScheduleUpdat
 import org.squad.careerhub.global.annotation.LoginMember;
 
 @RestController
-@RequestMapping("/v1/interviews")
+@RequestMapping("/v1")
 @RequiredArgsConstructor
 public class InterviewScheduleController extends InterviewScheduleDocsController {
 
     @Override
-    @PostMapping("/v1/applications/{applicationId}/interviews")
+    @PostMapping("/{applicationId}/interviews")
     public ResponseEntity<InterviewScheduleResponse> createInterview(
         @PathVariable Long applicationId,
         @Valid @RequestBody InterviewScheduleCreateRequest request,
@@ -36,8 +36,9 @@ public class InterviewScheduleController extends InterviewScheduleDocsController
     }
 
     @Override
-    @PatchMapping("/v1/interviews/{interviewId}")
+    @PatchMapping("/{applicationId}/interviews/{interviewId}")
     public ResponseEntity<InterviewScheduleResponse> updateInterview(
+        @PathVariable Long applicationId,
         @PathVariable Long interviewId,
         @Valid @RequestBody InterviewScheduleUpdateRequest request,
         @LoginMember Long memberId
@@ -46,8 +47,9 @@ public class InterviewScheduleController extends InterviewScheduleDocsController
     }
 
     @Override
-    @DeleteMapping("/v1/interviews/{interviewId}")
+    @DeleteMapping("/{applicationId}/interviews/{interviewId}")
     public ResponseEntity<Void> deleteInterview(
+        @PathVariable Long applicationId,
         @PathVariable Long interviewId,
         @LoginMember Long memberId
     ) {
@@ -55,9 +57,9 @@ public class InterviewScheduleController extends InterviewScheduleDocsController
     }
 
     @Override
-    @GetMapping("/v1/interviews")
+    @GetMapping("/{applicationId}/interviews")
     public ResponseEntity<InterviewSchedulePageResponse> getInterviews(
-        @RequestParam(required = false) Long applicationId,
+        @PathVariable Long applicationId,
         @RequestParam(required = false)
         @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
         @RequestParam(required = false)
@@ -69,8 +71,9 @@ public class InterviewScheduleController extends InterviewScheduleDocsController
         return ResponseEntity.ok(InterviewSchedulePageResponse.mock());
     }
 
+
     @Override
-    @GetMapping("/v1/interviews/upcoming")
+    @GetMapping("/interviews/upcoming")
     public ResponseEntity<InterviewSchedulePageResponse> getUpcomingInterviews(
         @RequestParam(required = false, defaultValue = "7") Integer days,
         @RequestParam(required = false) Long lastCursorId,
