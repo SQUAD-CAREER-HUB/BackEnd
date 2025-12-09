@@ -6,12 +6,15 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.time.LocalDate;
 import lombok.Builder;
+import org.squad.careerhub.domain.application.entity.ApplicationMethod;
 import org.squad.careerhub.domain.application.entity.ApplicationStatus;
+import org.squad.careerhub.domain.application.service.dto.NewApplicationInfo;
+import org.squad.careerhub.domain.application.service.dto.NewJobPosting;
 
 @Schema(description = "지원서 생성 요청 DTO")
 @Builder
 public record ApplicationCreateRequest(
-        @Schema(description = "잡 포스팅 URL", example = "https://www.example.com/job-posting")
+        @Schema(description = "잡 포스팅 URL(회사 정보 직접 입력 시 Null)", example = "https://www.example.com/job-posting")
         String jobPostingUrl,
 
         @Schema(description = "회사 이름", example = "Naver")
@@ -30,7 +33,7 @@ public record ApplicationCreateRequest(
         @NotNull(message = "지원서 상태는 필수 입력 항목입니다.")
         ApplicationStatus applicationStatus,
 
-        @Schema(description = "제출일", example = "2025.03.25", type = "string", pattern = "yyyy.MM.dd")
+        @Schema(description = "마감일", example = "2025.03.25", type = "string", pattern = "yyyy.MM.dd")
         @JsonFormat(pattern = "yyyy.MM.dd")
         @NotNull(message = "마감일은 필수 입력 항목입니다.")
         LocalDate deadline,
@@ -39,9 +42,32 @@ public record ApplicationCreateRequest(
         @JsonFormat(pattern = "yyyy.MM.dd")
         LocalDate submittedAt,
 
-        @Schema(description = "지원 방법", example = "Online Application")
-        @NotBlank(message = "지원 방법은 필수 입력 항목입니다.")
-        String applicationMethod
+        @Schema(description = "지원 방법", example = "HOMEPAGE")
+        @NotNull(message = "지원 방법은 필수 입력 항목입니다.")
+        ApplicationMethod applicationMethod,
+
+        // 기타 전형 시에만 입력할 수 있음
+        @Schema(description = "메모(기타 전형 시 사용됨)", example = "코딩 테스트")
+        String memo
 ) {
+
+    public NewJobPosting toNewJobPosting() {
+        return NewJobPosting.builder()
+                .jobPostingUrl(jobPostingUrl)
+                .company(company)
+                .position(position)
+                .jobLocation(jobLocation)
+                .build();
+    }
+
+    public NewApplicationInfo toNewApplicationInfo() {
+        return NewApplicationInfo.builder()
+                .applicationStatus(applicationStatus)
+                .applicationMethod(applicationMethod)
+                .memo(memo)
+                .deadline(deadline)
+                .submittedAt(submittedAt)
+                .build();
+    }
 
 }

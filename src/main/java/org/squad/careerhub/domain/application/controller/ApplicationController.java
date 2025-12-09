@@ -19,9 +19,9 @@ import org.squad.careerhub.domain.application.controller.dto.ApplicationCreateRe
 import org.squad.careerhub.domain.application.controller.dto.ApplicationUpdateRequest;
 import org.squad.careerhub.domain.application.entity.ApplicationStatus;
 import org.squad.careerhub.domain.application.service.ApplicationService;
-import org.squad.careerhub.domain.application.service.dto.ApplicationDetailResponse;
-import org.squad.careerhub.domain.application.service.dto.ApplicationPageResponse;
-import org.squad.careerhub.domain.application.service.dto.ApplicationStatisticsResponse;
+import org.squad.careerhub.domain.application.service.dto.response.ApplicationDetailResponse;
+import org.squad.careerhub.domain.application.service.dto.response.ApplicationPageResponse;
+import org.squad.careerhub.domain.application.service.dto.response.ApplicationStatisticsResponse;
 import org.squad.careerhub.global.annotation.LoginMember;
 
 @RequiredArgsConstructor
@@ -36,6 +36,12 @@ public class ApplicationController extends ApplicationDocsController {
             @Valid @RequestBody ApplicationCreateRequest request,
             @LoginMember Long memberId
     ) {
+        applicationService.createApplication(
+                request.toNewJobPosting(),
+                request.toNewApplicationInfo(),
+                memberId
+        );
+
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 

@@ -57,7 +57,7 @@
 
 ### 속성
 
-- `authorId` : 작성자 ID
+- `author` : 작성자
 - `jobPostingUrl` : 채용 공고 URL
 - `company`: 회사명
 - `position` :  직무
@@ -71,7 +71,10 @@
 ### 행위
 - `static register()` : 지원서 등록
 - `changeApplicationStatus()` : 지원 상태 변경
-- `updateMemo()` : 메모 변경
+- `updateApplication()` : 지원서 업데이트
 - `isDeadlinePassed()` : 마감일 경과 여부 확인
 
 ### 규칙
+- 채용 공고 URL은 필수 값이 아니다
+
+---

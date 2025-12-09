@@ -19,9 +19,9 @@ import org.springframework.web.multipart.MultipartFile;
 import org.squad.careerhub.domain.application.controller.dto.ApplicationCreateRequest;
 import org.squad.careerhub.domain.application.controller.dto.ApplicationUpdateRequest;
 import org.squad.careerhub.domain.application.entity.ApplicationStatus;
-import org.squad.careerhub.domain.application.service.dto.ApplicationDetailResponse;
-import org.squad.careerhub.domain.application.service.dto.ApplicationPageResponse;
-import org.squad.careerhub.domain.application.service.dto.ApplicationStatisticsResponse;
+import org.squad.careerhub.domain.application.service.dto.response.ApplicationDetailResponse;
+import org.squad.careerhub.domain.application.service.dto.response.ApplicationPageResponse;
+import org.squad.careerhub.domain.application.service.dto.response.ApplicationStatisticsResponse;
 import org.squad.careerhub.global.swagger.ApiExceptions;
 
 @Tag(name = "Application", description = "지원서 관련 API 문서")
