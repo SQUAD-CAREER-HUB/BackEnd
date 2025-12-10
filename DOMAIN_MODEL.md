@@ -77,4 +77,35 @@
 ### 규칙
 - 채용 공고 URL은 필수 값이 아니다
 
+
+## 면접 후기(Interview Review)
+
 ---
+
+### 속성
+- `author`  : 작성자
+- `company` : 회사명
+- `position`: 직무
+- `type`    : 면접 유형
+- `content` : 내용
+
+### 행위
+- `static create()` : 면접 후기 생성
+- `updateReview()` : 면접 후기 변경
+
+### 규칙
+
+
+## 면접 질문(InterviewQuestion)
+
+---
+
+### 속성
+- `interviewReview`: 면접 후기 
+- `question`         : 질문 내용
+
+### 행위
+- `static create()` : 면접 질문 생성
+- `updateQuestion()` : 질문 변경
+
+### 규칙

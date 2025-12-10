@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.squad.careerhub.ControllerTestSupport;
 import org.squad.careerhub.domain.community.interviewreview.controller.dto.ReviewCreateRequest;
+import org.squad.careerhub.domain.community.interviewreview.entity.SortType;
 import org.squad.careerhub.global.annotation.TestMember;
 
 class InterviewReviewControllerTest extends ControllerTestSupport {
@@ -33,6 +34,41 @@ class InterviewReviewControllerTest extends ControllerTestSupport {
                 .content(requestJson))
                 .apply(print())
                 .hasStatus(HttpStatus.CREATED);
+    }
+
+    @TestMember
+    @Test
+    void 면접_후기_목록을_조회한다() {
+        // when & then
+        assertThat(mvcTester.get().uri("/v1/reviews")
+                .param("sort", SortType.NEWEST.name())
+                .param("size", "20"))
+                .apply(print())
+                .hasStatusOk();
+    }
+
+    @TestMember
+    @Test
+    void 검색어로_면접_후기_목록을_조회한다() {
+        // when & then
+        assertThat(mvcTester.get().uri("/v1/reviews")
+                .param("query", "카카오")
+                .param("sort", SortType.NEWEST.name())
+                .param("size", "10"))
+                .apply(print())
+                .hasStatusOk();
+    }
+
+    @TestMember
+    @Test
+    void 커서_기반_페이징으로_다음_페이지를_조회한다() {
+        // when & then
+        assertThat(mvcTester.get().uri("/v1/reviews")
+                .param("sort", SortType.NEWEST.name())
+                .param("lastReviewId", "5")
+                .param("size", "20"))
+                .apply(print())
+                .hasStatusOk();
     }
 
 }
