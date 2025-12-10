@@ -197,7 +197,6 @@ class InterviewReviewReaderIntegrationTest extends IntegrationTestSupport {
         assertThatThrownBy(() -> interviewReviewReader.findReview(invalidReviewId, member.getId()))
                 .isInstanceOf(CareerHubException.class)
                 .hasMessage(ErrorStatus.NOT_FOUND_REVIEW.getMessage());
-
     }
 
 }
