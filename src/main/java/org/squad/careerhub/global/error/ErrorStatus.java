@@ -23,6 +23,7 @@ public enum ErrorStatus {
 
     // REVIEW
     NOT_FOUND_REVIEW (404, "리뷰를 찾을 수 없습니다."),
+    NOT_FOUND_INTERVIEW_QUESTION(404, "면접 질문을 찾을 수 없습니다."),
 
     // OAUTH
     UNSUPPORTED_OAUTH_PROVIDER (400, "지원하지 않는 OAuth 제공자입니다."),
