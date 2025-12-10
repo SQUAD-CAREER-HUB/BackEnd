@@ -47,7 +47,7 @@ class InterviewReviewReaderIntegrationTest extends IntegrationTestSupport {
     }
 
     @Test
-    void 면접후기_목록을_조회한다() {
+    void 면접_후기_목록을_조회한다() {
         // given
         interviewReviewJpaRepository.save(InterviewReview.create(member, "카카오", "백엔드", "온라인", "내용1"));
         interviewReviewJpaRepository.save(InterviewReview.create(member, "네이버", "프론트엔드", "대면", "내용2"));
@@ -63,7 +63,7 @@ class InterviewReviewReaderIntegrationTest extends IntegrationTestSupport {
     }
 
     @Test
-    void 검색어로_면접후기를_조회한다() {
+    void 검색어로_면접_후기를_조회한다() {
         // given
         interviewReviewJpaRepository.save(InterviewReview.create(member, "카카오", "백엔드", "온라인", "내용1"));
         interviewReviewJpaRepository.save(InterviewReview.create(member, "네이버", "프론트엔드", "대면", "내용2"));
@@ -183,7 +183,7 @@ class InterviewReviewReaderIntegrationTest extends IntegrationTestSupport {
     }
 
     @Test
-    void 면접이_존재하지_않을_경우_예외를_반환한다() {
+    void 면접_후기가_존재하지_않을_경우_예외를_반환한다() {
         // when
         long invalidReviewId = -999L;
         assertThatThrownBy(() -> interviewReviewReader.findReview(invalidReviewId, member.getId()))
