@@ -1,6 +1,8 @@
 package org.squad.careerhub.domain.community.interviewquestion.service.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.util.List;
+import org.squad.careerhub.domain.community.interviewquestion.entity.InterviewQuestion;
 
 @Schema(description = "면접 질문 응답 DTO")
 public record InterviewQuestionResponse(
@@ -11,5 +13,11 @@ public record InterviewQuestionResponse(
         String question
 
 ) {
+
+    public static List<InterviewQuestionResponse> from(List<InterviewQuestion> questionsByReview) {
+        return questionsByReview.stream()
+                .map(q -> new InterviewQuestionResponse(q.getId(), q.getQuestion()))
+                .toList();
+    }
 
 }

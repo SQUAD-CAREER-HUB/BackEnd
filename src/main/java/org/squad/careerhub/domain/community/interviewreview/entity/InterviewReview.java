@@ -64,4 +64,8 @@ public class InterviewReview extends BaseEntity {
         this.content = content;
     }
 
+    public boolean isAuthor(Long memberId) {
+        return author.getId().equals(memberId);
+    }
+
 }

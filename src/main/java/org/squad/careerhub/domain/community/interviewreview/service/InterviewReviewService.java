@@ -8,6 +8,7 @@ import org.squad.careerhub.domain.community.interviewquestion.service.InterviewQ
 import org.squad.careerhub.domain.community.interviewreview.entity.InterviewReview;
 import org.squad.careerhub.domain.community.interviewreview.entity.SortType;
 import org.squad.careerhub.domain.community.interviewreview.service.dto.NewInterviewReview;
+import org.squad.careerhub.domain.community.interviewreview.service.dto.response.ReviewDetailResponse;
 import org.squad.careerhub.domain.community.interviewreview.service.dto.response.ReviewSummaryResponse;
 import org.squad.careerhub.global.support.Cursor;
 import org.squad.careerhub.global.support.PageResponse;
@@ -31,6 +32,10 @@ public class InterviewReviewService {
 
     public PageResponse<ReviewSummaryResponse> findReviews(String query, SortType sort, Cursor cursor) {
         return interviewReviewReader.findReviews(query, sort, cursor);
+    }
+
+    public ReviewDetailResponse findReview(Long reviewId, Long memberId) {
+        return interviewReviewReader.findReview(reviewId, memberId);
     }
 
 }

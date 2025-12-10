@@ -88,7 +88,7 @@ public abstract class InterviewReviewDocsController {
                 BAD_REQUEST,
                 INTERNAL_SERVER_ERROR
         })
-        public abstract ResponseEntity<PageResponse<ReviewSummaryResponse>> getReviews(
+        public abstract ResponseEntity<PageResponse<ReviewSummaryResponse>> findReviews(
                 @Parameter(description = "검색어 (회사명 검색)", example = "네이버")
                 String query,
 
@@ -127,7 +127,7 @@ public abstract class InterviewReviewDocsController {
                 NOT_FOUND,
                 INTERNAL_SERVER_ERROR
         })
-        public abstract ResponseEntity<ReviewDetailResponse> getReview(
+        public abstract ResponseEntity<ReviewDetailResponse> findReview(
                 @Parameter(
                         description = "면접 후기 ID",
                         example = "1",
