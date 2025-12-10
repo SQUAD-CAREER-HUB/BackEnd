@@ -14,9 +14,10 @@ class MemberTest {
         var provider = SocialProvider.GOOGLE;
         var socialId = "social123";
         var nickname = "testUser";
+        var profileImageUrl = "http://example.com/profile.jpg";
 
         // when
-        var member = Member.create(email, provider, socialId, nickname);
+        var member = Member.create(email, provider, socialId, nickname, profileImageUrl);
 
         // then
         assertThat(member).isNotNull()
@@ -49,14 +50,14 @@ class MemberTest {
         var socialId = "social123";
 
         // when & then
-        assertThatThrownBy(() -> Member.create(email, provider, socialId, null /* nickname */))
+        assertThatThrownBy(() -> Member.create(email, provider, socialId, null /* nickname */, "http://example.com/profile.jpg"))
                 .isInstanceOf(NullPointerException.class);
     }
 
     @Test
     void refreshToken을_업데이트_한다() {
         // given
-        var member = Member.create("test@example.com", SocialProvider.GOOGLE, "social123", "testUser");
+        var member = Member.create("test@example.com", SocialProvider.GOOGLE, "social123", "testUser", "http://example.com/profile.jpg");
         var newToken = "newRefreshToken";
 
         // when
@@ -69,7 +70,7 @@ class MemberTest {
     @Test
     void RefreshToken_업데이트시_NULL_값이_들어가면_NullPointerException을_던진다() {
         // given
-        var member = Member.create("test@example.com", SocialProvider.GOOGLE, "social123", "testUser");
+        var member = Member.create("test@example.com", SocialProvider.GOOGLE, "social123", "testUser", "http://example.com/profile.jpg");
 
         // when & then
         assertThatThrownBy(() -> member.updateRefreshToken(null))
@@ -79,7 +80,7 @@ class MemberTest {
     @Test
     void refreshToken을_null로_초기화_한다() {
         // given
-        var member = Member.create("test@example.com", SocialProvider.GOOGLE, "social123", "testUser");
+        var member = Member.create("test@example.com", SocialProvider.GOOGLE, "social123", "testUser", "http://example.com/profile.jpg");
         member.updateRefreshToken("someToken");
 
         // when

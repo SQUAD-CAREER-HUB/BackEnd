@@ -17,9 +17,11 @@ import org.squad.careerhub.domain.community.interviewreview.controller.dto.Revie
 import org.squad.careerhub.domain.community.interviewreview.controller.dto.ReviewUpdateRequest;
 import org.squad.careerhub.domain.community.interviewreview.entity.SortType;
 import org.squad.careerhub.domain.community.interviewreview.service.InterviewReviewService;
-import org.squad.careerhub.domain.community.interviewreview.service.dto.ReviewDetailResponse;
-import org.squad.careerhub.domain.community.interviewreview.service.dto.ReviewPageResponse;
+import org.squad.careerhub.domain.community.interviewreview.service.dto.response.ReviewDetailResponse;
+import org.squad.careerhub.domain.community.interviewreview.service.dto.response.ReviewSummaryResponse;
 import org.squad.careerhub.global.annotation.LoginMember;
+import org.squad.careerhub.global.support.Cursor;
+import org.squad.careerhub.global.support.PageResponse;
 
 @RequiredArgsConstructor
 @RestController
@@ -33,28 +35,37 @@ public class InterviewReviewController extends InterviewReviewDocsController {
             @Valid @RequestBody ReviewCreateRequest request,
             @LoginMember Long memberId
     ) {
+        interviewReviewService.createReview(request.toNewInterviewReview(), request.interviewQuestions(), memberId);
+
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     @Override
     @GetMapping("/v1/reviews")
-    public ResponseEntity<ReviewPageResponse> getReviews(
+    public ResponseEntity<PageResponse<ReviewSummaryResponse>> findReviews(
             @RequestParam(required = false) String query,
-            @RequestParam SortType sort,
+            @RequestParam(defaultValue = "NEWEST") SortType sort,
             @RequestParam(required = false) Long lastReviewId,
-            @RequestParam(required = false) Long lastLikeCount,
-            @LoginMember Long memberId
+            @RequestParam(required = false, defaultValue = "20") int size
     ) {
-        return ResponseEntity.ok(ReviewPageResponse.mock());
+        PageResponse<ReviewSummaryResponse> response = interviewReviewService.findReviews(
+                query,
+                sort,
+                Cursor.of(lastReviewId, size)
+        );
+
+        return ResponseEntity.ok(response);
     }
 
     @Override
     @GetMapping("/v1/reviews/{reviewId}")
-    public ResponseEntity<ReviewDetailResponse> getReview(
+    public ResponseEntity<ReviewDetailResponse> findReview(
             @PathVariable Long reviewId,
             @LoginMember Long memberId
     ) {
-        return ResponseEntity.ok(ReviewDetailResponse.mock());
+        ReviewDetailResponse response = interviewReviewService.findReview(reviewId, memberId);
+
+        return ResponseEntity.ok(response);
     }
 
     @Override

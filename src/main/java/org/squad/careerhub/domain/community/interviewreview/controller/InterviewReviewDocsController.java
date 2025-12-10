@@ -19,8 +19,9 @@ import org.squad.careerhub.domain.community.interviewreview.controller.dto.Revie
 import org.squad.careerhub.domain.community.interviewreview.controller.dto.ReviewReportRequest;
 import org.squad.careerhub.domain.community.interviewreview.controller.dto.ReviewUpdateRequest;
 import org.squad.careerhub.domain.community.interviewreview.entity.SortType;
-import org.squad.careerhub.domain.community.interviewreview.service.dto.ReviewDetailResponse;
-import org.squad.careerhub.domain.community.interviewreview.service.dto.ReviewPageResponse;
+import org.squad.careerhub.domain.community.interviewreview.service.dto.response.ReviewDetailResponse;
+import org.squad.careerhub.domain.community.interviewreview.service.dto.response.ReviewSummaryResponse;
+import org.squad.careerhub.global.support.PageResponse;
 import org.squad.careerhub.global.swagger.ApiExceptions;
 
 @Tag(name = "Review", description = "면접 후기 관련 API 문서")
@@ -61,43 +62,39 @@ public abstract class InterviewReviewDocsController {
                   - 한 페이지당 기본 20개의 면접 후기 조회<br><br>
                 
                 - **[요청 파라미터]**<br>
-                  - **query**: 검색어 (선택 사항, 회사명 검색)<br>
-                  - **sort**: 정렬 기준 (RECENT: 최신순, LIKE_DESC: 추천순)<br>
+                  - **query**: 검색어 (선택 사항, 회사명, 포지션, 면접 유형 검색)<br>
+                  - **sort**: 정렬 기준 (NEWEST: 최신순, OLDEST: 오래된순)<br>
                   - **lastReviewId**: 마지막으로 조회한 면접 후기 ID (첫 페이지는 null)<br>
-                  - **lastLikeCount**: 마지막 좋아요 수 (추천순 정렬 시 필요)<br><br>
+                  - **size**: 한 페이지당 조회할 면접 후기 개수 (기본값 20)<br><br>
                 
                 - **[정렬 방식]**<br>
-                  - **RECENT**: 최신순 (작성일 기준)<br>
-                  - **LIKE_DESC**: 추천순 (좋아요 수 기준)<br><br>
+                  - **NEWEST**: 최신순 (작성일 기준)<br>
+                  - **OLDEST**: 오래된순 (작성일 기준)<br>
                 
                 - **[사용 예시]**<br>
-                  1. 첫 페이지 조회 (최신순): /v1/reviews?sort=RECENT<br>
-                  2. 다음 페이지 조회 (최신순): /v1/reviews?sort=RECENT&lastReviewId=20<br>
-                  3. 첫 페이지 조회 (추천순): /v1/reviews?sort=LIKE_DESC<br>
-                  4. 다음 페이지 조회 (추천순): /v1/reviews?sort=LIKE_DESC&lastReviewId=20&lastLikeCount=45<br>
-                  5. 검색어 포함: /v1/reviews?query=네이버&sort=RECENT
+                  1. 첫 페이지 조회 (최신순): /v1/reviews?sort=NEWEST&size=20<br>
+                  2. 다음 페이지 조회 (최신순): /v1/reviews?sort=NEWEST&lastReviewId=20&size=20<br>
+                  3. 첫 페이지 조회 (오래된순): /v1/reviews?sort=OLDEST&size=20<br>
+                  4. 다음 페이지 조회 (오래된순): /v1/reviews?sort=OLDEST&lastReviewId=20&size=20<br>
+                  5. 검색어 포함: /v1/reviews?query=네이버&sort=NEWEST&size=20
                 """
         )
         @ApiResponse(
                 responseCode = "200",
-                description = "면접 후기 목록 조회 성공",
-                content = @Content(
-                        mediaType = MediaType.APPLICATION_JSON_VALUE,
-                        schema = @Schema(implementation = ReviewPageResponse.class)
-                )
+                description = "면접 후기 목록 조회 성공"
         )
         @ApiExceptions(values = {
                 UNAUTHORIZED_ERROR,
                 BAD_REQUEST,
                 INTERNAL_SERVER_ERROR
         })
-        public abstract ResponseEntity<ReviewPageResponse> getReviews(
+        public abstract ResponseEntity<PageResponse<ReviewSummaryResponse>> findReviews(
                 @Parameter(description = "검색어 (회사명 검색)", example = "네이버")
                 String query,
 
                 @Parameter(
-                        description = "정렬 기준 (RECENT: 최신순, LIKE_DESC: 추천순)",
-                        example = "RECENT",
+                        description = "정렬 기준 (NEWEST: 최신순, OLDEST: 오래된순)",
+                        example = "NEWEST",
                         required = true
                 )
                 SortType sort,
@@ -105,10 +102,11 @@ public abstract class InterviewReviewDocsController {
                 @Parameter(description = "마지막으로 조회한 면접 후기 ID (다음 페이지 커서)", example = "20")
                 Long lastReviewId,
 
-                @Parameter(description = "마지막 좋아요 수 (추천순 정렬 시 필요)", example = "45")
-                Long lastLikeCount,
-
-                Long memberId
+                @Parameter(
+                        description = "한 페이지당 조회할 면접 후기 개수",
+                        example = "20"
+                )
+                int size
         );
 
 
@@ -129,7 +127,7 @@ public abstract class InterviewReviewDocsController {
                 NOT_FOUND,
                 INTERNAL_SERVER_ERROR
         })
-        public abstract ResponseEntity<ReviewDetailResponse> getReview(
+        public abstract ResponseEntity<ReviewDetailResponse> findReview(
                 @Parameter(
                         description = "면접 후기 ID",
                         example = "1",

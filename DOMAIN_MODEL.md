@@ -57,7 +57,7 @@
 
 ### 속성
 
-- `authorId` : 작성자 ID
+- `author` : 작성자
 - `jobPostingUrl` : 채용 공고 URL
 - `company`: 회사명
 - `position` :  직무
@@ -71,154 +71,41 @@
 ### 행위
 - `static register()` : 지원서 등록
 - `changeApplicationStatus()` : 지원 상태 변경
-- `updateMemo()` : 메모 변경
+- `updateApplication()` : 지원서 업데이트
 - `isDeadlinePassed()` : 마감일 경과 여부 확인
 
 ### 규칙
-- 채용 공고 URL은 필수 값이 아니
-## 학습 참여자(Learning_participant)
+- 채용 공고 URL은 필수 값이 아니다
+
+
+## 면접 후기(Interview Review)
 
 ---
 
 ### 속성
-
-- `learning_id` :  학습 id
-- `member_id`  : 회원 id
-- `role` : 학습 역할(**Learner**, **Leader**)
-- `joined_at` : 참여 시점
-- `left_at` : 탈퇴 시점
-
-### 행위
-
-- `create()` : 참여자 생성
-- `left()` : 탈퇴하다
-- `isLeader()` : 방장 확인 여부
-- `isLeft()` : 탈퇴 여부
-
-### 규칙
-
-- 학습에 참여한 시점부터 문제 조회, 풀이가 가능하다.
-- 참여 시점 전 문제는 볼 수 없다.
-
-## 문제(Problem)
-
----
-
-### 속성
-- `learning_id` : 학습 id
+- `author`  : 작성자
+- `company` : 회사명
+- `position`: 직무
+- `type`    : 면접 유형
 - `content` : 내용
-- `explanation` : 해설
-- `category` : 카테고리(ENUM)
-- `difficulty` : 난이도
-- `prompt_version` : 프롬프트 버전
 
 ### 행위
+- `static create()` : 면접 후기 생성
+- `updateReview()` : 면접 후기 변경
 
 ### 규칙
 
----
 
-## 일일 학습 과제(DailyAssignment)
+## 면접 질문(InterviewQuestion)
 
 ---
 
 ### 속성
-
-- `learning_id`: 학습 id
-- `problem_id`: 문제 id
-- `member_id` : 할당된 멤버 id
-- `scheduled_at` : 발송 예정 시각
-- `sentStatus` :발송 상태
-- `sent_at` : 실제 발송 시각
+- `interviewReview`: 면접 후기 
+- `question`         : 질문 내용
 
 ### 행위
-
-- `isSent()` : 발송 여부 조회
-- `sent()` : 발송
-
-### 규칙
-
-## 답변(Answer)
-
----
-
-### 속성
-
-- `daily_assignment_id` : 일일 학습 과제 Id
-- `content` : 내용
-- `submitted_at` : 답변 시각
-- `answerStatus` : 답변 상태(SUBMITTED / LATE / NOT_SUBMITTED)
-
-### 행위
-
-- `submit()` : 답변
-
-### 규칙
-
-## 초대 링크(InviteLink)
-
----
-
-### 속성
-
-- `learningId` : 학습 id
-- `member_id` : 발급자 id
-- `link` : 링크
-- `expires_at` :만료기간
-
-### 행위
-
-### 규칙
-
-## 즐겨찾기(favorite)
-
----
-
-### 속성
-
-- `memberId` : 회원 id
-- `problemId`: 문제 id
-
-### 행위
-
-### 규칙
-
-## 알림(Notification)
-
----
-
-### 속성
-
-### 행위
-
-### 규칙
-
----
-
-## QnA
-
----
-
-### 속성
-
-- 작성자 id
--
-- 내용
-- 답변
-- 프
-
-### 행위
-
-### 규칙
-
----
-
-## 좋아요
-
----
-
-### 속성
-
-### 행위
+- `static create()` : 면접 질문 생성
+- `updateQuestion()` : 질문 변경
 
 ### 규칙
