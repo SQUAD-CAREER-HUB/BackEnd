@@ -32,7 +32,6 @@ public class InterviewReviewManager {
         ));
     }
 
-    @Transactional
     public InterviewReview updateReview(UpdateInterviewReview updateReview, Long reviewId, Long memberId) {
         InterviewReview interviewReview = interviewReviewJpaRepository.findByIdAndStatus(reviewId, EntityStatus.ACTIVE)
                 .orElseThrow(() -> new CareerHubException(ErrorStatus.NOT_FOUND_REVIEW));

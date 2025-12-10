@@ -47,7 +47,6 @@ public class InterviewQuestionManager {
      * @param reviewId 면접 후기 ID
      * @param review 면접 후기 엔티티
      */
-    @Transactional
     public void updateQuestions(List<UpdateReviewQuestion> requests, Long reviewId, InterviewReview review) {
         List<InterviewQuestion> existingQuestions = interviewQuestionJpaRepository.findByInterviewReviewIdAndStatus(reviewId, EntityStatus.ACTIVE);
 
