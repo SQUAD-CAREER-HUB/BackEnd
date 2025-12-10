@@ -62,7 +62,7 @@ public abstract class InterviewReviewDocsController {
                   - 한 페이지당 기본 20개의 면접 후기 조회<br><br>
                 
                 - **[요청 파라미터]**<br>
-                  - **query**: 검색어 (선택 사항, 회사명 검색)<br>
+                  - **query**: 검색어 (선택 사항, 회사명, 포지션, 면접 유형 검색)<br>
                   - **sort**: 정렬 기준 (NEWEST: 최신순, OLDEST: 오래된순)<br>
                   - **lastReviewId**: 마지막으로 조회한 면접 후기 ID (첫 페이지는 null)<br>
                   - **size**: 한 페이지당 조회할 면접 후기 개수 (기본값 20)<br><br>
