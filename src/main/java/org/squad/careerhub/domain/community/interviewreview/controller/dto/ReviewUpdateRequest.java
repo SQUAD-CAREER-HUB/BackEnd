@@ -49,6 +49,10 @@ public record ReviewUpdateRequest(
     }
 
     public List<UpdateReviewQuestion> toUpdateInterviewQuestions() {
+        if (interviewQuestions == null) {
+            return List.of();
+        }
+
         return interviewQuestions.stream()
                 .map(InterviewQuestionUpdateRequest::toUpdateInterviewQuestion)
                 .toList();
