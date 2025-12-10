@@ -85,6 +85,8 @@ class InterviewReviewReaderIntegrationTest extends IntegrationTestSupport {
         assertThat(result3.contents().getFirst().company()).isEqualTo("네이버");
     }
 
+
+
     @Test
     void 커서_기반_페이징이_동작한다() {
         // given
@@ -195,6 +197,7 @@ class InterviewReviewReaderIntegrationTest extends IntegrationTestSupport {
         assertThatThrownBy(() -> interviewReviewReader.findReview(invalidReviewId, member.getId()))
                 .isInstanceOf(CareerHubException.class)
                 .hasMessage(ErrorStatus.NOT_FOUND_REVIEW.getMessage());
+
     }
 
 }
