@@ -142,14 +142,14 @@ class InterviewReviewReaderIntegrationTest extends IntegrationTestSupport {
     @Test
     void 면접_후기를_상세조회_한다() {
         // given
-        var savedReview = interviewReviewJpaRepository.save(InterviewReview.create(
-                        member,
-                        "카카오",
-                        "백엔드",
-                        "온라인",
-                        "내용1"
-                )
+        InterviewReview review = InterviewReview.create(
+                member,
+                "카카오",
+                "백엔드",
+                "온라인",
+                "내용1"
         );
+        var savedReview = interviewReviewJpaRepository.save(review);
         var savedQuestion = interviewQuestionJpaRepository.save(InterviewQuestion.create(savedReview, "질문1"));
 
         // when
@@ -162,13 +162,19 @@ class InterviewReviewReaderIntegrationTest extends IntegrationTestSupport {
                         ReviewDetailResponse::company,
                         ReviewDetailResponse::position,
                         ReviewDetailResponse::interviewType,
-                        ReviewDetailResponse::content
+                        ReviewDetailResponse::content,
+                        ReviewDetailResponse::author,
+                        ReviewDetailResponse::isAuthor,
+                        ReviewDetailResponse::createdAt
                 ).containsExactly(
                         savedReview.getId(),
-                        "카카오",
-                        "백엔드",
-                        "온라인",
-                        "내용1"
+                        review.getCompany(),
+                        review.getPosition(),
+                        review.getInterviewType(),
+                        review.getContent(),
+                        member.getNickname(),
+                        true,
+                        savedReview.getCreatedAt()
                 );
 
         assertThat(response.interviewQuestions()).hasSize(1);
@@ -184,12 +190,13 @@ class InterviewReviewReaderIntegrationTest extends IntegrationTestSupport {
 
     @Test
     void 면접_후기가_존재하지_않을_경우_예외를_반환한다() {
-        // when
+        // given
         long invalidReviewId = -999L;
+
+        // when & then
         assertThatThrownBy(() -> interviewReviewReader.findReview(invalidReviewId, member.getId()))
                 .isInstanceOf(CareerHubException.class)
                 .hasMessage(ErrorStatus.NOT_FOUND_REVIEW.getMessage());
-
     }
 
 }
