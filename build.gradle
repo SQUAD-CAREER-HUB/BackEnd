@@ -72,6 +72,9 @@ dependencies {
 
 	// Firebase
 	implementation 'com.google.firebase:firebase-admin:9.5.0'
+
+	// Spring AI
+	implementation "org.springframework.ai:spring-ai-starter-model-google-genai:1.1.1"
 }
 
 tasks.named('test') {
