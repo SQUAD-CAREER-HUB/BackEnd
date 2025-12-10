@@ -64,11 +64,20 @@ class InterviewReviewReaderIntegrationTest extends IntegrationTestSupport {
 
         // when
         PageResponse<ReviewSummaryResponse> result = interviewReviewReader.findReviews("카카오", SortType.NEWEST, cursor);
+        PageResponse<ReviewSummaryResponse> result2 = interviewReviewReader.findReviews("   ", SortType.NEWEST, cursor);
+        PageResponse<ReviewSummaryResponse> result3 = interviewReviewReader.findReviews(" 네이버   ", SortType.NEWEST, cursor);
 
         // then
         assertThat(result.contents()).hasSize(1);
         assertThat(result.contents().getFirst().company()).isEqualTo("카카오");
+
+        assertThat(result2.contents()).hasSize(2);
+
+        assertThat(result3.contents()).hasSize(1);
+        assertThat(result3.contents().getFirst().company()).isEqualTo("네이버");
     }
+
+
 
     @Test
     void 커서_기반_페이징이_동작한다() {

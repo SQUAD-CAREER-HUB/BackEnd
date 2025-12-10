@@ -9,6 +9,7 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
+import org.springframework.util.StringUtils;
 import org.squad.careerhub.domain.community.interviewreview.entity.InterviewReview;
 import org.squad.careerhub.domain.community.interviewreview.entity.SortType;
 import org.squad.careerhub.global.entity.EntityStatus;
@@ -23,7 +24,7 @@ public class InterviewReviewQueryDslRepository {
         return jpaQueryFactory.selectFrom(interviewReview)
                 .join(interviewReview.author, member).fetchJoin()
                 .where(
-                        containsQuery(query),
+                        searchByKeyword(query),
                         getPaginationCondition(sort, lastReviewId),
                         isActive()
                 )
@@ -32,14 +33,16 @@ public class InterviewReviewQueryDslRepository {
                 .fetch();
     }
 
-    private BooleanExpression containsQuery(String query) {
-        if (query == null) {
+    private BooleanExpression searchByKeyword(String query) {
+        if (!StringUtils.hasText(query)) {
             return null;
         }
 
-        return interviewReview.company.containsIgnoreCase(query)
-                .or(interviewReview.position.containsIgnoreCase(query))
-                .or(interviewReview.interviewType.containsIgnoreCase(query));
+        String trimmedQuery = query.trim();
+
+        return interviewReview.company.containsIgnoreCase(trimmedQuery)
+                .or(interviewReview.position.containsIgnoreCase(trimmedQuery))
+                .or(interviewReview.interviewType.containsIgnoreCase(trimmedQuery));
     }
 
     private BooleanExpression isActive() {
