@@ -44,7 +44,7 @@ class InterviewReviewReaderIntegrationTest extends IntegrationTestSupport {
         interviewReviewJpaRepository.save(InterviewReview.create(member, "카카오", "백엔드", "온라인", "내용1"));
         interviewReviewJpaRepository.save(InterviewReview.create(member, "네이버", "프론트엔드", "대면", "내용2"));
 
-        var cursor = new Cursor(null, 10);
+        var cursor = Cursor.of(null, 10);
 
         // when
         PageResponse<ReviewSummaryResponse> result = interviewReviewReader.findReviews(null, SortType.NEWEST, cursor);
@@ -60,7 +60,7 @@ class InterviewReviewReaderIntegrationTest extends IntegrationTestSupport {
         interviewReviewJpaRepository.save(InterviewReview.create(member, "카카오", "백엔드", "온라인", "내용1"));
         interviewReviewJpaRepository.save(InterviewReview.create(member, "네이버", "프론트엔드", "대면", "내용2"));
 
-        var cursor = new Cursor(null, 10);
+        var cursor = Cursor.of(null, 10);
 
         // when
         PageResponse<ReviewSummaryResponse> result = interviewReviewReader.findReviews("카카오", SortType.NEWEST, cursor);
@@ -77,7 +77,7 @@ class InterviewReviewReaderIntegrationTest extends IntegrationTestSupport {
             interviewReviewJpaRepository.save(InterviewReview.create(member, "회사" + i, "포지션", "타입", "내용"));
         }
 
-        var cursor = new Cursor(null, 10);
+        var cursor = Cursor.of(null, 10);
 
         // when
         PageResponse<ReviewSummaryResponse> result = interviewReviewReader.findReviews(null, SortType.NEWEST, cursor);
@@ -95,10 +95,10 @@ class InterviewReviewReaderIntegrationTest extends IntegrationTestSupport {
             interviewReviewJpaRepository.save(InterviewReview.create(member, "회사" + i, "포지션", "타입", "내용"));
         }
 
-        var firstCursor = new Cursor(null, 10);
+        var firstCursor = Cursor.of(null, 10);
         PageResponse<ReviewSummaryResponse> firstPage = interviewReviewReader.findReviews(null, SortType.NEWEST, firstCursor);
 
-        var secondCursor = new Cursor(firstPage.nextCursorId(), 10);
+        var secondCursor = Cursor.of(firstPage.nextCursorId(), 10);
 
         // when
         PageResponse<ReviewSummaryResponse> secondPage = interviewReviewReader.findReviews(null, SortType.NEWEST, secondCursor);
@@ -111,7 +111,7 @@ class InterviewReviewReaderIntegrationTest extends IntegrationTestSupport {
     @Test
     void 조회_결과가_없으면_빈_리스트를_반환한다() {
         // given
-        var cursor = new Cursor(null, 10);
+        var cursor = Cursor.of(null, 10);
 
         // when
         PageResponse<ReviewSummaryResponse> response = interviewReviewReader.findReviews(null, SortType.NEWEST, cursor);
