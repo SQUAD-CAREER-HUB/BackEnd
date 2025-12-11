@@ -178,6 +178,35 @@ class InterviewReviewControllerTest extends ControllerTestSupport {
                 .hasStatus(HttpStatus.FORBIDDEN);
     }
 
+    @TestMember
+    @Test
+    void 면접_후기를_삭제한다() {
+        // given
+        Long reviewId = 1L;
+
+        willDoNothing().given(interviewReviewService).deleteReview(any(), any());
+
+        // when & then
+        assertThat(mvcTester.delete().uri("/v1/reviews/{reviewId}", reviewId))
+                .apply(print())
+                .hasStatus(HttpStatus.NO_CONTENT);
+    }
+
+    @TestMember
+    @Test
+    void 작성자가_아닌_사용자가_삭제시_403을_반환한다() {
+        // given
+        Long reviewId = 1L;
+
+        willThrow(new CareerHubException(ErrorStatus.FORBIDDEN_DELETE))
+                .given(interviewReviewService).deleteReview(any(), any());
+
+        // when & then
+        assertThat(mvcTester.delete().uri("/v1/reviews/{reviewId}", reviewId))
+                .apply(print())
+                .hasStatus(HttpStatus.FORBIDDEN);
+    }
+
     public ReviewDetailResponse createReviewDetailResponse(Long reviewId) {
         return ReviewDetailResponse.builder()
                 .reviewId(reviewId)

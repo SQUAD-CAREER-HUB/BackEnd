@@ -32,14 +32,6 @@ public class InterviewReviewService {
         return review.getId();
     }
 
-    public PageResponse<ReviewSummaryResponse> findReviews(String query, SortType sort, Cursor cursor) {
-        return interviewReviewReader.findReviews(query, sort, cursor);
-    }
-
-    public ReviewDetailResponse findReview(Long reviewId, Long memberId) {
-        return interviewReviewReader.findReview(reviewId, memberId);
-    }
-
     @Transactional
     public void update(
             UpdateInterviewReview updateInterviewReview,
@@ -50,6 +42,19 @@ public class InterviewReviewService {
         InterviewReview review = interviewReviewManager.updateReview(updateInterviewReview, reviewId, memberId);
 
         interviewQuestionManager.updateQuestions(updateReviewQuestions, reviewId, review);
+    }
+
+    public void deleteReview(Long reviewId, Long memberId) {
+        interviewReviewManager.deleteReview(reviewId, memberId);
+    }
+
+
+    public PageResponse<ReviewSummaryResponse> findReviews(String query, SortType sort, Cursor cursor) {
+        return interviewReviewReader.findReviews(query, sort, cursor);
+    }
+
+    public ReviewDetailResponse findReview(Long reviewId, Long memberId) {
+        return interviewReviewReader.findReview(reviewId, memberId);
     }
 
 }

@@ -91,6 +91,8 @@ public class InterviewReviewController extends InterviewReviewDocsController {
             @PathVariable Long reviewId,
             @LoginMember Long memberId
     ) {
+        interviewReviewService.deleteReview(reviewId, memberId);
+
         return ResponseEntity.noContent().build();
     }
 
