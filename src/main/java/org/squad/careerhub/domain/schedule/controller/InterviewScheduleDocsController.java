@@ -12,11 +12,10 @@ import java.time.LocalDate;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.squad.careerhub.domain.schedule.controller.dto.InterviewScheduleCreateRequest;
+import org.squad.careerhub.domain.schedule.controller.dto.InterviewScheduleUpdateRequest;
 import org.squad.careerhub.domain.schedule.service.dto.InterviewSchedulePageResponse;
 import org.squad.careerhub.domain.schedule.service.dto.InterviewScheduleResponse;
-import org.squad.careerhub.domain.schedule.controller.dto.InterviewScheduleUpdateRequest;
 import org.squad.careerhub.global.error.ErrorStatus;
 import org.squad.careerhub.global.swagger.ApiExceptions;
 
