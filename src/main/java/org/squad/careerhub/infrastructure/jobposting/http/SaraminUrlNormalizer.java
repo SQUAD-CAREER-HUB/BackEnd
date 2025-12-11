@@ -10,7 +10,6 @@ public class SaraminUrlNormalizer {
     public String normalize(String url) {
         URI uri = URI.create(url);
 
-        // 사라민이 아니면 건드리지 않음
         String host = uri.getHost();
         if (host == null || !host.contains("saramin.co.kr")) {
             return url;
@@ -18,7 +17,6 @@ public class SaraminUrlNormalizer {
 
         String path = uri.getPath();
 
-        // 이미 view-detail이면 그대로 사용
         if (path.startsWith("/zf_user/jobs/relay/view-detail")) {
             return url;
         }
