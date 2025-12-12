@@ -13,9 +13,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.squad.careerhub.domain.notification.service.dto.NotificationPageResponse;
 import org.squad.careerhub.domain.notification.controller.dto.NotificationTokenRequest;
 import org.squad.careerhub.domain.notification.service.NotificationService;
+import org.squad.careerhub.domain.notification.service.dto.NotificationPageResponse;
 import org.squad.careerhub.global.annotation.LoginMember;
 
 @RequiredArgsConstructor

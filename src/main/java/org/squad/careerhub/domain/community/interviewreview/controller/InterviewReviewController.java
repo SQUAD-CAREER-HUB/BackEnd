@@ -75,6 +75,13 @@ public class InterviewReviewController extends InterviewReviewDocsController {
             @PathVariable Long reviewId,
             @LoginMember Long memberId
     ) {
+        interviewReviewService.update(
+                request.toUpdateInterviewReview(),
+                request.toUpdateInterviewQuestions(),
+                reviewId,
+                memberId
+        );
+
         return ResponseEntity.noContent().build();
     }
 
@@ -84,6 +91,8 @@ public class InterviewReviewController extends InterviewReviewDocsController {
             @PathVariable Long reviewId,
             @LoginMember Long memberId
     ) {
+        interviewReviewService.deleteReview(reviewId, memberId);
+
         return ResponseEntity.noContent().build();
     }
 

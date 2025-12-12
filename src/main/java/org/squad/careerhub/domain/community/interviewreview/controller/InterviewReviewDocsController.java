@@ -178,6 +178,7 @@ public abstract class InterviewReviewDocsController {
                 description = """
                         ### 등록된 면접 후기를 삭제합니다.<br>
                         - 본인이 작성한 후기만 삭제할 수 있습니다.
+                        - 면접 후기 삭제 시 해당 후기와 연관된 면접 질문들도 함께 삭제됩니다.
                         """
         )
         @ApiResponse(

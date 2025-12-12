@@ -10,9 +10,9 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.squad.careerhub.domain.member.controller.dto.MemberProfileUpdateRequest;
 import org.squad.careerhub.domain.member.service.dto.MemberActivityPageResponse;
 import org.squad.careerhub.domain.member.service.dto.MemberProfileResponse;
-import org.squad.careerhub.domain.member.controller.dto.MemberProfileUpdateRequest;
 import org.squad.careerhub.global.error.ErrorStatus;
 import org.squad.careerhub.global.swagger.ApiExceptions;
 

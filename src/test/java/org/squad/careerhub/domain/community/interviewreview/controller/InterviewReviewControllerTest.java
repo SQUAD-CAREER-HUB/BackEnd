@@ -3,6 +3,8 @@ package org.squad.careerhub.domain.community.interviewreview.controller;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.willDoNothing;
+import static org.mockito.BDDMockito.willThrow;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -14,6 +16,8 @@ import org.springframework.http.MediaType;
 import org.squad.careerhub.ControllerTestSupport;
 import org.squad.careerhub.domain.community.interviewquestion.service.dto.InterviewQuestionResponse;
 import org.squad.careerhub.domain.community.interviewreview.controller.dto.ReviewCreateRequest;
+import org.squad.careerhub.domain.community.interviewreview.controller.dto.ReviewUpdateRequest;
+import org.squad.careerhub.domain.community.interviewreview.controller.dto.ReviewUpdateRequest.InterviewQuestionUpdateRequest;
 import org.squad.careerhub.domain.community.interviewreview.entity.SortType;
 import org.squad.careerhub.domain.community.interviewreview.service.dto.response.ReviewDetailResponse;
 import org.squad.careerhub.global.annotation.TestMember;
@@ -116,6 +120,91 @@ class InterviewReviewControllerTest extends ControllerTestSupport {
         assertThat(mvcTester.get().uri("/v1/reviews/{reviewId}", nonExistentReviewId))
                 .apply(print())
                 .hasStatus(HttpStatus.NOT_FOUND);
+    }
+
+    @TestMember
+    @Test
+    void 면접_후기를_수정한다() throws JsonProcessingException {
+        // given
+        Long reviewId = 1L;
+
+        var request = ReviewUpdateRequest.builder()
+                .company("수정된 회사")
+                .position("수정된 포지션")
+                .interviewType("수정된 면접 유형")
+                .content("수정된 내용입니다.")
+                .interviewQuestions(List.of(
+                        new InterviewQuestionUpdateRequest(1L, "수정된 질문1"),
+                        new InterviewQuestionUpdateRequest(null, "새로운 질문")
+                ))
+                .build();
+
+        String requestJson = objectMapper.writeValueAsString(request);
+
+        willDoNothing().given(interviewReviewService).update(any(), any(), any(), any());
+
+        // when & then
+        assertThat(mvcTester.patch().uri("/v1/reviews/{reviewId}", reviewId)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(requestJson))
+                .apply(print())
+                .hasStatus(HttpStatus.NO_CONTENT);
+    }
+
+    @TestMember
+    @Test
+    void 작성자가_아닌_사용자가_수정시_403을_반환한다() throws JsonProcessingException {
+        // given
+        Long reviewId = 1L;
+
+        var request = ReviewUpdateRequest.builder()
+                .company("회사")
+                .position("포지션")
+                .interviewType("면접 유형")
+                .content("내용입니다.")
+                .interviewQuestions(List.of())
+                .build();
+
+        String requestJson = objectMapper.writeValueAsString(request);
+
+        willThrow(new CareerHubException(ErrorStatus.FORBIDDEN_MODIFY))
+                .given(interviewReviewService).update(any(), any(), any(), any());
+
+        // when & then
+        assertThat(mvcTester.patch().uri("/v1/reviews/{reviewId}", reviewId)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(requestJson))
+                .apply(print())
+                .hasStatus(HttpStatus.FORBIDDEN);
+    }
+
+    @TestMember
+    @Test
+    void 면접_후기를_삭제한다() {
+        // given
+        Long reviewId = 1L;
+
+        willDoNothing().given(interviewReviewService).deleteReview(any(), any());
+
+        // when & then
+        assertThat(mvcTester.delete().uri("/v1/reviews/{reviewId}", reviewId))
+                .apply(print())
+                .hasStatus(HttpStatus.NO_CONTENT);
+    }
+
+    @TestMember
+    @Test
+    void 작성자가_아닌_사용자가_삭제시_403을_반환한다() {
+        // given
+        Long reviewId = 1L;
+
+        willThrow(new CareerHubException(ErrorStatus.FORBIDDEN_DELETE))
+                .given(interviewReviewService).deleteReview(any(), any());
+
+        // when & then
+        assertThat(mvcTester.delete().uri("/v1/reviews/{reviewId}", reviewId))
+                .apply(print())
+                .hasStatus(HttpStatus.FORBIDDEN);
     }
 
     public ReviewDetailResponse createReviewDetailResponse(Long reviewId) {

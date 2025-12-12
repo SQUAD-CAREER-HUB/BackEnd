@@ -2,7 +2,6 @@ package org.squad.careerhub.domain.member.service.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
-import java.util.stream.Collectors;
 import lombok.Builder;
 
 @Schema(description = "회원 최근 활동 페이지 응답 DTO (커서 기반 페이지네이션)")
