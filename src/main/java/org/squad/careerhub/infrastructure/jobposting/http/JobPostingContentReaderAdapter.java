@@ -25,24 +25,44 @@ public class JobPostingContentReaderAdapter implements JobPostingContentReaderPo
     private final WebClient webClient;
     private final RobotsTxtChecker robotsTxtChecker;
     private final SaraminUrlNormalizer saraminUrlNormalizer;
+    private final RallitJobPostingApiClient rallitJobPostingApiClient;
 
     @Override
     public JobPostingContentReadResult read(String url) {
 
         String normalizedUrl = saraminUrlNormalizer.normalize(url);
-
         URI uri = URI.create(normalizedUrl);
 
+        // 1) robots.txt 체크
         if (!robotsTxtChecker.isAllowed(uri)) {
             return JobPostingContentReadResult.error(
                 JobPostingContentReadStatus.DISALLOWED_BY_ROBOTS,
                 "Blocked by robots.txt"
             );
         }
+        // Rallit면 전용 파서 먼저 시도
+        var rallitResult = rallitJobPostingApiClient.fetchPosition(uri, url);
+        log.info(rallitResult.toString());
+        if (rallitResult.isPresent()) {
+            return JobPostingContentReadResult.success(rallitResult.get());
+        }
 
-        String html;
+        // 2) HTML GET
+        String html = fetchHtml(normalizedUrl);
+        if (html == null || html.isBlank()) {
+            return JobPostingContentReadResult.error(
+                JobPostingContentReadStatus.UNKNOWN_ERROR,
+                "Empty HTML"
+            );
+        }
+
+        // 3) generic HTML → body.text() 기반 파싱
+        return parseGenericHtml(uri, url, html);
+    }
+
+    private String fetchHtml(String normalizedUrl) {
         try {
-            html = webClient.get()
+            return webClient.get()
                 .uri(normalizedUrl)
                 .retrieve()
                 .onStatus(HttpStatusCode::is4xxClientError,
@@ -53,34 +73,20 @@ public class JobPostingContentReaderAdapter implements JobPostingContentReaderPo
                 .block();
         } catch (WebClientResponseException e) {
             log.warn("[JobPosting][ContentReader] HTTP error when fetching url={} status={} body={}",
-                url, e.getStatusCode(), e.getResponseBodyAsString());
-
+                normalizedUrl, e.getStatusCode(), e.getResponseBodyAsString());
 
             if (e.getStatusCode() == HttpStatus.UNAUTHORIZED || e.getStatusCode() == HttpStatus.FORBIDDEN) {
-                return JobPostingContentReadResult.error(
-                    JobPostingContentReadStatus.NEED_LOGIN,
-                    "Need login or forbidden"
-                );
+                // 필요하다면 JobPostingContentReadStatus.NEED_LOGIN으로 바로 매핑하도록 변경 가능
+                return null;
             }
-            return JobPostingContentReadResult.error(
-                JobPostingContentReadStatus.UNKNOWN_ERROR,
-                "Http error: " + e.getStatusCode()
-            );
+            return null;
         } catch (Exception e) {
-            log.warn("[JobPosting][ContentReader] Exception when fetching url={}", url, e);
-            return JobPostingContentReadResult.error(
-                JobPostingContentReadStatus.UNKNOWN_ERROR,
-                e.getMessage()
-            );
+            log.warn("[JobPosting][ContentReader] Exception when fetching url={}", normalizedUrl, e);
+            return null;
         }
+    }
 
-        if (html == null || html.isBlank()) {
-            return JobPostingContentReadResult.error(
-                JobPostingContentReadStatus.UNKNOWN_ERROR,
-                "Empty HTML"
-            );
-        }
-
+    private JobPostingContentReadResult parseGenericHtml(URI uri, String url, String html) {
         Document doc = Jsoup.parse(html);
         String title = doc.title();
 
@@ -100,6 +106,7 @@ public class JobPostingContentReaderAdapter implements JobPostingContentReaderPo
                 "Too short body text, probably needs JS rendering"
             );
         }
+
         if (log.isDebugEnabled()) {
             String preview = bodyText.length() > 1000
                 ? bodyText.substring(0, 1000) + "..."
