@@ -3,6 +3,8 @@ package org.squad.careerhub.domain.community.interviewreview.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.annotation.Transactional;
+import org.squad.careerhub.domain.community.interviewquestion.service.InterviewQuestionManager;
 import org.squad.careerhub.domain.community.interviewreview.entity.InterviewReview;
 import org.squad.careerhub.domain.community.interviewreview.repository.InterviewReviewJpaRepository;
 import org.squad.careerhub.domain.community.interviewreview.service.dto.NewInterviewReview;
@@ -18,6 +20,7 @@ import org.squad.careerhub.global.error.ErrorStatus;
 public class InterviewReviewManager {
 
     private final MemberReader memberReader;
+    private final InterviewQuestionManager interviewQuestionManager;
     private final InterviewReviewJpaRepository interviewReviewJpaRepository;
 
     public InterviewReview createReview(NewInterviewReview newReview, Long authorId) {
@@ -48,6 +51,20 @@ public class InterviewReviewManager {
         );
 
         return interviewReview;
+    }
+
+    @Transactional
+    public void deleteReview(Long reviewId, Long memberId) {
+        InterviewReview interviewReview = interviewReviewJpaRepository.findByIdAndStatus(reviewId, EntityStatus.ACTIVE)
+                .orElseThrow(() -> new CareerHubException(ErrorStatus.NOT_FOUND_REVIEW));
+
+        if (!interviewReview.isAuthor(memberId)) {
+            throw new CareerHubException(ErrorStatus.FORBIDDEN_DELETE);
+        }
+
+        interviewQuestionManager.deleteQuestionsByReview(reviewId);
+
+        interviewReview.delete();
     }
 
 }

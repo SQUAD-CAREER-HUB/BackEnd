@@ -8,7 +8,6 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 import org.squad.careerhub.domain.community.interviewquestion.entity.InterviewQuestion;
 import org.squad.careerhub.domain.community.interviewquestion.repository.InterviewQuestionJpaRepository;
 import org.squad.careerhub.domain.community.interviewquestion.service.dto.UpdateReviewQuestion;
@@ -81,6 +80,12 @@ public class InterviewQuestionManager {
                 interviewQuestionJpaRepository.save(newQuestion);
             }
         }
+    }
+
+    // NOTE: MVP 단계라 현재 반복문으로 삭제 처리, 추후 성능 이슈 있을 시 bulk update 고려
+    public void deleteQuestionsByReview(Long reviewId) {
+        interviewQuestionJpaRepository.findByInterviewReviewIdAndStatus(reviewId, EntityStatus.ACTIVE)
+                .forEach(InterviewQuestion::delete);
     }
 
 }

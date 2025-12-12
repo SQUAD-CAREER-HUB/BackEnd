@@ -14,10 +14,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.squad.careerhub.domain.archive.controller.dto.PersonalQuestionCreateRequest;
-import org.squad.careerhub.domain.archive.service.dto.PersonalQuestionPageResponse;
-import org.squad.careerhub.domain.archive.service.dto.PersonalQuestionResponse;
 import org.squad.careerhub.domain.archive.controller.dto.PersonalQuestionUpdateRequest;
 import org.squad.careerhub.domain.archive.service.QuestionArchiveService;
+import org.squad.careerhub.domain.archive.service.dto.PersonalQuestionPageResponse;
+import org.squad.careerhub.domain.archive.service.dto.PersonalQuestionResponse;
 import org.squad.careerhub.global.annotation.LoginMember;
 
 @RestController

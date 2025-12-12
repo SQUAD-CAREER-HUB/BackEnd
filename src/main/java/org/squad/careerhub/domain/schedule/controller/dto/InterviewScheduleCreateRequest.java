@@ -3,8 +3,8 @@ package org.squad.careerhub.domain.schedule.controller.dto;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import lombok.Builder;
 import java.time.LocalDateTime;
+import lombok.Builder;
 import org.squad.careerhub.domain.schedule.enums.InterviewType;
 
 @Schema(description = "면접 일정 생성 요청 DTO")
