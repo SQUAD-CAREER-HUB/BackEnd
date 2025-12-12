@@ -1,4 +1,4 @@
-package org.squad.careerhub.infrastructure.jobposting.ai;
+package org.squad.careerhub.infrastructure.jobposting.dto;
 
 import java.util.List;
 

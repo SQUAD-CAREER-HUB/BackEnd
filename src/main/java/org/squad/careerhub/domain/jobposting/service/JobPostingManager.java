@@ -1,6 +1,7 @@
 package org.squad.careerhub.domain.jobposting.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import org.squad.careerhub.domain.jobposting.service.dto.JobPostingContent;
 import org.squad.careerhub.domain.jobposting.service.dto.JobPostingContentReadResult;
@@ -12,6 +13,7 @@ import org.squad.careerhub.domain.jobposting.service.dto.response.JobPostingExtr
 @Component
 public class JobPostingManager {
 
+    @Qualifier("jobPostingExtractionStrategy")
     private final JobPostingExtractionPort jobPostingExtractionPort;
     private final JobPostingContentReaderPort jobPostingContentReaderPort;
 
