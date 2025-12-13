@@ -18,9 +18,9 @@ public class DefaultJobPostingPromptFactory implements JobPostingPromptFactory {
      - 출력은 반드시 JSON 형식이어야 하고, 내가 지정한 필드만 포함해야 한다.
      - 회사명, 직무명, 마감일, 근무지, 주요업무, 자격요건, 우대사항, 채용 전형을 한국어 그대로 추출한다.
      - 마감일 정보를 못 찾거나 없거나 상시채용이면 deadline은 null로 둔다.
-     - 마감일 정보를 찾은 경우 "yyyy-MM-dd"로 표현한다.
-     - 근무지 정보를 못 찾거나 없으면 workplace는 "-"로 둔다.
-     - 값이 없는 필드는 빈 배열([])로 응답한다.
+     - 마감일 정보를 찾은 경우 "yyyy-MM-dd HH:mm:ss"로 표현한다.
+     - 회사명, 직무명, 근무지 정보를 못 찾거나 없으면 "-"로 둔다.
+     - 배열로 나타내는 필드는 값을 못 찾거나 모르는 경우 빈 배열([])로 응답한다.
      - status 필드는 반드시 "SUCCESS" | "PARTIAL" | "FAILED" 중 하나다.
      - 모든 값을 성공적으로 가져왔으면 "SUCCESS",
          부분적으로 가져왔으면 "PARTIAL",
