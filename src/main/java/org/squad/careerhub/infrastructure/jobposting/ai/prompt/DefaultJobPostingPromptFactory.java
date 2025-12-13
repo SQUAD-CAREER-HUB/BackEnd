@@ -54,15 +54,15 @@ public class DefaultJobPostingPromptFactory implements JobPostingPromptFactory {
        위 텍스트에서 다음 정보를 아래 주어진 JSON 형태로만 답변해:
 
           {
-            "company": string or '-', // 회사명
-            "position": string or '-', // 직무명
-            "deadline": string or null, // 지원 마감기한
-            "workplace": string, // 근무지
-            "recruitmentProcess": [string, ...] or [], // 채용 절차
-            "mainTasks": [string, ...] or [], // 주요 업무
-            "requiredQualifications": [string, ...] or [], // 필수 자격사항
-            "preferredQualifications": [string, ...] or [], // 우대사항
-            "status": "SUCCESS" | "PARTIAL" | "FAILED" // 추출 성공 여부
+            "company": string or '-',
+            "position": string or '-',
+            "deadline": string or null,
+            "workplace": string,
+            "recruitmentProcess": [string, ...] or [],
+            "mainTasks": [string, ...] or [],
+            "requiredQualifications": [string, ...] or [],
+            "preferredQualifications": [string, ...] or [],
+            "status": "SUCCESS" | "PARTIAL" | "FAILED"
           }
           
         """.formatted(
