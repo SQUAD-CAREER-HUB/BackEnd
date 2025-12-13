@@ -30,7 +30,7 @@ public class InterviewQuestionManager {
                 .map(question -> InterviewQuestion.create(review, question))
                 .toList();
 
-        // NOTE: saveAll은 개수만큼 save 쿼리를 날림 MVP라 현재는 saveAll로 진행하지만 추후에 성능 이슈 있을 시 batch 처리 고려
+        // NOTE: saveAll은 개수만큼 save 쿼리를 날림 MVP라 현재는 saveAll로 진행하지만 추후에 성능 이슈 있을 시 성능 개선
         interviewQuestionJpaRepository.saveAll(questions);
     }
 
@@ -44,48 +44,85 @@ public class InterviewQuestionManager {
      *
      * @param requests 수정할 질문 목록
      * @param reviewId 면접 후기 ID
-     * @param review 면접 후기 엔티티
+     * @param review   면접 후기 엔티티
      */
     public void updateQuestions(List<UpdateReviewQuestion> requests, Long reviewId, InterviewReview review) {
-        List<InterviewQuestion> existingQuestions = interviewQuestionJpaRepository.findByInterviewReviewIdAndStatus(reviewId, EntityStatus.ACTIVE);
+        if (requests == null || requests.isEmpty()) {
+            // 요청이 비어있으면 모든 질문 삭제
+            deleteQuestionsByReview(reviewId);
+            return;
+        }
+
+        List<InterviewQuestion> existingQuestions = interviewQuestionJpaRepository.findByInterviewReviewIdAndStatus(reviewId,
+                EntityStatus.ACTIVE);
 
         Map<Long, InterviewQuestion> existingMap = existingQuestions.stream()
                 .collect(Collectors.toMap(InterviewQuestion::getId, Function.identity()));
 
-        Set<Long> requestIds = requests.stream()
-                .map(UpdateReviewQuestion::id)
-                .filter(Objects::nonNull)
-                .collect(Collectors.toSet());
+        Set<Long> requestIds = extractRequestIds(requests);
 
-        // 1. 삭제: 요청에 없는 기존 질문
-        existingQuestions.stream()
-                .filter(q -> !requestIds.contains(q.getId()))
-                .forEach(InterviewQuestion::delete);
-
-        // 2. 수정 또는 생성
-        for (UpdateReviewQuestion request : requests) {
-            if (request.id() != null) {
-                // ID가 있는 경우
-                InterviewQuestion existing = existingMap.get(request.id());
-                if (existing != null) {
-                    // 수정
-                    existing.updateQuestion(request.question());
-                } else {
-                    // 존재하지 않는 ID
-                    throw new CareerHubException(ErrorStatus.NOT_FOUND_INTERVIEW_QUESTION);
-                }
-            } else {
-                // ID가 없는 경우 → 생성
-                InterviewQuestion newQuestion = InterviewQuestion.create(review, request.question());
-                interviewQuestionJpaRepository.save(newQuestion);
-            }
-        }
+        softDeleteUnrequestedQuestions(existingQuestions, requestIds);
+        saveNewQuestionsAndUpdateExisting(requests, existingMap, review);
     }
 
     // NOTE: MVP 단계라 현재 반복문으로 삭제 처리, 추후 성능 이슈 있을 시 bulk update 고려
     public void deleteQuestionsByReview(Long reviewId) {
         interviewQuestionJpaRepository.findByInterviewReviewIdAndStatus(reviewId, EntityStatus.ACTIVE)
                 .forEach(InterviewQuestion::delete);
+    }
+
+    private Set<Long> extractRequestIds(List<UpdateReviewQuestion> requests) {
+        return requests.stream()
+                .map(UpdateReviewQuestion::id)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toSet());
+    }
+
+    private void softDeleteUnrequestedQuestions(List<InterviewQuestion> existingQuestions, Set<Long> requestIds) {
+        existingQuestions.stream()
+                .filter(question -> !requestIds.contains(question.getId()))
+                .forEach(InterviewQuestion::delete);
+    }
+
+    private void saveNewQuestionsAndUpdateExisting(
+            List<UpdateReviewQuestion> requests,
+            Map<Long, InterviewQuestion> existingQuestionsById,
+            InterviewReview review
+    ) {
+        List<InterviewQuestion> newQuestions = requests.stream()
+                .map(request -> createNewQuestionIfNotExists(request, existingQuestionsById, review))
+                .filter(Objects::nonNull)
+                .toList();
+
+        if (!newQuestions.isEmpty()) {
+            interviewQuestionJpaRepository.saveAll(newQuestions);
+        }
+    }
+
+    private InterviewQuestion createNewQuestionIfNotExists(
+            UpdateReviewQuestion request,
+            Map<Long, InterviewQuestion> existingMap,
+            InterviewReview review
+    ) {
+        if (request.id() != null) {
+            // 수정: 기존 질문 업데이트
+            return updateExistingQuestion(request, existingMap);
+        } else {
+            // 생성: 새로운 질문 생성
+            return InterviewQuestion.create(review, request.question());
+        }
+    }
+
+    private InterviewQuestion updateExistingQuestion(
+            UpdateReviewQuestion request,
+            Map<Long, InterviewQuestion> existingMap
+    ) {
+        InterviewQuestion existing = existingMap.get(request.id());
+        if (existing == null) {
+            throw new CareerHubException(ErrorStatus.INTERVIEW_QUESTION_NOT_BELONG_TO_REVIEW);
+        }
+        existing.updateQuestion(request.question());
+        return null; // 수정은 영속성 컨텍스트에서 자동 반영되므로 null 반환
     }
 
 }

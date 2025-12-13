@@ -23,8 +23,11 @@ public enum ErrorStatus {
     NOT_FOUND_APPLICATION (404, "지원서를 찾을 수 없습니다."),
 
     // REVIEW
-    NOT_FOUND_REVIEW (404, "리뷰를 찾을 수 없습니다."),
-    NOT_FOUND_INTERVIEW_QUESTION(404, "면접 질문을 찾을 수 없습니다."),
+    INTERVIEW_QUESTION_NOT_BELONG_TO_REVIEW (403, "해당 면접 후기에 속하지 않는 질문입니다."),
+    NOT_FOUND_REVIEW                        (404, "리뷰를 찾을 수 없습니다."),
+    NOT_FOUND_INTERVIEW_QUESTION            (404, "면접 질문을 찾을 수 없습니다."),
+
+
 
     // OAUTH
     UNSUPPORTED_OAUTH_PROVIDER (400, "지원하지 않는 OAuth 제공자입니다."),
