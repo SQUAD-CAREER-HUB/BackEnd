@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 import org.squad.careerhub.domain.application.service.FileProvider;
+import org.squad.careerhub.domain.application.service.dto.response.FileResponse;
 
 @RequiredArgsConstructor
 @Component

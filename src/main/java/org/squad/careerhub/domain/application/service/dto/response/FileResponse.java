@@ -1,4 +1,4 @@
-package org.squad.careerhub.infrastructure.s3;
+package org.squad.careerhub.domain.application.service.dto.response;
 
 import lombok.Builder;
 

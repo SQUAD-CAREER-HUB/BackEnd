@@ -7,7 +7,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.squad.careerhub.domain.application.entity.Application;
 import org.squad.careerhub.domain.application.entity.ApplicationAttachment;
 import org.squad.careerhub.domain.application.repository.ApplicationAttachmentJpaRepository;
-import org.squad.careerhub.infrastructure.s3.FileResponse;
+import org.squad.careerhub.domain.application.service.dto.response.FileResponse;
 
 @RequiredArgsConstructor
 @Component

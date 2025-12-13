@@ -2,7 +2,7 @@ package org.squad.careerhub.domain.application.service;
 
 import java.util.List;
 import org.springframework.web.multipart.MultipartFile;
-import org.squad.careerhub.infrastructure.s3.FileResponse;
+import org.squad.careerhub.domain.application.service.dto.response.FileResponse;
 
 public interface FileProvider {
 
