@@ -7,7 +7,6 @@ import org.squad.careerhub.domain.jobposting.service.dto.JobPostingContentReadRe
 import org.squad.careerhub.domain.jobposting.service.dto.response.JobPostingExtractResponse;
 import org.squad.careerhub.domain.jobposting.service.port.JobPostingExtractionPort;
 
-@Slf4j
 @RequiredArgsConstructor
 @Service
 public class JobPostingService {
