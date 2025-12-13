@@ -5,11 +5,10 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.squad.careerhub.domain.jobposting.service.dto.JobPostingExtractResponse;
+import org.squad.careerhub.domain.jobposting.service.dto.response.JobPostingExtractResponse;
 import org.squad.careerhub.global.error.ErrorStatus;
 import org.squad.careerhub.global.swagger.ApiExceptions;
 
@@ -24,8 +23,7 @@ public abstract class JobPostingDocsController {
                     - 지원자가 채용 공고 URL을 입력하면 서버에서 Gemini 등의 LLM을 통해 정보를 추출합니다.
                     - AI 추출 실패 또는 일부만 추출된 경우, status 필드로 상태를 반환하며
                       프론트에서 결과 확인 화면을 띄운 뒤 수동 입력을 유도할 수 있습니다.
-                    """,
-        security = { @SecurityRequirement(name = "Bearer") }
+                    """
     )
     @ApiResponse(
         responseCode = "200",

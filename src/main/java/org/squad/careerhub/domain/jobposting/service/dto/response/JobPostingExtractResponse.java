@@ -1,4 +1,4 @@
-package org.squad.careerhub.domain.jobposting.service.dto;
+package org.squad.careerhub.domain.jobposting.service.dto.response;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;

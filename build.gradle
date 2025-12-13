@@ -72,6 +72,17 @@ dependencies {
 
 	// Firebase
 	implementation 'com.google.firebase:firebase-admin:9.5.0'
+
+	// Spring AI
+	implementation(platform("org.springframework.ai:spring-ai-bom:1.1.2"))
+	implementation "org.springframework.ai:spring-ai-starter-model-google-genai"
+	implementation "org.springframework.ai:spring-ai-starter-model-ollama"
+
+	// WEB CLIENT
+	implementation 'org.springframework.boot:spring-boot-starter-webflux'
+
+	// CRAWLING
+	implementation "org.jsoup:jsoup:1.21.2"
 }
 
 tasks.named('test') {
