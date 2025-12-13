@@ -28,7 +28,7 @@ public record StageRequest(
 
         @Schema(description = "면접 일정 리스트 (면접 전형일 때만 입력)")
         @Valid
-        List<InterviewScheduleCreateRequest> interviewSchedules
+        List<@NotNull InterviewScheduleCreateRequest> interviewSchedules
 ) {
 
     public NewStage toNewStage() {
