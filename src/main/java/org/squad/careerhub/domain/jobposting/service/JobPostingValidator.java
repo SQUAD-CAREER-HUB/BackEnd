@@ -7,6 +7,7 @@ import java.util.Locale;
 import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import org.springframework.web.util.UriComponentsBuilder;
 import org.squad.careerhub.domain.jobposting.enums.JobPostingContentReadStatus;
 import org.squad.careerhub.domain.jobposting.service.dto.JobPostingContentReadResult;
 import org.squad.careerhub.global.error.CareerHubException;
@@ -18,28 +19,35 @@ public class JobPostingValidator {
 
     public void validateJobPostingUrl(String url) {
         if (url == null || url.isBlank()) {
-            throw new CareerHubException(ErrorStatus.BAD_REQUEST);
+            throw new CareerHubException(ErrorStatus.URL_ERROR);
         }
 
+        final URI uri;
         try {
-            URI uri = new URI(url.trim());
-            String scheme = uri.getScheme();
-            if (!"http".equalsIgnoreCase(scheme) && !"https".equalsIgnoreCase(scheme)) {
-                throw new CareerHubException(ErrorStatus.BAD_REQUEST);
-            }
-            String host = uri.getHost();
-            if (host == null) {
-                throw new CareerHubException(ErrorStatus.BAD_REQUEST);
-            }
-            host = host.toLowerCase(Locale.ROOT);
-            if (host.startsWith("www.")) {
-                host = host.substring(4);
-            }
-            if (!SUPPORTED_HOSTS.contains(host)) {
-                throw new CareerHubException(ErrorStatus.BAD_REQUEST);
-            }
-        } catch (URISyntaxException e) {
-            throw new CareerHubException(ErrorStatus.BAD_REQUEST);
+            uri = UriComponentsBuilder
+                .fromUriString(url.trim())
+                .build()
+                .encode()
+                .toUri();
+        } catch (IllegalArgumentException e) {
+            throw new CareerHubException(ErrorStatus.URL_ERROR);
+        }
+
+        String scheme = uri.getScheme();
+        if (!"http".equalsIgnoreCase(scheme) && !"https".equalsIgnoreCase(scheme)) {
+            throw new CareerHubException(ErrorStatus.URL_ERROR);
+        }
+
+        String host = uri.getHost();
+        if (host == null) {
+            throw new CareerHubException(ErrorStatus.URL_ERROR);
+        }
+
+        host = host.toLowerCase(Locale.ROOT);
+        if (host.startsWith("www.")) host = host.substring(4);
+
+        if (!SUPPORTED_HOSTS.contains(host)) {
+            throw new CareerHubException(ErrorStatus.URL_ERROR);
         }
     }
 
@@ -66,11 +74,10 @@ public class JobPostingValidator {
 
 
     private static final Set<String> SUPPORTED_HOSTS = Set.of(
-        "www.wanted.co.kr",
         "wanted.co.kr",
-        "www.saramin.co.kr",
-        "www.jobkorea.co.kr",
-        "www.rallit.com"
+        "saramin.co.kr",
+        "jobkorea.co.kr",
+        "rallit.com"
     );
 
 }
