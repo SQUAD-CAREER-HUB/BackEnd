@@ -2,6 +2,7 @@ package org.squad.careerhub.domain.community.interviewreview.controller.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import java.util.List;
 import lombok.Builder;
 import org.squad.careerhub.domain.community.interviewquestion.service.dto.UpdateReviewQuestion;
@@ -23,7 +24,7 @@ public record ReviewUpdateRequest(
         String interviewType,
 
         @Schema(description = "면접 질문 리스트 (id가 null 이면 새로 생성, 기존 id가 요청에 없으면 삭제)")
-        List<InterviewQuestionUpdateRequest> interviewQuestions,
+        List<@NotNull InterviewQuestionUpdateRequest> interviewQuestions,
 
         @Schema(description = "면접 후기 내용", example = "면접 과정이 매우 체계적이고 친절했습니다.")
         @NotBlank(message = "면접 후기 내용은 필수 입력 항목 입니다.")
