@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
@@ -98,28 +99,41 @@ class InterviewQuestionManagerUnitTest {
     @DisplayName("ID가 없는 요청은 새로운 질문을 생성한다")
     void ID가_없는_요청은_새로운_질문을_생성한다() {
         // given
-        var reviewId = 1L;
+        Long reviewId = 1L;
+        InterviewReview review = mock(InterviewReview.class);
+
+        // 기존 질문 (DB에 이미 있다고 가정)
+        InterviewQuestion existingQuestion = InterviewQuestion.create(review, "기존 질문");
+        ReflectionTestUtils.setField(existingQuestion, "id", 1L);
 
         given(interviewQuestionJpaRepository.findByInterviewReviewIdAndStatus(reviewId, EntityStatus.ACTIVE))
-                .willReturn(List.of());
+                .willReturn(List.of(existingQuestion));
 
+        // 요청: 1개는 수정, 2개는 신규 생성
         List<UpdateReviewQuestion> requests = List.of(
-                new UpdateReviewQuestion(null, "새로운 질문1"),
-                new UpdateReviewQuestion(null, "새로운 질문2")
+                new UpdateReviewQuestion(existingQuestion.getId(), "수정된 질문"),      // 기존 질문 수정
+                new UpdateReviewQuestion(null, "새로운 질문1"),   // 신규 생성
+                new UpdateReviewQuestion(null, "새로운 질문2")    // 신규 생성
         );
 
         // when
         interviewQuestionManager.updateQuestions(requests, reviewId, review);
 
         // then
-        ArgumentCaptor<InterviewQuestion> captor = ArgumentCaptor.forClass(InterviewQuestion.class);
-        verify(interviewQuestionJpaRepository, times(2)).save(captor.capture());
 
-        List<InterviewQuestion> savedQuestions = captor.getAllValues();
-        assertThat(savedQuestions).hasSize(2);
-        assertThat(savedQuestions.get(0).getQuestion()).isEqualTo("새로운 질문1");
-        assertThat(savedQuestions.get(1).getQuestion()).isEqualTo("새로운 질문2");
+        // 신규 질문 2개가 저장되었는지 확인
+        ArgumentCaptor<List<InterviewQuestion>> captor = ArgumentCaptor.forClass(List.class);
+        verify(interviewQuestionJpaRepository).saveAll(captor.capture());
+
+        List<InterviewQuestion> savedQuestions = captor.getValue();
+        assertThat(savedQuestions).hasSize(2);  // 신규 생성된 2개만
+
+        //  저장된 질문 내용 확인 (실제 엔티티 생성 확인)
+        assertThat(savedQuestions)
+                .extracting(InterviewQuestion::getQuestion)
+                .containsExactly("새로운 질문1", "새로운 질문2");
     }
+
 
     @Test
     @DisplayName("삭제, 수정, 생성이 동시에 처리된다")
@@ -150,7 +164,7 @@ class InterviewQuestionManagerUnitTest {
         assertThat(toUpdate.isDeleted()).isFalse();
 
         // 생성 검증
-        verify(interviewQuestionJpaRepository, times(1)).save(any(InterviewQuestion.class));
+        verify(interviewQuestionJpaRepository, times(1)).saveAll(any());
     }
 
     @Test
@@ -169,7 +183,7 @@ class InterviewQuestionManagerUnitTest {
         // when & then
         assertThatThrownBy(() -> interviewQuestionManager.updateQuestions(requests, reviewId, review))
                 .isInstanceOf(CareerHubException.class)
-                .hasMessage(ErrorStatus.NOT_FOUND_INTERVIEW_QUESTION.getMessage());
+                .hasMessage(ErrorStatus.INTERVIEW_QUESTION_NOT_BELONG_TO_REVIEW.getMessage());
     }
 
     @Test
