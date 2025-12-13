@@ -74,8 +74,9 @@ dependencies {
 	implementation 'com.google.firebase:firebase-admin:9.5.0'
 
 	// Spring AI
-	implementation "org.springframework.ai:spring-ai-starter-model-google-genai:1.1.1"
-	implementation "org.springframework.ai:spring-ai-starter-model-ollama:1.1.2"
+	implementation(platform("org.springframework.ai:spring-ai-bom:1.1.2"))
+	implementation "org.springframework.ai:spring-ai-starter-model-google-genai"
+	implementation "org.springframework.ai:spring-ai-starter-model-ollama"
 
 	// WEB CLIENT
 	implementation 'org.springframework.boot:spring-boot-starter-webflux'
