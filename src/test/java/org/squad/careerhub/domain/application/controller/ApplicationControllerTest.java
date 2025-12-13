@@ -32,7 +32,7 @@ class ApplicationControllerTest extends ControllerTestSupport {
         var request = createApplicationCreateRequest2();
 
         var file = new MockMultipartFile(
-                "imageFiles",
+                "files",
                 "profile.jpg",
                 "image/jpeg",
                 "profile image content".getBytes()
