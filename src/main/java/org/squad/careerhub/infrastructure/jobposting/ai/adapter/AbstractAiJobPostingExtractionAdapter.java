@@ -28,21 +28,15 @@ public abstract class AbstractAiJobPostingExtractionAdapter implements JobPostin
         String systemPrompt = promptFactory.createSystemPrompt();
         String userPrompt = promptFactory.createUserPrompt(content);
         long t1 = System.currentTimeMillis();
-        JobPostingAiResult aiResult;
-        try {
-            aiResult = chatClient
-                .prompt()
-                .system(systemPrompt)
-                .user(userPrompt)
-                .call()
-                .entity(JobPostingAiResult.class);
-        } catch (Exception e) {
-            log.warn("[{}] AI extraction failed. url={}", providerName(), content.content().url(), e);
-            return JobPostingExtractResponse.builder()
-                .status(JobPostingExtractStatus.FAILED)
-                .build();
-        }
+
+        JobPostingAiResult aiResult = chatClient
+            .prompt()
+            .system(systemPrompt)
+            .user(userPrompt)
+            .call()
+            .entity(JobPostingAiResult.class);
         long t2 = System.currentTimeMillis();
+
         log.debug("[{}] job posting extracted. url={}, status={}",
             providerName(), content.content().url(), aiResult.status());
 
