@@ -1,6 +1,7 @@
 package org.squad.careerhub.infrastructure.jobposting.http;
 
 import java.net.URI;
+import java.time.Duration;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatusCode;
 import lombok.RequiredArgsConstructor;
@@ -67,11 +68,9 @@ public class JobPostingContentReaderAdapter implements JobPostingContentReaderPo
             return webClient.get()
                 .uri(normalizedUrl)
                 .retrieve()
-                .onStatus(HttpStatusCode::is4xxClientError,
-                    resp -> Mono.error(new RuntimeException("4xx")))
-                .onStatus(HttpStatusCode::is5xxServerError,
-                    resp -> Mono.error(new RuntimeException("5xx")))
+                .onStatus(HttpStatusCode::isError, resp -> resp.createException().flatMap(Mono::error))
                 .bodyToMono(String.class)
+                .timeout(Duration.ofSeconds(10))
                 .block();
         } catch (WebClientResponseException e) {
             log.warn("[JobPosting][ContentReader] HTTP error when fetching url={} status={} body={}",
