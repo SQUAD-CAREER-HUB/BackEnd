@@ -16,11 +16,13 @@ public class RobotsTxtChecker {
     private final WebClient webClient;
 
     public boolean isAllowed(URI uri) {
+        if (uri == null || uri.getScheme() == null || uri.getHost() == null) {
+            return false;
+        }
         String robotsUrl = uri.getScheme() + "://" + uri.getHost() + "/robots.txt";
-
         String robotsTxt = fetchRobotsTxt(robotsUrl);
         if (robotsTxt == null) {
-            // robots.txt 없으면 일단 허용 (보수적으로 가고 싶으면 false로 바꿔도 됨)
+            // robots.txt 없으면 일단 허용
             return true;
         }
 
