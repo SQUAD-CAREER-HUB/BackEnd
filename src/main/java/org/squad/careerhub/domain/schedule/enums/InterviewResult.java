@@ -7,9 +7,9 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum InterviewResult {
 
-    PENDING("대기중"),
-    PASS("합격"),
-    FAIL("불합격");
+    PENDING ("대기중"),
+    PASS    ("합격"),
+    FAIL    ("불합격");
 
     private final String description;
 

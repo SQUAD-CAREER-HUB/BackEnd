@@ -33,12 +33,7 @@ public class Application extends BaseEntity {
     @Column(nullable = false)
     private String position;
 
-    @Column(nullable = false)
     private String jobLocation;
-
-    @Column(nullable = false)
-    @Enumerated(EnumType.STRING)
-    private ApplicationStatus applicationStatus;
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
@@ -58,11 +53,9 @@ public class Application extends BaseEntity {
             String company,
             String position,
             String jobLocation,
-            ApplicationStatus applicationStatus,
             ApplicationMethod applicationMethod,
             LocalDate deadline,
-            LocalDate submittedAt,
-            String memo
+            LocalDate submittedAt
     ) {
         Application application = new Application();
 
@@ -71,11 +64,10 @@ public class Application extends BaseEntity {
         application.company = requireNonNull(company);
         application.position = requireNonNull(position);
         application.jobLocation = requireNonNull(jobLocation);
-        application.applicationStatus = requireNonNull(applicationStatus);
         application.applicationMethod = requireNonNull(applicationMethod);
         application.deadline = requireNonNull(deadline);
         application.submittedAt = submittedAt;
-        application.memo = memo;
+        application.memo = null;
 
         return application;
     }
@@ -85,7 +77,6 @@ public class Application extends BaseEntity {
             String company,
             String position,
             String jobLocation,
-            ApplicationStatus applicationStatus,
             ApplicationMethod applicationMethod,
             LocalDate deadline,
             LocalDate submittedAt,
@@ -95,7 +86,6 @@ public class Application extends BaseEntity {
         this.company = requireNonNull(company);
         this.position = requireNonNull(position);
         this.jobLocation = requireNonNull(jobLocation);
-        this.applicationStatus = requireNonNull(applicationStatus);
         this.applicationMethod = requireNonNull(applicationMethod);
         this.deadline = requireNonNull(deadline);
         this.submittedAt = submittedAt;

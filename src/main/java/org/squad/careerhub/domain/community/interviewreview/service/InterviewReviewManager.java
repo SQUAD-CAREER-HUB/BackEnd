@@ -3,7 +3,6 @@ package org.squad.careerhub.domain.community.interviewreview.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.transaction.annotation.Transactional;
 import org.squad.careerhub.domain.community.interviewquestion.service.InterviewQuestionManager;
 import org.squad.careerhub.domain.community.interviewreview.entity.InterviewReview;
 import org.squad.careerhub.domain.community.interviewreview.repository.InterviewReviewJpaRepository;

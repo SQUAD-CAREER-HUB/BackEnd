@@ -38,7 +38,7 @@ public record NotificationResponse(
     @Schema(
         description = "연결 리소스 유형",
         example = "INTERVIEW",
-        allowableValues = {"APPLICATION","TASK", "INTERVIEW", "REVIEW", "OTHER"}
+        allowableValues = {"APPLICATION","TASK", "INTERVIEW", "REVIEW", "ETC"}
     )
     TargetType targetType,
 
