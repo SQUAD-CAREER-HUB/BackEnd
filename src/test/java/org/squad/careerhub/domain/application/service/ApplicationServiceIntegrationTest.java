@@ -264,6 +264,45 @@ class ApplicationServiceIntegrationTest extends IntegrationTestSupport {
     }
 
     @Test
+    void 기타_전형_일정_미입력_시_기본_유형명_생성_테스트() {
+        // given
+        var etcNewStage = NewStage.builder()
+                .stageType(StageType.ETC)
+                .newInterviewSchedules(List.of())
+                .build();
+
+        // when
+        var applicationId = applicationService.createApplication(
+                createJobPosting("NHN", "게임 서버 개발자", "https://careers.nhn.com"),
+                createApplicationInfo(),
+                etcNewStage,
+                List.of(),
+                testMember.getId()
+        );
+
+        // then
+        List<ApplicationStage> stages = applicationStageRepository.findByApplicationId(applicationId);
+        assertThat(stages).hasSize(2);
+
+        var etcStage = stages.stream()
+                .filter(s -> s.getStageType() == StageType.ETC)
+                .findFirst()
+                .orElseThrow();
+
+        assertThat(etcStage).extracting(
+                ApplicationStage::getStageType,
+                ApplicationStage::getStageName,
+                ApplicationStage::getStageStatus,
+                ApplicationStage::getSubmissionStatus
+        ).containsExactly(
+                StageType.ETC,
+                StageType.ETC.getDescription(),
+                StageStatus.WAITING,
+                null
+        );
+    }
+
+    @Test
     void 기타_전형은_기타_일정_생성_Manager를_호출한다() {
         // given
         var etcSchedule = new NewEtcSchedule("과제제출", LocalDateTime.now());
