@@ -29,7 +29,9 @@ public class RobotsTxtChecker {
 
         List<String> disallowsForAll = parseDisallowsForUserAgentStar(robotsTxt);
         String path = uri.getPath();
-
+        if (path == null) {
+            path = "/";
+        }
         // path가 Disallow 패턴에 매칭되면 크롤링 금지
         return disallowsForAll.stream()
             .noneMatch(path::startsWith);
