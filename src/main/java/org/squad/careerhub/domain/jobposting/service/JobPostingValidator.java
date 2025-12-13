@@ -3,6 +3,7 @@ package org.squad.careerhub.domain.jobposting.service;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Locale;
 import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -21,12 +22,19 @@ public class JobPostingValidator {
         }
 
         try {
-            URI uri = new URI(url);
+            URI uri = new URI(url.trim());
             String scheme = uri.getScheme();
             if (!"http".equalsIgnoreCase(scheme) && !"https".equalsIgnoreCase(scheme)) {
                 throw new CareerHubException(ErrorStatus.BAD_REQUEST);
             }
             String host = uri.getHost();
+            if (host == null) {
+                throw new CareerHubException(ErrorStatus.BAD_REQUEST);
+            }
+            host = host.toLowerCase(Locale.ROOT);
+            if (host.startsWith("www.")) {
+                host = host.substring(4);
+            }
             if (!SUPPORTED_HOSTS.contains(host)) {
                 throw new CareerHubException(ErrorStatus.BAD_REQUEST);
             }
