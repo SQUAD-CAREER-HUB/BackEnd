@@ -42,10 +42,9 @@ public record StageRequest(
 
     private NewEtcSchedule toNewEtcSchedule() {
         if (etcSchedule == null) {
-            return NewEtcSchedule.builder()
-                    .stageName(StageType.ETC.getDescription())
-                    .build();
+            return null;
         }
+
         return etcSchedule.toNewEtcSchedule();
     }
 
@@ -59,4 +58,3 @@ public record StageRequest(
     }
 
 }
-
