@@ -45,7 +45,9 @@ public class JobPostingContentReaderAdapter implements JobPostingContentReaderPo
         }
         // Rallit면 전용 파서 먼저 시도
         var rallitResult = rallitJobPostingApiClient.fetchPosition(uri, url);
-        log.info(rallitResult.toString());
+
+        log.debug("[JobPosting][ContentReader] rallit parsed={}", rallitResult.isPresent());
+
         if (rallitResult.isPresent()) {
             return JobPostingContentReadResult.success(rallitResult.get());
         }
