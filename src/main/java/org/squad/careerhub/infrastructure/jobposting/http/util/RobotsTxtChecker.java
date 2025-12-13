@@ -1,6 +1,7 @@
 package org.squad.careerhub.infrastructure.jobposting.http.util;
 
 import java.net.URI;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -44,6 +45,7 @@ public class RobotsTxtChecker {
                 .onStatus(HttpStatusCode::is5xxServerError,
                     resp -> Mono.error(new RuntimeException("5xx")))
                 .bodyToMono(String.class)
+                .timeout(Duration.ofSeconds(5))
                 .block();
         } catch (Exception e) {
             return null;
