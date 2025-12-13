@@ -22,7 +22,7 @@ public class AiConfig {
     @Qualifier("solarChatClient")
     public ChatClient solarChatClient(OllamaApi ollamaApi) {
         OllamaChatOptions options = OllamaChatOptions.builder()
-            .model("solar:latest ")
+            .model("solar:latest")
             .build();
 
         OllamaChatModel model = OllamaChatModel.builder()
