@@ -70,7 +70,6 @@ public class JobPostingContentReaderAdapter implements JobPostingContentReaderPo
             return webClient.get()
                 .uri(normalizedUrl)
                 .retrieve()
-                .onStatus(HttpStatusCode::isError, resp -> resp.createException().flatMap(Mono::error))
                 .bodyToMono(String.class)
                 .timeout(Duration.ofSeconds(10))
                 .block();
@@ -79,7 +78,6 @@ public class JobPostingContentReaderAdapter implements JobPostingContentReaderPo
                 normalizedUrl, e.getStatusCode(), e.getResponseBodyAsString());
 
             if (e.getStatusCode() == HttpStatus.UNAUTHORIZED || e.getStatusCode() == HttpStatus.FORBIDDEN) {
-                // 필요하다면 JobPostingContentReadStatus.NEED_LOGIN으로 바로 매핑하도록 변경 가능
                 return null;
             }
             return null;
