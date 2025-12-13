@@ -13,7 +13,7 @@ public record EtcScheduleCreateRequest(
         LocalDateTime scheduledAt
 ) {
 
-        public NewEtcSchedule toNewEtcStage() {
+        public NewEtcSchedule toNewEtcSchedule() {
             return NewEtcSchedule.builder()
                     .stageName(stageName)
                     .scheduledAt(scheduledAt)

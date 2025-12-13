@@ -44,7 +44,7 @@ public record StageRequest(
         if (etcSchedule == null) {
             return null;
         }
-        return etcSchedule.toNewEtcStage();
+        return etcSchedule.toNewEtcSchedule();
     }
 
     private List<NewInterviewSchedule> toNewInterviewSchedules() {
