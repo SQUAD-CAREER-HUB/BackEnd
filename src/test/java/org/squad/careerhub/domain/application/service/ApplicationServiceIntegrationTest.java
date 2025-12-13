@@ -402,3 +402,188 @@ class ApplicationServiceIntegrationTest extends IntegrationTestSupport {
     }
 
 }
+    @Test
+    void 첨부파일_없이_지원서를_생성한다() {
+        // given
+        var jobPosting = createJobPosting("카카오", "백엔드 개발자", "https://careers.kakao.com");
+        var applicationInfo = createApplicationInfo();
+        var documentStage = createDocumentNewStage();
+
+        // when
+        Long applicationId = applicationService.createApplication(
+                jobPosting,
+                applicationInfo,
+                documentStage,
+                null, // 첨부 파일 없음
+                testMember.getId()
+        );
+
+        // then
+        assertThat(applicationId).isNotNull();
+        verify(applicationFileManager, times(1)).addApplicationFile(any(), any());
+    }
+
+    @Test
+    void 여러_첨부파일과_함께_지원서를_생성한다() {
+        // given
+        var file1 = new MockMultipartFile("file1", "resume.pdf", "application/pdf", "content1".getBytes());
+        var file2 = new MockMultipartFile("file2", "portfolio.pdf", "application/pdf", "content2".getBytes());
+        var file3 = new MockMultipartFile("file3", "certificate.pdf", "application/pdf", "content3".getBytes());
+
+        doNothing().when(applicationFileManager).addApplicationFile(any(), any());
+
+        // when
+        Long applicationId = applicationService.createApplication(
+                createJobPosting("배달의민족", "서버 개발자", "https://careers.woowahan.com"),
+                createApplicationInfo(),
+                createDocumentNewStage(),
+                List.of(file1, file2, file3),
+                testMember.getId()
+        );
+
+        // then
+        assertThat(applicationId).isNotNull();
+        verify(applicationFileManager, times(1)).addApplicationFile(any(), any());
+    }
+
+    @Test
+    void URL_없이_직접_입력으로_지원서를_생성한다() {
+        // given
+        var jobPosting = NewJobPosting.builder()
+                .jobPostingUrl(null) // URL 없음
+                .company("스타트업")
+                .position("풀스택 개발자")
+                .jobLocation("리모트")
+                .build();
+
+        // when
+        Long applicationId = applicationService.createApplication(
+                jobPosting,
+                createApplicationInfo(),
+                createDocumentNewStage(),
+                List.of(),
+                testMember.getId()
+        );
+
+        // then
+        Application application = applicationRepository.findById(applicationId).orElseThrow();
+        assertThat(application.getJobPostingUrl()).isNull();
+        assertThat(application.getCompany()).isEqualTo("스타트업");
+    }
+
+    @Test
+    void 제출일_없이_지원서를_생성한다() {
+        // given
+        var applicationInfo = NewApplicationInfo.builder()
+                .applicationMethod(ApplicationMethod.HOMEPAGE)
+                .deadline(LocalDate.now().plusDays(7))
+                .submittedAt(null) // 제출일 없음
+                .build();
+
+        // when
+        Long applicationId = applicationService.createApplication(
+                createJobPosting("LG전자", "임베디드 개발자", "https://careers.lg.com"),
+                applicationInfo,
+                createDocumentNewStage(),
+                List.of(),
+                testMember.getId()
+        );
+
+        // then
+        Application application = applicationRepository.findById(applicationId).orElseThrow();
+        assertThat(application.getSubmittedAt()).isNull();
+    }
+
+    @Test
+    void 서류_SUBMITTED_상태로_지원서를_생성한다() {
+        // given
+        var documentStage = NewStage.builder()
+                .stageType(StageType.DOCUMENT)
+                .submissionStatus(SubmissionStatus.SUBMITTED) // 이미 제출 완료
+                .newInterviewSchedules(List.of())
+                .build();
+
+        // when
+        Long applicationId = applicationService.createApplication(
+                createJobPosting("우아한형제들", "데이터 엔지니어", null),
+                createApplicationInfo(),
+                documentStage,
+                List.of(),
+                testMember.getId()
+        );
+
+        // then
+        List<ApplicationStage> stages = applicationStageRepository.findByApplicationId(applicationId);
+        assertThat(stages).hasSize(1);
+        assertThat(stages.get(0).getSubmissionStatus()).isEqualTo(SubmissionStatus.SUBMITTED);
+    }
+
+    @Test
+    void 기타_전형에서_NullPointerException이_발생하지_않는다() {
+        // given - stageName이 있는 NewEtcSchedule
+        var etcSchedule = new NewEtcSchedule("온라인 테스트", LocalDateTime.now().plusDays(5));
+        var etcStage = NewStage.builder()
+                .stageType(StageType.ETC)
+                .newEtcSchedule(etcSchedule)
+                .newInterviewSchedules(List.of())
+                .build();
+
+        // when & then - 예외 없이 성공적으로 생성되어야 함
+        Long applicationId = applicationService.createApplication(
+                createJobPosting("컬리", "프론트엔드 개발자", null),
+                createApplicationInfo(),
+                etcStage,
+                List.of(),
+                testMember.getId()
+        );
+
+        assertThat(applicationId).isNotNull();
+    }
+
+    @Test
+    void 근무지_정보_없이_지원서를_생성한다() {
+        // given
+        var jobPosting = NewJobPosting.builder()
+                .company("글로벌 기업")
+                .position("소프트웨어 엔지니어")
+                .jobPostingUrl("https://example.com")
+                .jobLocation(null) // 근무지 정보 없음
+                .build();
+
+        // when
+        Long applicationId = applicationService.createApplication(
+                jobPosting,
+                createApplicationInfo(),
+                createDocumentNewStage(),
+                List.of(),
+                testMember.getId()
+        );
+
+        // then
+        Application application = applicationRepository.findById(applicationId).orElseThrow();
+        assertThat(application.getJobLocation()).isNull();
+    }
+
+    @Test
+    void 마감일과_제출일이_같은_날인_경우_지원서를_생성한다() {
+        // given
+        LocalDate today = LocalDate.now();
+        var applicationInfo = NewApplicationInfo.builder()
+                .applicationMethod(ApplicationMethod.EMAIL)
+                .deadline(today)
+                .submittedAt(today)
+                .build();
+
+        // when
+        Long applicationId = applicationService.createApplication(
+                createJobPosting("하이퍼커넥트", "머신러닝 엔지니어", null),
+                applicationInfo,
+                createDocumentNewStage(),
+                List.of(),
+                testMember.getId()
+        );
+
+        // then
+        Application application = applicationRepository.findById(applicationId).orElseThrow();
+        assertThat(application.getDeadline()).isEqualTo(application.getSubmittedAt());
+    }
