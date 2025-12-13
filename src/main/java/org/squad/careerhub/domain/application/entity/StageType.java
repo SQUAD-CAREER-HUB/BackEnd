@@ -12,8 +12,8 @@ public enum StageType {
     DOCUMENT   (1, "서류 전형"),
     ETC        (2, "기타 전형"),
     INTERVIEW  (3, "면접 전형"),
-    FINAL_PASS (4, "최종 힙격"),
-    FINAL_FAIL (4, "최종 힙격"),
+    FINAL_PASS (4, "최종 합격"),
+    FINAL_FAIL (4, "최종 합격"),
     ;
 
     private final int order;
