@@ -2,6 +2,7 @@ package org.squad.careerhub.domain.schedule.controller.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 import lombok.Builder;
 import org.squad.careerhub.domain.schedule.enums.InterviewResult;
@@ -20,7 +21,7 @@ public record InterviewScheduleUpdateRequest(
         example = "TECH",
         allowableValues = {"TECH", "FIT", "EXECUTIVE", "TASK", "TEST", "ETC"}
     )
-    @NotBlank(message = "면접 유형은 필수 입력값입니다.")
+    @NotNull(message = "면접 유형은 필수 입력값입니다.")
     InterviewType type,
 
     @Schema(
