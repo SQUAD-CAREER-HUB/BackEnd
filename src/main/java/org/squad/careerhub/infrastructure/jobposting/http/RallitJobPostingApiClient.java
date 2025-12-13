@@ -17,7 +17,6 @@ import org.squad.careerhub.domain.jobposting.service.dto.JobPostingContent;
 public class RallitJobPostingApiClient {
 
     private final WebClient webClient;
-    /** ✅ 직접 new 하지 말고 Spring 이 관리하는 ObjectMapper 주입 */
     private final ObjectMapper objectMapper;
 
     public Optional<JobPostingContent> fetchPosition(URI uri, String url) {
@@ -144,7 +143,7 @@ public class RallitJobPostingApiClient {
         // 탭/캐리지리턴 등 → 공백 하나로
         t = t.replaceAll("[ \\t\\x0B\\f\\r]+", " ");
 
-        // 🔥 모든 개행을 공백으로 통일
+        // 모든 개행을 공백으로 통일
         t = t.replaceAll("\\n+", " ");
 
         // 공백 여러 개 → 하나
@@ -185,10 +184,6 @@ public class RallitJobPostingApiClient {
         sb.append(text);
     }
 
-    /**
-     * 제목 + 회사명 + 상태(모집 중) 조합
-     * 예: "멀티플랫폼 앱 개발자 (Android & Flutter) - 룰루랩 (모집 중)"
-     */
     private String buildTitle(String title, String companyName, String status) {
         StringBuilder sb = new StringBuilder();
         if (!title.isBlank()) sb.append(title);

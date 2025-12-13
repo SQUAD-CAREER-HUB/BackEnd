@@ -15,6 +15,8 @@ import org.squad.careerhub.domain.jobposting.enums.JobPostingContentReadStatus;
 import org.squad.careerhub.domain.jobposting.service.dto.JobPostingContent;
 import org.squad.careerhub.domain.jobposting.service.dto.JobPostingContentReadResult;
 import org.squad.careerhub.domain.jobposting.service.port.JobPostingContentReaderPort;
+import org.squad.careerhub.infrastructure.jobposting.http.util.RobotsTxtChecker;
+import org.squad.careerhub.infrastructure.jobposting.http.util.SaraminUrlNormalizer;
 import reactor.core.publisher.Mono;
 
 @Component

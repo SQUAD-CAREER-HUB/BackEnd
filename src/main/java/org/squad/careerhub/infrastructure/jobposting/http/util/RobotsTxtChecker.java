@@ -1,4 +1,4 @@
-package org.squad.careerhub.infrastructure.jobposting.http;
+package org.squad.careerhub.infrastructure.jobposting.http.util;
 
 import java.net.URI;
 import java.util.ArrayList;
