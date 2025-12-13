@@ -24,7 +24,7 @@ class ApplicationPolicyValidatorTest extends TestDoubleSupport {
     @Test
     void 기타_일정은_기타_전형일_때만_가능하다() {
         // given
-        var ectNewStage = new NewStage(
+        var etcNewStage = new NewStage(
                 StageType.ETC,
                 null,
                 new NewEtcSchedule("코딩 테스트", LocalDateTime.now()),
@@ -46,7 +46,7 @@ class ApplicationPolicyValidatorTest extends TestDoubleSupport {
         );
 
         // when & then
-        applicationPolicyValidator.validateNewStage(ectNewStage);
+        applicationPolicyValidator.validateNewStage(etcNewStage);
 
         // 서류 전형과 면접 전형에 기타 일정이 포함된 경우 예외 발생
         assertThatThrownBy(() -> applicationPolicyValidator.validateNewStage(documentStage))
@@ -61,7 +61,7 @@ class ApplicationPolicyValidatorTest extends TestDoubleSupport {
     @Test
     void 면접_일정은_면접_전형일_때만_가능하다() {
         // given
-        var ectNewStage = new NewStage(
+        var etcNewStage = new NewStage(
                 StageType.ETC,
                 null,
                 null,
@@ -86,7 +86,7 @@ class ApplicationPolicyValidatorTest extends TestDoubleSupport {
         applicationPolicyValidator.validateNewStage(interviewStage);
 
         // 기타 전형과 서류 전형에 면접 일정이 포함된 경우 예외 발생
-        assertThatThrownBy(() -> applicationPolicyValidator.validateNewStage(ectNewStage))
+        assertThatThrownBy(() -> applicationPolicyValidator.validateNewStage(etcNewStage))
                 .isInstanceOf(CareerHubException.class)
                 .hasMessage(ErrorStatus.INVALID_SCHEDULE_TYPE_RULE.getMessage());
 
