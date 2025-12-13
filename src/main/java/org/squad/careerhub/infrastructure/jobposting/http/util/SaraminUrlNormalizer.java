@@ -8,10 +8,25 @@ import org.springframework.web.util.UriComponentsBuilder;
 public class SaraminUrlNormalizer {
 
     public String normalize(String url) {
-        URI uri = URI.create(url);
+        if (url == null) return null;
+        String trimmed = url.trim();
+        if (trimmed.isEmpty()) return url;
 
+        URI uri;
+        try {
+            uri = URI.create(trimmed);
+        } catch (IllegalArgumentException e) {
+            // URL 형식이 깨진 경우 → 그냥 원본 유지(또는 null/예외 변환 정책)
+            return url;
+        }
+
+        String scheme = uri.getScheme();
         String host = uri.getHost();
-        if (host == null || !host.contains("saramin.co.kr")) {
+        if (scheme == null || host == null) {
+            return url;
+        }
+
+        if (!host.contains("saramin.co.kr")) {
             return url;
         }
 
