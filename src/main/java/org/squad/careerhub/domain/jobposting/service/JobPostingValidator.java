@@ -44,6 +44,9 @@ public class JobPostingValidator {
     }
 
     public void validateReadResult(JobPostingContentReadResult result) {
+        if (result == null) {
+            throw new CareerHubException(ErrorStatus.JOB_POSTING_READ_FAILED);
+        }
         if (result.status() == JobPostingContentReadStatus.SUCCESS) {
             return;
         }
