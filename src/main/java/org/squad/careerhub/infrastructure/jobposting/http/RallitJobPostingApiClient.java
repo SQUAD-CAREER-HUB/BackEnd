@@ -3,6 +3,7 @@ package org.squad.careerhub.infrastructure.jobposting.http;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.net.URI;
+import java.time.Duration;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -36,6 +37,7 @@ public class RallitJobPostingApiClient {
                 .uri(apiUrl)
                 .retrieve()
                 .bodyToMono(String.class)
+                .timeout(Duration.ofSeconds(10))
                 .block();
 
             JsonNode root = objectMapper.readTree(json);
