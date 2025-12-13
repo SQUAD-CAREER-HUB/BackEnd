@@ -1,6 +1,5 @@
 package org.squad.careerhub.infrastructure.jobposting.ai.strategy;
 
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
