@@ -70,6 +70,7 @@ class ApplicationStageManagerUnitTest extends TestDoubleSupport {
                 StageType.DOCUMENT.getDescription(),
                 documentStage.getSubmissionStatus()
         );
+        verify(applicationStageJpaRepository, times(1)).save(any());
     }
 
     @Test
