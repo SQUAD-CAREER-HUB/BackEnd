@@ -68,27 +68,6 @@ public class RallitJobPostingApiClient {
         return -1;
     }
 
-
-    /**
-     * HTML 조각 정제:
-     *  - Jsoup 로 태그 제거
-     *  - 제로폭/nbsp 제거
-     *  - 연속 공백 하나로 정리
-     */
-    private String cleanHtmlBlock(String htmlFragment) {
-        if (htmlFragment == null || htmlFragment.isBlank()) return "";
-        String text = Jsoup.parse(htmlFragment).text();
-
-        // 제로폭 공백, BOM 등 제거
-        text = text.replaceAll("[\\u200B-\\u200D\\uFEFF]", "");
-        // nbsp → 일반 공백
-        text = text.replace('\u00A0', ' ');
-        // 공백 정규화
-        text = text.replaceAll("\\s+", " ");
-
-        return text.trim();
-    }
-
     private JobPostingContent toJobPostingContentFromRallitJson(String url, URI uri, JsonNode node) {
         String title = node.path("title").asText("");
         String companyName = node.path("companyName").asText("");
