@@ -4,7 +4,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalDate;
 import java.util.List;
 import lombok.Builder;
-import org.squad.careerhub.domain.application.entity.ApplicationStatus;
+import org.squad.careerhub.domain.application.entity.StageType;
 
 @Schema(description = "지원서 상세 응답 DTO")
 @Builder
@@ -24,8 +24,8 @@ public record ApplicationDetailResponse(
         @Schema(description = "근무지", example = "Seoul, Korea")
         String jobLocation,
 
-        @Schema(description = "지원서 상태", example = "서류 제출 완료")
-        String applicationStatus,
+        @Schema(description = "지원서 전형 단계", example = "서류 전형")
+        String currentStageType,
 
         @Schema(description = "제출일", example = "2025.03.25", type = "string", pattern = "yyyy.MM.dd")
         LocalDate deadline,
@@ -50,7 +50,7 @@ public record ApplicationDetailResponse(
                 .company("Naver")
                 .position("Backend Developer")
                 .jobLocation("Seoul, Korea")
-                .applicationStatus(ApplicationStatus.DOCUMENT_SUBMITTED.getDescription())
+                .currentStageType(StageType.DOCUMENT.getDescription())
                 .deadline(LocalDate.of(2025, 3, 25))
                 .submittedAt(LocalDate.of(2025, 3, 20))
                 .applicationMethod("Online Application")
