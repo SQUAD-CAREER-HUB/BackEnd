@@ -6,7 +6,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.time.LocalDate;
 import lombok.Builder;
-import org.squad.careerhub.domain.application.entity.ApplicationStatus;
+import org.squad.careerhub.domain.application.entity.StageType;
 
 @Schema(description = "지원서 수정 요청 DTO")
 @Builder
@@ -26,9 +26,9 @@ public record ApplicationUpdateRequest(
         @NotBlank(message = "근무지는 필수 입력 항목입니다.")
         String jobLocation,
 
-        @Schema(description = "지원서 상태", example = "DOCUMENT_SUBMITTED")
-        @NotNull(message = "지원서 상태는 필수 입력 항목입니다.")
-        ApplicationStatus applicationStatus,
+        @Schema(description = "지원서 현재 전형 단계", example = "DOCUMENT")
+        @NotNull(message = "지원서 현재 전형 단계는 필수 입력 항목입니다.")
+        StageType stageType,
 
         @Schema(description = "제출일", example = "2025.03.25", type = "string", pattern = "yyyy.MM.dd")
         @JsonFormat(pattern = "yyyy.MM.dd")

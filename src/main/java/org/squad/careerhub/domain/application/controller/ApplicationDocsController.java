@@ -18,7 +18,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.multipart.MultipartFile;
 import org.squad.careerhub.domain.application.controller.dto.ApplicationCreateRequest;
 import org.squad.careerhub.domain.application.controller.dto.ApplicationUpdateRequest;
-import org.squad.careerhub.domain.application.entity.ApplicationStatus;
+import org.squad.careerhub.domain.application.entity.StageType;
 import org.squad.careerhub.domain.application.service.dto.response.ApplicationDetailResponse;
 import org.squad.careerhub.domain.application.service.dto.response.ApplicationPageResponse;
 import org.squad.careerhub.domain.application.service.dto.response.ApplicationStatisticsResponse;
@@ -180,13 +180,13 @@ public abstract class ApplicationDocsController {
                     
                     - **[요청 파라미터]**<br>
                       - **query**: 검색어 (선택 사항, 회사명 검색)<br>
-                      - **applicationStatus**: 지원 상태 필터 (필수)<br>
+                      - **stageType**: 지원 상태 필터 (필수)<br>
                       - **lastCursorId**: 마지막으로 조회한 지원 카드 ID (첫 페이지는 null, 다음 페이지는 이전 응답의 nextCursorId 사용)<br><br>
                     
                     - **[사용 예시]**<br>
-                      1. 첫 페이지 조회: /v1/applications?applicationStatus=ALL<br>
-                      2. 다음 페이지 조회: /v1/applications?applicationStatus=ALL&lastCursorId=20<br>
-                      3. 검색어 포함: /v1/applications?query=네이버&applicationStatus=ALL
+                      1. 첫 페이지 조회: /v1/applications?stageType=ALL<br>
+                      2. 다음 페이지 조회: /v1/applications?stageType=ALL&lastCursorId=20<br>
+                      3. 검색어 포함: /v1/applications?query=네이버&stageType=ALL
                     """
     )
     @ApiResponse(
@@ -210,11 +210,11 @@ public abstract class ApplicationDocsController {
             String query,
 
             @Parameter(
-                    description = "지원 상태 필터",
+                    description = "현재 지원서 전형 단계",
                     example = "ALL (기본값)",
                     required = true
             )
-            ApplicationStatus applicationStatus,
+            StageType stageType,
 
             @Parameter(
                     description = "마지막으로 조회한 지원 카드 ID (다음 페이지 커서)",

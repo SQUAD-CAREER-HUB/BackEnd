@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import org.squad.careerhub.domain.application.controller.dto.ApplicationCreateRequest;
 import org.squad.careerhub.domain.application.controller.dto.ApplicationUpdateRequest;
-import org.squad.careerhub.domain.application.entity.ApplicationStatus;
+import org.squad.careerhub.domain.application.entity.StageType;
 import org.squad.careerhub.domain.application.service.ApplicationService;
 import org.squad.careerhub.domain.application.service.dto.response.ApplicationDetailResponse;
 import org.squad.careerhub.domain.application.service.dto.response.ApplicationPageResponse;
@@ -80,7 +80,7 @@ public class ApplicationController extends ApplicationDocsController {
     @GetMapping("/v1/applications")
     public ResponseEntity<ApplicationPageResponse> getApplications(
             @RequestParam(required = false) String query,
-            @RequestParam ApplicationStatus applicationStatus,
+            @RequestParam StageType stageType,
             @RequestParam(required = false) Long lastCursorId,
             @LoginMember Long memberId
     ) {

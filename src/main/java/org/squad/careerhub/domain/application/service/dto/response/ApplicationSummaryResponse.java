@@ -22,8 +22,8 @@ public record ApplicationSummaryResponse(
         @Schema(description = "마감일", example = "2025.03.25", type = "string", pattern = "yyyy.MM.dd")
         LocalDate deadline,
 
-        @Schema(description = "지원서 상태", example = "서류 제출 완료")
-        String applicationStatus,
+        @Schema(description = "지원서 현재 전형 단계", example = "서류 전형")
+        String currentStageType,
 
         @Schema(description = "다음 면접 날짜", example = "2025.04.10", type = "string", pattern = "yyyy.MM.dd")
         LocalDate nextInterviewDate
