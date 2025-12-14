@@ -98,6 +98,7 @@ class ApplicationServiceIntegrationTest extends IntegrationTestSupport {
                 Application::getPosition,
                 Application::getJobPostingUrl,
                 Application::getApplicationMethod,
+                Application::getCurrentStageType,
                 Application::getDeadline,
                 Application::getSubmittedAt,
                 Application::getMemo
@@ -106,6 +107,7 @@ class ApplicationServiceIntegrationTest extends IntegrationTestSupport {
                 jobPosting.position(),
                 jobPosting.jobPostingUrl(),
                 applicationInfo.applicationMethod(),
+                documentStage.stageType(),
                 applicationInfo.deadline(),
                 applicationInfo.submittedAt(),
                 null
@@ -157,15 +159,39 @@ class ApplicationServiceIntegrationTest extends IntegrationTestSupport {
         var interviewNewStage = createInterviewNewStage();
 
         // when
+        var jobPosting = createJobPosting("당근마켓", "안드로이드 개발자", "https://careers.daangn.com");
+        var applicationInfo = createApplicationInfo();
         var applicationId = applicationService.createApplication(
-                createJobPosting("당근마켓", "안드로이드 개발자", "https://careers.daangn.com"),
-                createApplicationInfo(),
+                jobPosting,
+                applicationInfo,
                 interviewNewStage,
                 List.of(),
                 testMember.getId()
         );
 
         // then
+        // Application 검증
+        var application = applicationRepository.findById(applicationId).orElseThrow();
+        assertThat(application).extracting(
+                Application::getCompany,
+                Application::getPosition,
+                Application::getJobPostingUrl,
+                Application::getApplicationMethod,
+                Application::getCurrentStageType,
+                Application::getDeadline,
+                Application::getSubmittedAt,
+                Application::getMemo
+        ).containsExactly(
+                jobPosting.company(),
+                jobPosting.position(),
+                jobPosting.jobPostingUrl(),
+                applicationInfo.applicationMethod(),
+                interviewNewStage.stageType(),
+                applicationInfo.deadline(),
+                applicationInfo.submittedAt(),
+                null
+        );
+
         List<ApplicationStage> stages = applicationStageRepository.findByApplicationId(applicationId);
         assertThat(stages).hasSize(2);
 
@@ -231,20 +257,44 @@ class ApplicationServiceIntegrationTest extends IntegrationTestSupport {
                 .newEtcSchedule(etcSchedule)
                 .newInterviewSchedules(List.of())
                 .build();
+        var jobPosting = createJobPosting("NHN", "게임 서버 개발자", "https://careers.nhn.com");
+        var applicationInfo = createApplicationInfo();
 
         // when
         var applicationId = applicationService.createApplication(
-                createJobPosting("NHN", "게임 서버 개발자", "https://careers.nhn.com"),
-                createApplicationInfo(),
+                jobPosting,
+                applicationInfo,
                 etcNewStage,
                 List.of(),
                 testMember.getId()
         );
 
         // then
+        // Application 검증
+        var application = applicationRepository.findById(applicationId).orElseThrow();
+        assertThat(application).extracting(
+                Application::getCompany,
+                Application::getPosition,
+                Application::getJobPostingUrl,
+                Application::getApplicationMethod,
+                Application::getCurrentStageType,
+                Application::getDeadline,
+                Application::getSubmittedAt,
+                Application::getMemo
+        ).containsExactly(
+                jobPosting.company(),
+                jobPosting.position(),
+                jobPosting.jobPostingUrl(),
+                applicationInfo.applicationMethod(),
+                etcNewStage.stageType(),
+                applicationInfo.deadline(),
+                applicationInfo.submittedAt(),
+                null
+        );
+
         List<ApplicationStage> stages = applicationStageRepository.findByApplicationId(applicationId);
         assertThat(stages).hasSize(2);
-
+        // 기타 전형 검증
         var etcStage = stages.stream()
                 .filter(s -> s.getStageType() == StageType.ETC)
                 .findFirst()
@@ -364,21 +414,44 @@ class ApplicationServiceIntegrationTest extends IntegrationTestSupport {
     @Test
     void 최종합격_전형_지원서가_정상_생성된다() {
         // given
-        var finalNewStage = NewStage.builder()
+        var finalPassNewStage = NewStage.builder()
                 .stageType(StageType.FINAL_PASS)
                 .newInterviewSchedules(List.of())
                 .build();
+        var jobPosting = createJobPosting("현대자동차", "자율주행 엔지니어", null);
+        var applicationInfo = createApplicationInfo();
 
         // when
         var applicationId = applicationService.createApplication(
-                createJobPosting("현대자동차", "자율주행 엔지니어", null),
-                createApplicationInfo(),
-                finalNewStage,
+                jobPosting,
+                applicationInfo,
+                finalPassNewStage,
                 List.of(),
                 testMember.getId()
         );
 
         // then
+        var application = applicationRepository.findById(applicationId).orElseThrow();
+        // Application 검증
+        assertThat(application).extracting(
+                Application::getCompany,
+                Application::getPosition,
+                Application::getJobPostingUrl,
+                Application::getApplicationMethod,
+                Application::getCurrentStageType,
+                Application::getDeadline,
+                Application::getSubmittedAt,
+                Application::getMemo
+        ).containsExactly(
+                jobPosting.company(),
+                jobPosting.position(),
+                jobPosting.jobPostingUrl(),
+                applicationInfo.applicationMethod(),
+                finalPassNewStage.stageType(),
+                applicationInfo.deadline(),
+                applicationInfo.submittedAt(),
+                null
+        );
         List<ApplicationStage> stages = applicationStageRepository.findByApplicationId(applicationId);
         assertThat(stages).hasSize(2);
 
@@ -388,6 +461,59 @@ class ApplicationServiceIntegrationTest extends IntegrationTestSupport {
                 .orElseThrow();
 
         assertThat(finalStage.getStageName()).isEqualTo(StageType.FINAL_PASS.getDescription());
+    }
+
+    @Test
+    void 최종_불합격_전형_지원서가_정상_생성된다() {
+        // given
+        var finalFailNewStage = NewStage.builder()
+                .stageType(StageType.FINAL_FAIL)
+                .newInterviewSchedules(List.of())
+                .build();
+        var jobPosting = createJobPosting("현대자동차", "자율주행 엔지니어", null);
+        var applicationInfo = createApplicationInfo();
+
+        // when
+        var applicationId = applicationService.createApplication(
+                jobPosting,
+                applicationInfo,
+                finalFailNewStage,
+                List.of(),
+                testMember.getId()
+        );
+
+        // then
+        // Application 검증
+        var application = applicationRepository.findById(applicationId).orElseThrow();
+        assertThat(application).extracting(
+                Application::getCompany,
+                Application::getPosition,
+                Application::getJobPostingUrl,
+                Application::getApplicationMethod,
+                Application::getCurrentStageType,
+                Application::getDeadline,
+                Application::getSubmittedAt,
+                Application::getMemo
+        ).containsExactly(
+                jobPosting.company(),
+                jobPosting.position(),
+                jobPosting.jobPostingUrl(),
+                applicationInfo.applicationMethod(),
+                finalFailNewStage.stageType(),
+                applicationInfo.deadline(),
+                applicationInfo.submittedAt(),
+                null
+        );
+        // ApplicationStage 검증
+        List<ApplicationStage> stages = applicationStageRepository.findByApplicationId(applicationId);
+        assertThat(stages).hasSize(2);
+
+        var finalStage = stages.stream()
+                .filter(s -> s.getStageType() == StageType.FINAL_FAIL)
+                .findFirst()
+                .orElseThrow();
+
+        assertThat(finalStage.getStageName()).isEqualTo(StageType.FINAL_FAIL.getDescription());
     }
 
     @Test

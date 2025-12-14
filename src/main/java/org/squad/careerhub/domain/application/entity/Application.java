@@ -37,6 +37,10 @@ public class Application extends BaseEntity {
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
+    private StageType currentStageType;
+
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
     private ApplicationMethod applicationMethod;
 
     @Column(nullable = false)
@@ -53,6 +57,7 @@ public class Application extends BaseEntity {
             String company,
             String position,
             String jobLocation,
+            StageType currentStageType,
             ApplicationMethod applicationMethod,
             LocalDate deadline,
             LocalDate submittedAt
@@ -64,6 +69,7 @@ public class Application extends BaseEntity {
         application.company = requireNonNull(company);
         application.position = requireNonNull(position);
         application.jobLocation = requireNonNull(jobLocation);
+        application.currentStageType = requireNonNull(currentStageType);
         application.applicationMethod = requireNonNull(applicationMethod);
         application.deadline = requireNonNull(deadline);
         application.submittedAt = submittedAt;
