@@ -13,7 +13,7 @@ public enum StageType {
     ETC        (2, "기타 전형"),
     INTERVIEW  (3, "면접 전형"),
     FINAL_PASS (4, "최종 합격"),
-    FINAL_FAIL (4, "최종 합격"),
+    FINAL_FAIL (4, "최종 불합격"),
     ;
 
     private final int order;
