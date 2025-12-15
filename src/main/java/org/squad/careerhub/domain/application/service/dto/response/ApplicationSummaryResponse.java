@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import lombok.Builder;
+import org.squad.careerhub.domain.application.entity.StageStatus;
 import org.squad.careerhub.domain.application.entity.StageType;
 
 @Schema(description = "지원서 요약 응답 DTO")
@@ -21,7 +22,7 @@ public record ApplicationSummaryResponse(
         @Schema(description = "지원서 현재 전형 단계", example = "서류 전형")
         String currentStageType,
 
-        @Schema(description = "지원서 현재 전형 상태", example = "제출 완료")
+        @Schema(description = "지원서 현재 전형 상태", example = "PASS")
         String currentStageStatus,
 
         @Schema(description = "제출일")
@@ -40,7 +41,7 @@ public record ApplicationSummaryResponse(
             String company,
             String position,
             StageType currentStageTypeEnum,
-            String currentStageStatus,
+            StageStatus currentStageStatusEnum,
             LocalDate submittedAt,
             LocalDate deadline,
             LocalDateTime nextInterviewDate
@@ -50,7 +51,7 @@ public record ApplicationSummaryResponse(
                 company,
                 position,
                 currentStageTypeEnum.getDescription(),
-                currentStageStatus,
+                currentStageStatusEnum.name(),
                 submittedAt,
                 deadline,
                 nextInterviewDate
@@ -63,6 +64,7 @@ public record ApplicationSummaryResponse(
                 .company(company)
                 .position(position)
                 .currentStageType(currentStageType)
+                .currentStageStatus(currentStageStatus)
                 .submittedAt(submittedAt)
                 .deadline(deadline)
                 .nextInterviewDate(nextInterview)

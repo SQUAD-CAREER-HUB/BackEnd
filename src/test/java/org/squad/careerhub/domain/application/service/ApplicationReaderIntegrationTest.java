@@ -15,6 +15,7 @@ import org.squad.careerhub.domain.application.entity.Application;
 import org.squad.careerhub.domain.application.entity.ApplicationMethod;
 import org.squad.careerhub.domain.application.entity.ApplicationStage;
 import org.squad.careerhub.domain.application.entity.StageResult;
+import org.squad.careerhub.domain.application.entity.StageStatus;
 import org.squad.careerhub.domain.application.entity.StageType;
 import org.squad.careerhub.domain.application.entity.SubmissionStatus;
 import org.squad.careerhub.domain.application.repository.ApplicationJpaRepository;
@@ -80,9 +81,9 @@ class ApplicationReaderIntegrationTest extends IntegrationTestSupport {
     @Test
     void 회사명으로_검색하여_지원서를_조회한다() {
         // given
-        createApplication(member, "카카오", "백엔드 개발자", StageType.DOCUMENT);
-        createApplication(member, "네이버", "프론트엔드 개발자", StageType.INTERVIEW);
-        createApplication(member, "라인", "DevOps 엔지니어", StageType.ETC);
+        createApplicationWithStage(member, "카카오", "백엔드 개발자", StageType.DOCUMENT);
+        createApplicationWithStage(member, "네이버", "프론트엔드 개발자", StageType.INTERVIEW);
+        createApplicationWithStage(member, "라인", "DevOps 엔지니어", StageType.ETC);
 
         var condition = SearchCondition.builder()
                 .query("카카오")
@@ -97,20 +98,22 @@ class ApplicationReaderIntegrationTest extends IntegrationTestSupport {
         assertThat(response.contents().getFirst()).extracting(
                 ApplicationSummaryResponse::company,
                 ApplicationSummaryResponse::position,
-                ApplicationSummaryResponse::currentStageType
+                ApplicationSummaryResponse::currentStageType,
+                ApplicationSummaryResponse::currentStageStatus
         ).containsExactly(
                 "카카오",
                 "백엔드 개발자",
-                StageType.DOCUMENT.getDescription()
+                StageType.DOCUMENT.getDescription(),
+                StageStatus.WAITING.name()
         );
     }
 
     @Test
     void 직무명으로_검색하여_지원서를_조회한다() {
         // given
-        createApplication(member, "카카오", "백엔드 개발자", StageType.DOCUMENT);
-        createApplication(member, "네이버", "프론트엔드 개발자", StageType.INTERVIEW);
-        createApplication(member, "라인", "DevOps 엔지니어", StageType.ETC);
+        createApplicationWithStage(member, "카카오", "백엔드 개발자", StageType.DOCUMENT);
+        createApplicationWithStage(member, "네이버", "프론트엔드 개발자", StageType.INTERVIEW);
+        createApplicationWithStage(member, "라인", "DevOps 엔지니어", StageType.ETC);
 
         var condition = SearchCondition.builder()
                 .query("백엔드")
@@ -130,16 +133,17 @@ class ApplicationReaderIntegrationTest extends IntegrationTestSupport {
         ).containsExactly(
                 "카카오",
                 "백엔드 개발자",
-                StageType.DOCUMENT.getDescription()
+                StageType.DOCUMENT.getDescription(),
+                StageStatus.WAITING.name()
         );
     }
 
     @Test
     void 전형_타입으로_필터링하여_지원서를_조회한다() {
         // given
-        createApplication(member, "카카오", "백엔드 개발자", StageType.INTERVIEW);
-        createApplication(member, "네이버", "프론트엔드 개발자", StageType.DOCUMENT);
-        createApplication(member, "쿠팡", "DevOps 개발자", StageType.ETC);
+        createApplicationWithStage(member, "카카오", "백엔드 개발자", StageType.INTERVIEW);
+        createApplicationWithStage(member, "네이버", "프론트엔드 개발자", StageType.DOCUMENT);
+        createApplicationWithStage(member, "쿠팡", "DevOps 개발자", StageType.ETC);
 
         var condition = SearchCondition.builder()
                 .stageTypes(List.of(StageType.INTERVIEW))
@@ -155,21 +159,23 @@ class ApplicationReaderIntegrationTest extends IntegrationTestSupport {
                 .extracting(
                         ApplicationSummaryResponse::company,
                         ApplicationSummaryResponse::position,
-                        ApplicationSummaryResponse::currentStageType
+                        ApplicationSummaryResponse::currentStageType,
+                        ApplicationSummaryResponse::currentStageStatus
                 ).containsExactly(
                         "카카오",
                         "백엔드 개발자",
-                        StageType.INTERVIEW.getDescription()
+                        StageType.INTERVIEW.getDescription(),
+                        StageStatus.WAITING.name()
                 );
     }
 
     @Test
     void 여러_가지_전형_타입으로_필터링하여_지원서를_조회한다() {
         // given
-        var app1 = createApplication(member, "카카오", "백엔드 개발자", StageType.INTERVIEW);
+        var app1 = createApplicationWithStage(member, "카카오", "백엔드 개발자", StageType.INTERVIEW);
         createApplicationStage(app1, StageType.DOCUMENT, SubmissionStatus.SUBMITTED);
 
-        createApplication(member, "네이버", "프론트엔드 개발자", StageType.DOCUMENT);
+        createApplicationWithStage(member, "네이버", "프론트엔드 개발자", StageType.DOCUMENT);
 
         var condition = SearchCondition.builder()
                 .stageTypes(List.of(StageType.INTERVIEW, StageType.DOCUMENT))
@@ -188,18 +194,16 @@ class ApplicationReaderIntegrationTest extends IntegrationTestSupport {
     @Test
     void 서류_제출_상태로_필터링하여_지원서를_조회한다() {
         // given
-        var app1 = createApplication(member, "카카오", "백엔드 개발자", StageType.DOCUMENT);
+        var app1 = createApplicationWithStage(member, "카카오", "백엔드 개발자", StageType.DOCUMENT);
         createApplicationStage(app1, StageType.DOCUMENT, SubmissionStatus.SUBMITTED);
 
-        var app2 = createApplication(member, "네이버", "프론트엔드 개발자", StageType.DOCUMENT);
+        var app2 = createApplicationWithStage(member, "네이버", "프론트엔드 개발자", StageType.DOCUMENT);
         createApplicationStage(app2, StageType.DOCUMENT, SubmissionStatus.NOT_SUBMITTED);
 
-        var condition = new SearchCondition(
-                null,
-                List.of(StageType.DOCUMENT),
-                SubmissionStatus.SUBMITTED,
-                null
-        );
+        var condition = SearchCondition.builder()
+                .stageTypes(List.of(StageType.DOCUMENT))
+                .submissionStatus(SubmissionStatus.SUBMITTED)
+                .build();
         var cursor = Cursor.of(null, 20);
 
         // when
@@ -213,7 +217,7 @@ class ApplicationReaderIntegrationTest extends IntegrationTestSupport {
     @Test
     void 가장_가까운_면접_일정이_포함되어_조회된다() {
         // given
-        var kakaoApp = createApplication(member, "카카오", "백엔드 개발자", StageType.INTERVIEW);
+        var kakaoApp = createApplicationWithStage(member, "카카오", "백엔드 개발자", StageType.INTERVIEW);
         createApplicationSchedule(
                 kakaoApp,
                 "1차 면접",
@@ -229,9 +233,10 @@ class ApplicationReaderIntegrationTest extends IntegrationTestSupport {
                 LocalDateTime.of(2025, 12, 25, 14, 0)
         );
 
-        var naverApp = createApplication(member, "네이버", "프론트엔드 개발자", StageType.DOCUMENT);
+        var naverApp = createApplicationWithStage(member, "네이버", "프론트엔드 개발자", StageType.DOCUMENT);
 
-        var condition = new SearchCondition(null, null, null, null);
+        var condition = SearchCondition.builder().build();
+        ;
         var cursor = Cursor.of(null, 20);
 
         // when
@@ -260,7 +265,8 @@ class ApplicationReaderIntegrationTest extends IntegrationTestSupport {
     void 커서_기반_페이지네이션이_정상_작동한다() {
         // given
         createRandomApplications(member, 15);
-        var condition = new SearchCondition(null, null, null, null);
+        var condition = SearchCondition.builder().build();
+        ;
         var firstCursor = Cursor.of(null, 10);
 
         // when - 첫 페이지
@@ -284,7 +290,7 @@ class ApplicationReaderIntegrationTest extends IntegrationTestSupport {
     @Test
     void 다른_사용자의_지원서는_조회되지_않는다() {
         // given
-        createApplication(member, "카카오", "백엔드", StageType.DOCUMENT);
+        createApplicationWithStage(member, "카카오", "백엔드", StageType.DOCUMENT);
 
         var otherMember = Member.create(
                 "other@example.com",
@@ -295,7 +301,7 @@ class ApplicationReaderIntegrationTest extends IntegrationTestSupport {
         );
         memberRepository.save(otherMember);
 
-        var condition = new SearchCondition(null, null, null, null);
+        var condition = SearchCondition.builder().build();
         var cursor = Cursor.of(null, 20);
 
         // when
@@ -319,11 +325,12 @@ class ApplicationReaderIntegrationTest extends IntegrationTestSupport {
         );
         memberRepository.save(emptyMember);
 
-        var condition = new SearchCondition(null, null, null, null);
+        var condition = SearchCondition.builder().build();
         var cursor = Cursor.of(null, 20);
 
         // when
-        PageResponse<ApplicationSummaryResponse> response = applicationReader.findApplications(condition, cursor, emptyMember.getId());
+        PageResponse<ApplicationSummaryResponse> response = applicationReader.findApplications(condition, cursor,
+                emptyMember.getId());
 
         // then
         assertThat(response.contents()).isEmpty();
@@ -334,20 +341,18 @@ class ApplicationReaderIntegrationTest extends IntegrationTestSupport {
     @Test
     void 복합_조건으로_검색이_가능하다() {
         // given
-        var app1 = createApplication(member, "카카오", "백엔드 개발자", StageType.INTERVIEW);
+        var app1 = createApplicationWithStage(member, "카카오", "백엔드 개발자", StageType.INTERVIEW);
         createPassedDocumentStage(app1);
-        var app2 = createApplication(member, "쿠팡", "백엔드 개발자", StageType.ETC);
+        var app2 = createApplicationWithStage(member, "쿠팡", "백엔드 개발자", StageType.ETC);
         createPassedDocumentStage(app2);
 
-        createApplication(member, "네이버", "프론트엔드 개발자", StageType.DOCUMENT);
-        createApplication(member, "라인", "백엔드 개발자", StageType.DOCUMENT);
+        createApplicationWithStage(member, "네이버", "프론트엔드 개발자", StageType.DOCUMENT);
+        createApplicationWithStage(member, "라인", "백엔드 개발자", StageType.DOCUMENT);
 
-        var condition = new SearchCondition(
-                "개발자",
-                List.of(StageType.INTERVIEW, StageType.ETC),
-                null,
-                StageResult.STAGE_PASS
-        );
+        var condition = SearchCondition.builder()
+                .query("개발자")
+                .stageTypes(List.of(StageType.INTERVIEW, StageType.ETC))
+                .build();
         var cursor = Cursor.of(null, 20);
 
         // when
@@ -364,12 +369,45 @@ class ApplicationReaderIntegrationTest extends IntegrationTestSupport {
     }
 
     @Test
+    void 전형_합격_필터링으로_검색이_가능하다() {
+        // given
+        var app1 = createApplication(member, "네이버", "프론트엔드 개발자", StageType.DOCUMENT);
+        var applicationStage1 = createApplicationStage(app1, StageType.DOCUMENT, SubmissionStatus.SUBMITTED);
+        applicationStage1.updateStageStatus(StageStatus.PASS);
+
+        var app2 = createApplication(member, "라인", "백엔드 개발자", StageType.INTERVIEW);
+        var applicationStage2 = createApplicationStage(app2, StageType.INTERVIEW, null);
+        applicationStage2.updateStageStatus(StageStatus.PASS);
+
+        var app3 = createApplication(member, "쿠팡", "백엔드 개발자", StageType.INTERVIEW);
+        var applicationStage3 = createApplicationStage(app3, StageType.INTERVIEW, null);
+
+        var condition = SearchCondition.builder()
+                .stageTypes(List.of(StageType.INTERVIEW, StageType.DOCUMENT))
+                .stageResult(StageResult.STAGE_PASS)
+                .build();
+        var cursor = Cursor.of(null, 20);
+
+        // when
+        PageResponse<ApplicationSummaryResponse> response = applicationReader.findApplications(condition, cursor, member.getId());
+
+        // then
+        assertThat(response.contents()).hasSize(2);
+        assertThat(response.contents()).extracting(
+                ApplicationSummaryResponse::company
+        ).containsExactlyInAnyOrder(
+                "네이버",
+                "라인"
+        );
+    }
+
+    @Test
     void 랜덤_StageType_으로_다양한_지원서를_생성하고_조회한다() {
         // given
         int size = 20;
         createRandomApplications(member, size);
 
-        var condition = new SearchCondition(null, null, null, null);
+        var condition = SearchCondition.builder().build();
         var cursor = Cursor.of(null, 10);
 
         // when
@@ -381,7 +419,7 @@ class ApplicationReaderIntegrationTest extends IntegrationTestSupport {
         assertThat(response.nextCursorId()).isNotNull();
     }
 
-    private Application createApplication(
+    private Application createApplicationWithStage(
             Member member,
             String company,
             String position,
@@ -405,6 +443,28 @@ class ApplicationReaderIntegrationTest extends IntegrationTestSupport {
                 : null;
 
         createApplicationStage(app, stageType, submissionStatus);
+
+        return app;
+    }
+
+    private Application createApplication(
+            Member member,
+            String company,
+            String position,
+            StageType stageType
+    ) {
+        Application app = Application.create(
+                member,
+                "jobPosting",
+                company,
+                position,
+                "서울",
+                stageType,
+                ApplicationMethod.EMAIL,
+                LocalDate.now(),
+                LocalDate.now().plusDays(30)
+        );
+        applicationRepository.save(app);
 
         return app;
     }
@@ -473,7 +533,7 @@ class ApplicationReaderIntegrationTest extends IntegrationTestSupport {
         }
     }
 
-    private void createApplicationStage(
+    private ApplicationStage createApplicationStage(
             Application app,
             StageType stageType,
             SubmissionStatus submissionStatus
@@ -484,7 +544,7 @@ class ApplicationReaderIntegrationTest extends IntegrationTestSupport {
                 stageType.getDescription(),
                 submissionStatus
         );
-        applicationStageRepository.save(stage);
+        return applicationStageRepository.save(stage);
     }
 
     private void createPassedDocumentStage(Application app) {

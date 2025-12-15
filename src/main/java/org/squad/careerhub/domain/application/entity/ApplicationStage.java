@@ -61,4 +61,10 @@ public class ApplicationStage extends BaseEntity {
         );
     }
 
+    // test 용으로 작성
+    public void updateStageStatus(StageStatus stageStatus) {
+        this.stageStatus = stageStatus;
+    }
+
+
 }
