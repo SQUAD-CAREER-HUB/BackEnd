@@ -10,6 +10,8 @@ import org.squad.careerhub.domain.application.entity.StageType;
 import org.squad.careerhub.domain.application.service.dto.NewApplicationInfo;
 import org.squad.careerhub.domain.application.service.dto.NewJobPosting;
 import org.squad.careerhub.domain.application.service.dto.NewStage;
+import org.squad.careerhub.domain.application.service.dto.SearchCondition;
+import org.squad.careerhub.domain.application.service.dto.response.ApplicationSummaryResponse;
 import org.squad.careerhub.domain.application.repository.dto.BeforeDeadlineApplicationResponse;
 import org.squad.careerhub.domain.application.service.dto.response.ApplicationStatisticsResponse;
 import org.squad.careerhub.domain.schedule.service.InterviewScheduleManager;
@@ -64,6 +66,14 @@ public class ApplicationService {
         }
 
         return application.getId();
+    }
+
+    public PageResponse<ApplicationSummaryResponse> findApplications(
+            SearchCondition searchCondition,
+            Cursor cursor,
+            Long memberId
+    ) {
+       return applicationReader.findApplications(searchCondition, cursor, memberId);
     }
 
     public ApplicationStatisticsResponse getApplicationStatic(Long authorId) {

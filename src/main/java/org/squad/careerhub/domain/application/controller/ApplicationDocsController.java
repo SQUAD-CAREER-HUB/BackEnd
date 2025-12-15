@@ -19,11 +19,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.multipart.MultipartFile;
 import org.squad.careerhub.domain.application.controller.dto.ApplicationCreateRequest;
 import org.squad.careerhub.domain.application.controller.dto.ApplicationUpdateRequest;
+import org.squad.careerhub.domain.application.entity.StageResult;
 import org.squad.careerhub.domain.application.entity.StageType;
-import org.squad.careerhub.domain.application.service.dto.response.ApplicationDetailResponse;
-import org.squad.careerhub.domain.application.service.dto.response.ApplicationPageResponse;
-import org.squad.careerhub.domain.application.service.dto.response.ApplicationStatisticsResponse;
+import org.squad.careerhub.domain.application.entity.SubmissionStatus;
 import org.squad.careerhub.domain.application.repository.dto.BeforeDeadlineApplicationResponse;
+import org.squad.careerhub.domain.application.service.dto.response.ApplicationDetailResponse;
+import org.squad.careerhub.domain.application.service.dto.response.ApplicationStatisticsResponse;
+import org.squad.careerhub.domain.application.service.dto.response.ApplicationSummaryResponse;
 import org.squad.careerhub.global.support.PageResponse;
 import org.squad.careerhub.global.swagger.ApiExceptions;
 
@@ -164,59 +166,69 @@ public abstract class ApplicationDocsController {
             Long memberId
     );
 
-
     @Operation(
             summary = "지원 카드 목록 조회 - JWT O",
             description = """
-                    ### 검색어, 지원 상태 필터를 통해 지원 카드 목록을 조회합니다.<br><br>
+                    ### 검색어, 전형 단계, 서류 상태, 전형 결과 필터를 통해 지원 카드 목록을 조회합니다.<br><br>
                     
                     - **[페이징 방식]**<br>
                       - 커서 기반 페이징 사용<br>
                       - 한 페이지당 기본 20개의 지원 카드 조회<br>
                     
                     - **[요청 파라미터]**<br>
-                      - **query**: 검색어 (선택 사항, 회사명 검색)<br>
-                      - **stageType**: 지원 상태 필터 (필수)<br>
-                      - **lastCursorId**: 마지막으로 조회한 지원 카드 ID (첫 페이지는 null, 다음 페이지는 이전 응답의 nextCursorId 사용)<br><br>
+                      - **query**: 검색어 (선택 사항, 회사명 또는 직무명 검색)<br>
+                      - **stageType**: 전형 단계 필터 (선택 사항)<br>
+                      - **submissionStatus**: 서류 상태 필터 (선택 사항, 서류 전형일 경우 유효합니다)<br>
+                      - **stageResult**: 전형 결과 필터 (선택 사항)<br>
+                      - **lastCursorId**: 마지막으로 조회한 지원 카드 ID (첫 페이지는 null, 다음 페이지는 이전 응답의 nextCursorId 사용)<br>
+                      - **size**: 한 페이지당 조회할 지원 카드 개수 (기본값 20 10 <= size <=30)<br><br>
                     
                     - **[사용 예시]**<br>
-                      1. 첫 페이지 조회: /v1/applications?stageType=ALL<br>
-                      2. 다음 페이지 조회: /v1/applications?stageType=ALL&lastCursorId=20<br>
-                      3. 검색어 포함: /v1/applications?query=네이버&stageType=ALL
+                      1. 첫 페이지 조회: /v1/applications?size=20<br>
+                      2. 다음 페이지 조회: /v1/applications?lastCursorId=20&size=20<br>
+                      3. 검색어 포함: /v1/applications?query=네이버&size=20<br>
+                      4. 지원 상태 필터링: /v1/applications?stageType=INTERVIEWING&size=20<br>
+                      5. 제출 상태 필터링: /v1/applications?submissionStatus=SUBMITTED&size=20<br>
+                      6. 전형 결과 필터링: /v1/applications?stageResult=STAGE_PASS&size=20
+                      7. 복합 필터링: /v1/applications?query=네이버&stageType=INTERVIEWING&stageType=ETC&stageResult=STAGE_PASS&size=20
                     """
-    )
-    @ApiResponse(
-            responseCode = "200",
-            description = "지원 카드 목록 조회 성공",
-            content = @Content(
-                    mediaType = MediaType.APPLICATION_JSON_VALUE,
-                    schema = @Schema(implementation = ApplicationPageResponse.class)
-            )
     )
     @ApiExceptions(values = {
             UNAUTHORIZED_ERROR,
             BAD_REQUEST,
             INTERNAL_SERVER_ERROR
     })
-    public abstract ResponseEntity<ApplicationPageResponse> getApplications(
+    public abstract ResponseEntity<PageResponse<ApplicationSummaryResponse>> findApplications(
             @Parameter(
-                    description = "검색어 (회사명, 포지션 등)",
+                    description = "검색어 (회사명, 직무)",
                     example = "Backend"
             )
             String query,
-
             @Parameter(
                     description = "현재 지원서 전형 단계",
-                    example = "ALL (기본값)",
-                    required = true
+                    example = "DOCUMENT"
             )
-            StageType stageType,
-
+            List<StageType> stageType,
+            @Parameter(
+                    description = "제출 상태",
+                    example = "NOT_SUBMITTED"
+            )
+            SubmissionStatus submissionStatus,
+            @Parameter(
+                    description = "전형 결과",
+                    example = "STAGE_PASS"
+            )
+            StageResult stageResult,
             @Parameter(
                     description = "마지막으로 조회한 지원 카드 ID (다음 페이지 커서)",
                     example = "10"
             )
             Long lastCursorId,
+            @Parameter(
+                    description = "한 페이지당 조회할 지원 카드 개수",
+                    example = "20"
+            )
+            int size,
             Long memberId
     );
 
