@@ -10,12 +10,14 @@ import org.squad.careerhub.domain.application.entity.SubmissionStatus;
 public record SearchCondition(
         String query,
         List<StageType> stageTypes,
-        SubmissionStatus submissionStatus,
-        StageResult stageResult
+        List<SubmissionStatus> submissionStatus,
+        List<StageResult> stageResult
 ) {
 
     public SearchCondition {
         stageTypes = (stageTypes != null) ? stageTypes : List.of();
+        submissionStatus = (submissionStatus != null) ? submissionStatus : List.of();
+        stageResult = (stageResult != null) ? stageResult : List.of();
     }
 
 }

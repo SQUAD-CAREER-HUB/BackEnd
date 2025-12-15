@@ -202,7 +202,7 @@ class ApplicationReaderIntegrationTest extends IntegrationTestSupport {
 
         var condition = SearchCondition.builder()
                 .stageTypes(List.of(StageType.DOCUMENT))
-                .submissionStatus(SubmissionStatus.SUBMITTED)
+                .submissionStatus(List.of(SubmissionStatus.SUBMITTED))
                 .build();
         var cursor = Cursor.of(null, 20);
 
@@ -382,7 +382,7 @@ class ApplicationReaderIntegrationTest extends IntegrationTestSupport {
 
         var condition = SearchCondition.builder()
                 .stageTypes(List.of(StageType.INTERVIEW, StageType.DOCUMENT))
-                .stageResult(StageResult.STAGE_PASS)
+                .stageResult(List.of(StageResult.STAGE_PASS))
                 .build();
         var cursor = Cursor.of(null, 20);
 

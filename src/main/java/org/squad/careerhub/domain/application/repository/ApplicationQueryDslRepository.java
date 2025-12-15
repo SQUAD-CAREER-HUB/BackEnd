@@ -108,22 +108,32 @@ public class ApplicationQueryDslRepository {
     }
 
     // DOCUMENT 전형일 경우에만 필터링 가능
-    private BooleanExpression searchBySubmissionStatus(List<StageType> stageTypes, SubmissionStatus submissionStatus) {
-        if (submissionStatus == null || !stageTypes.contains(StageType.DOCUMENT)) {
+    private BooleanExpression searchBySubmissionStatus(List<StageType> stageTypes, List<SubmissionStatus> submissionStatus) {
+        if (submissionStatus == null || submissionStatus.isEmpty()) {
             return null;
         }
-        return applicationStage.submissionStatus.eq(submissionStatus);
+        if (!stageTypes.contains(StageType.DOCUMENT)) {
+            return null;
+        }
+        return applicationStage.submissionStatus.in(submissionStatus);
     }
 
-    private BooleanExpression searchByStageResult(StageResult stageResult) {
-        if (stageResult == null) {
+    private BooleanExpression searchByStageResult(List<StageResult> stageResults) {
+        if (stageResults == null || stageResults.isEmpty()) {
             return null;
         }
-        return switch (stageResult) {
-            case STAGE_PASS -> applicationStage.stageStatus.eq(StageStatus.PASS);
-            case FINAL_PASS -> applicationStage.stageType.eq(StageType.FINAL_PASS);
-            case FINAL_FAIL -> applicationStage.stageType.eq(StageType.FINAL_FAIL);
-        };
+
+        List<BooleanExpression> conditions = stageResults.stream()
+                .map(result -> switch (result) {
+                    case STAGE_PASS -> applicationStage.stageStatus.eq(StageStatus.PASS);
+                    case FINAL_PASS -> applicationStage.stageType.eq(StageType.FINAL_PASS);
+                    case FINAL_FAIL -> applicationStage.stageType.eq(StageType.FINAL_FAIL);
+                })
+                .toList();
+
+        return conditions.stream()
+                .reduce(BooleanExpression::or)
+                .orElse(null);
     }
 
     private BooleanExpression paginationCondition(Long lastCursorId) {

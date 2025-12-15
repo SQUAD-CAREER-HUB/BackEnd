@@ -192,10 +192,10 @@ public abstract class ApplicationDocsController {
                       1. 첫 페이지 조회: /v1/applications?size=20<br>
                       2. 다음 페이지 조회: /v1/applications?lastCursorId=20&size=20<br>
                       3. 검색어 포함: /v1/applications?query=네이버&size=20<br>
-                      4. 지원 상태 필터링: /v1/applications?stageType=INTERVIEWING&size=20<br>
+                      4. 지원 상태 필터링: /v1/applications?stageType=INTERVIEW&size=20<br>
                       5. 제출 상태 필터링: /v1/applications?submissionStatus=SUBMITTED&size=20<br>
                       6. 전형 결과 필터링: /v1/applications?stageResult=STAGE_PASS&size=20
-                      7. 복합 필터링: /v1/applications?query=네이버&stageType=INTERVIEWING&stageType=ETC&stageResult=STAGE_PASS&size=20
+                      7. 복합 필터링: /v1/applications?query=네이버&stageType=INTERVIEW&stageType=ETC&stageResult=STAGE_PASS&size=20
                     """
     )
     @ApiExceptions(values = {
@@ -218,12 +218,12 @@ public abstract class ApplicationDocsController {
                     description = "제출 상태",
                     example = "NOT_SUBMITTED"
             )
-            SubmissionStatus submissionStatus,
+            List<SubmissionStatus> submissionStatus,
             @Parameter(
                     description = "전형 결과",
                     example = "STAGE_PASS"
             )
-            StageResult stageResult,
+            List<StageResult> stageResult,
             @Parameter(
                     description = "마지막으로 조회한 지원 카드 ID (다음 페이지 커서)",
                     example = "10"

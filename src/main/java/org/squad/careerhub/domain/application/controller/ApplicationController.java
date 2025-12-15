@@ -86,8 +86,8 @@ public class ApplicationController extends ApplicationDocsController {
     public ResponseEntity<PageResponse<ApplicationSummaryResponse>> findApplications(
             @RequestParam(required = false) String query,
             @RequestParam(required = false) List<StageType> stageType,
-            @RequestParam(required = false) SubmissionStatus submissionStatus,
-            @RequestParam(required = false) StageResult stageResult,
+            @RequestParam(required = false) List<SubmissionStatus> submissionStatus,
+            @RequestParam(required = false) List<StageResult> stageResult,
             @RequestParam(required = false) Long lastCursorId,
             @RequestParam(required = false, defaultValue = "20") int size,
             @LoginMember Long memberId
