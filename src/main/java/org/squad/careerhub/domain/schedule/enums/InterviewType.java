@@ -2,7 +2,9 @@ package org.squad.careerhub.domain.schedule.enums;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-
+/**
+ * 기타 전형은 직접 입력임으로 바꿔야함
+ * */
 @Getter
 @AllArgsConstructor
 public enum InterviewType {
