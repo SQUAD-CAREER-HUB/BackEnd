@@ -14,4 +14,8 @@ public record SearchCondition(
         StageResult stageResult
 ) {
 
+    public SearchCondition {
+        stageTypes = (stageTypes != null) ? stageTypes : List.of();
+    }
+
 }
