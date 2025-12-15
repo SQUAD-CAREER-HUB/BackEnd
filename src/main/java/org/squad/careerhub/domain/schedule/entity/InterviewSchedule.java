@@ -14,10 +14,14 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.squad.careerhub.domain.application.entity.Application;
+import org.squad.careerhub.domain.schedule.enums.InterviewType;
 import org.squad.careerhub.global.entity.BaseEntity;
 
 /**
  * 면접 일정 관리 Entity
+ * 자원서 생성 기능 구현을 위해 제가 면접 일정 엔티티를 추가했습니다.
+ * 변동 사항 있으시면 변경 부탁드립니다.
+ * from MunSu Kwak
  **/
 
 @Getter
