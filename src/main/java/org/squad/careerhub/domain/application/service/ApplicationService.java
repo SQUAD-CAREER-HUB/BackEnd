@@ -10,19 +10,25 @@ import org.squad.careerhub.domain.application.entity.StageType;
 import org.squad.careerhub.domain.application.service.dto.NewApplicationInfo;
 import org.squad.careerhub.domain.application.service.dto.NewJobPosting;
 import org.squad.careerhub.domain.application.service.dto.NewStage;
+import org.squad.careerhub.domain.application.service.dto.SearchCondition;
+import org.squad.careerhub.domain.application.service.dto.response.ApplicationSummaryResponse;
 import org.squad.careerhub.domain.schedule.service.InterviewScheduleManager;
+import org.squad.careerhub.global.support.Cursor;
+import org.squad.careerhub.global.support.PageResponse;
 
 @RequiredArgsConstructor
 @Service
 public class ApplicationService {
 
     private final ApplicationManager applicationManager;
+    private final ApplicationReader applicationReader;
     private final ApplicationPolicyValidator applicationPolicyValidator;
     private final ApplicationFileManager applicationFileManager;
     private final InterviewScheduleManager interviewScheduleManager;
 
     /**
      * 지원서를 생성합니다.
+     *
      * @param newJobPosting      새로운 채용 공고 정보
      * @param newApplicationInfo 새로운 지원서 정보
      * @param newStage           새로운 전형 정보
@@ -59,6 +65,15 @@ public class ApplicationService {
         }
 
         return application.getId();
+    }
+
+    public PageResponse<ApplicationSummaryResponse> findApplications(
+            SearchCondition searchCondition,
+            Cursor cursor,
+            Long memberId
+    ) {
+       return applicationReader.findApplications(searchCondition, cursor, memberId);
+
     }
 
 }

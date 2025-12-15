@@ -16,12 +16,17 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import org.squad.careerhub.domain.application.controller.dto.ApplicationCreateRequest;
 import org.squad.careerhub.domain.application.controller.dto.ApplicationUpdateRequest;
+import org.squad.careerhub.domain.application.entity.StageResult;
 import org.squad.careerhub.domain.application.entity.StageType;
+import org.squad.careerhub.domain.application.entity.SubmissionStatus;
 import org.squad.careerhub.domain.application.service.ApplicationService;
+import org.squad.careerhub.domain.application.service.dto.SearchCondition;
 import org.squad.careerhub.domain.application.service.dto.response.ApplicationDetailResponse;
-import org.squad.careerhub.domain.application.service.dto.response.ApplicationPageResponse;
 import org.squad.careerhub.domain.application.service.dto.response.ApplicationStatisticsResponse;
+import org.squad.careerhub.domain.application.service.dto.response.ApplicationSummaryResponse;
 import org.squad.careerhub.global.annotation.LoginMember;
+import org.squad.careerhub.global.support.Cursor;
+import org.squad.careerhub.global.support.PageResponse;
 
 @RequiredArgsConstructor
 @RestController
@@ -78,13 +83,27 @@ public class ApplicationController extends ApplicationDocsController {
 
     @Override
     @GetMapping("/v1/applications")
-    public ResponseEntity<ApplicationPageResponse> getApplications(
+    public ResponseEntity<PageResponse<ApplicationSummaryResponse>> findApplications(
             @RequestParam(required = false) String query,
-            @RequestParam StageType stageType,
+            @RequestParam(required = false) List<StageType> stageType,
+            @RequestParam(required = false) SubmissionStatus submissionStatus,
+            @RequestParam(required = false) StageResult stageResult,
             @RequestParam(required = false) Long lastCursorId,
+            @RequestParam(required = false, defaultValue = "20") int size,
             @LoginMember Long memberId
     ) {
-        return ResponseEntity.ok(ApplicationPageResponse.mock());
+        PageResponse<ApplicationSummaryResponse> response = applicationService.findApplications(
+                new SearchCondition(
+                        query,
+                        stageType,
+                        submissionStatus,
+                        stageResult
+                ),
+                Cursor.of(lastCursorId, size),
+                memberId
+        );
+
+        return ResponseEntity.ok(response);
     }
 
     @Override
@@ -96,8 +115,8 @@ public class ApplicationController extends ApplicationDocsController {
 
     @Override
     @GetMapping("/v1/applications/in-progress")
-    public ResponseEntity<ApplicationPageResponse> getInProgressApplications(@LoginMember Long memberId) {
-        return ResponseEntity.ok(ApplicationPageResponse.inProgressMock());
+    public ResponseEntity<PageResponse<ApplicationSummaryResponse>> getInProgressApplications(@LoginMember Long memberId) {
+        return ResponseEntity.ok().build();
     }
 
 }
