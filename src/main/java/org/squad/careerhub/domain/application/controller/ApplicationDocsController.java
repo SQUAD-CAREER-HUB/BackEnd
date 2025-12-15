@@ -186,7 +186,7 @@ public abstract class ApplicationDocsController {
                       - **submissionStatus**: 서류 상태 필터 (선택 사항, 서류 전형일 경우 유효합니다)<br>
                       - **stageResult**: 전형 결과 필터 (선택 사항)<br>
                       - **lastCursorId**: 마지막으로 조회한 지원 카드 ID (첫 페이지는 null, 다음 페이지는 이전 응답의 nextCursorId 사용)<br>
-                      - **size**: 한 페이지당 조회할 지원 카드 개수 (기본값 20 10 <= size <=30)<br><br>
+                      - **size**: 한 페이지당 조회할 지원 카드 개수 (기본값 20, 범위: 10 <= size <=30)<br><br>
                     
                     - **[사용 예시]**<br>
                       1. 첫 페이지 조회: /v1/applications?size=20<br>
