@@ -50,7 +50,7 @@ public record ApplicationSummaryResponse(
                 applicationId,
                 company,
                 position,
-                currentStageTypeEnum.getDescription(),
+                currentStageTypeEnum != null ? currentStageTypeEnum.getDescription() : null,
                 currentStageStatusEnum != null ? currentStageStatusEnum.name() : null,
                 submittedAt,
                 deadline,
