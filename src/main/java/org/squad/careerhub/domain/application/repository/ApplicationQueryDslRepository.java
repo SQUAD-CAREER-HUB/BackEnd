@@ -37,13 +37,16 @@ public class ApplicationQueryDslRepository {
                         application.company,
                         application.position,
                         application.currentStageType,
-                        applicationStage.stageStatus.stringValue(),
+                        applicationStage.stageStatus,
                         application.submittedAt,
                         application.deadline,
                         Expressions.nullExpression(LocalDateTime.class)
                 ))
                 .from(application)
-                .leftJoin(applicationStage).on(applicationStage.application.id.eq(application.id))
+                .join(applicationStage).on(
+                        applicationStage.application.id.eq(application.id)
+                                .and(applicationStage.stageType.eq(application.currentStageType))  // 현재 전형만
+                )
                 .where(
                         memberEq(memberId),
                         searchByKeyword(searchCondition.query()),
@@ -53,7 +56,6 @@ public class ApplicationQueryDslRepository {
                         paginationCondition(cursor.lastCursorId()),
                         isActive()
                 )
-                .groupBy(application.id)
                 .orderBy(application.id.desc())
                 .limit(cursor.limit() + 1)
                 .fetch();
