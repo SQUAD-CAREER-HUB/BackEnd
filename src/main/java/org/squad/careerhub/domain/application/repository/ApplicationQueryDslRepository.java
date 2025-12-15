@@ -93,6 +93,7 @@ public class ApplicationQueryDslRepository {
         if (!StringUtils.hasText(query)) {
             return null;
         }
+        // NOTE: trim 처리를 Controller 단계에서 할까요 여기서 할까요.
         String trimmedQuery = query.trim();
 
         return application.company.containsIgnoreCase(trimmedQuery)
