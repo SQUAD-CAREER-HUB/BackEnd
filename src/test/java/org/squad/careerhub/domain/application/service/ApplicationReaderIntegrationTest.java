@@ -170,7 +170,7 @@ class ApplicationReaderIntegrationTest extends IntegrationTestSupport {
     }
 
     @Test
-    void 여러_가지_전형_타입으로_필터링하여_지원서를_조회한다() {
+    void 여러_가지_전형_단계로_필터링하여_지원서를_조회한다() {
         // given
         var app1 = createApplicationWithStage(member, "카카오", "백엔드 개발자", StageType.INTERVIEW);
         createApplicationStage(app1, StageType.DOCUMENT, SubmissionStatus.SUBMITTED);
@@ -189,6 +189,30 @@ class ApplicationReaderIntegrationTest extends IntegrationTestSupport {
         assertThat(response.contents()).hasSize(2)
                 .extracting(ApplicationSummaryResponse::company)
                 .containsExactlyInAnyOrder("네이버", "카카오");
+    }
+
+    @Test
+    void 최종_결과로_필터링하여_지원서를_조회한다() {
+        // given
+        createApplication(member, "카카오", "백엔드 개발자", StageType.FINAL_PASS);
+        createApplication(member, "쿠팡", "백엔드 개발자", StageType.FINAL_PASS);
+        createApplication(member, "네이버", "프론트엔드 개발자", StageType.FINAL_FAIL);
+        var application = createApplication(member, "네이버", "프론트엔드 개발자", StageType.INTERVIEW);
+        createApplicationStage(application, StageType.INTERVIEW, null);
+
+        var condition = SearchCondition.builder()
+                .query("백엔드")
+                .stageTypes(List.of(StageType.FINAL_PASS, StageType.FINAL_FAIL))
+                .build();
+        var cursor = Cursor.of(null, 20);
+
+        // when
+        PageResponse<ApplicationSummaryResponse> response = applicationReader.findApplications(condition, cursor, member.getId());
+
+        // then
+        assertThat(response.contents()).hasSize(2)
+                .extracting(ApplicationSummaryResponse::company)
+                .containsExactlyInAnyOrder("카카오", "쿠팡");
     }
 
     @Test
@@ -212,6 +236,87 @@ class ApplicationReaderIntegrationTest extends IntegrationTestSupport {
         // then
         assertThat(response.contents()).hasSize(1);
         assertThat(response.contents().getFirst().company()).isEqualTo("카카오");
+    }
+
+    @Test
+    void 복합_조건으로_검색이_가능하다() {
+        // given
+        var app1 = createApplicationWithStage(member, "카카오", "백엔드 개발자", StageType.INTERVIEW);
+        createPassedDocumentStage(app1);
+        var app2 = createApplicationWithStage(member, "쿠팡", "백엔드 개발자", StageType.ETC);
+        createPassedDocumentStage(app2);
+
+        createApplicationWithStage(member, "네이버", "프론트엔드 개발자", StageType.DOCUMENT);
+        createApplicationWithStage(member, "라인", "백엔드 개발자", StageType.DOCUMENT);
+
+        var condition = SearchCondition.builder()
+                .query("개발자")
+                .stageTypes(List.of(StageType.INTERVIEW, StageType.ETC))
+                .build();
+        var cursor = Cursor.of(null, 20);
+
+        // when
+        PageResponse<ApplicationSummaryResponse> response = applicationReader.findApplications(condition, cursor, member.getId());
+
+        // then
+        assertThat(response.contents()).hasSize(2);
+        assertThat(response.contents()).extracting(
+                ApplicationSummaryResponse::company
+        ).containsExactlyInAnyOrder(
+                "카카오",
+                "쿠팡"
+        );
+    }
+
+    @Test
+    void 전형_합격_필터링으로_검색이_가능하다() {
+        // given
+        var app1 = createApplication(member, "네이버", "프론트엔드 개발자", StageType.DOCUMENT);
+        var applicationStage1 = createApplicationStage(app1, StageType.DOCUMENT, SubmissionStatus.SUBMITTED);
+        applicationStage1.updateStageStatus(StageStatus.PASS);
+
+        var app2 = createApplication(member, "라인", "백엔드 개발자", StageType.INTERVIEW);
+        var applicationStage2 = createApplicationStage(app2, StageType.INTERVIEW, null);
+        applicationStage2.updateStageStatus(StageStatus.PASS);
+
+        var app3 = createApplication(member, "쿠팡", "백엔드 개발자", StageType.INTERVIEW);
+        var applicationStage3 = createApplicationStage(app3, StageType.INTERVIEW, null);
+
+        var condition = SearchCondition.builder()
+                .stageTypes(List.of(StageType.INTERVIEW, StageType.DOCUMENT))
+                .stageResult(List.of(StageResult.STAGE_PASS))
+                .build();
+        var cursor = Cursor.of(null, 20);
+
+        // when
+        PageResponse<ApplicationSummaryResponse> response = applicationReader.findApplications(condition, cursor, member.getId());
+
+        // then
+        assertThat(response.contents()).hasSize(2);
+        assertThat(response.contents()).extracting(
+                ApplicationSummaryResponse::company
+        ).containsExactlyInAnyOrder(
+                "네이버",
+                "라인"
+        );
+    }
+
+    @Test
+    void 랜덤_StageType_으로_다양한_지원서를_생성하고_조회한다() {
+        // given
+        int size = 20;
+        createRandomApplications(member, size);
+
+        var condition = SearchCondition.builder().build();
+        var cursor = Cursor.of(null, 10);
+
+        // when
+        PageResponse<ApplicationSummaryResponse> response = applicationReader.findApplications(condition, cursor, member.getId());
+
+        // then
+        assertThat(response.contents()).hasSize(cursor.limit());
+        assertThat(response.hasNext()).isTrue();
+        assertThat(response.nextCursorId()).isNotNull();
     }
 
     @Test
@@ -334,87 +439,6 @@ class ApplicationReaderIntegrationTest extends IntegrationTestSupport {
         assertThat(response.contents()).isEmpty();
         assertThat(response.hasNext()).isFalse();
         assertThat(response.nextCursorId()).isNull();
-    }
-
-    @Test
-    void 복합_조건으로_검색이_가능하다() {
-        // given
-        var app1 = createApplicationWithStage(member, "카카오", "백엔드 개발자", StageType.INTERVIEW);
-        createPassedDocumentStage(app1);
-        var app2 = createApplicationWithStage(member, "쿠팡", "백엔드 개발자", StageType.ETC);
-        createPassedDocumentStage(app2);
-
-        createApplicationWithStage(member, "네이버", "프론트엔드 개발자", StageType.DOCUMENT);
-        createApplicationWithStage(member, "라인", "백엔드 개발자", StageType.DOCUMENT);
-
-        var condition = SearchCondition.builder()
-                .query("개발자")
-                .stageTypes(List.of(StageType.INTERVIEW, StageType.ETC))
-                .build();
-        var cursor = Cursor.of(null, 20);
-
-        // when
-        PageResponse<ApplicationSummaryResponse> response = applicationReader.findApplications(condition, cursor, member.getId());
-
-        // then
-        assertThat(response.contents()).hasSize(2);
-        assertThat(response.contents()).extracting(
-                ApplicationSummaryResponse::company
-        ).containsExactlyInAnyOrder(
-                "카카오",
-                "쿠팡"
-        );
-    }
-
-    @Test
-    void 전형_합격_필터링으로_검색이_가능하다() {
-        // given
-        var app1 = createApplication(member, "네이버", "프론트엔드 개발자", StageType.DOCUMENT);
-        var applicationStage1 = createApplicationStage(app1, StageType.DOCUMENT, SubmissionStatus.SUBMITTED);
-        applicationStage1.updateStageStatus(StageStatus.PASS);
-
-        var app2 = createApplication(member, "라인", "백엔드 개발자", StageType.INTERVIEW);
-        var applicationStage2 = createApplicationStage(app2, StageType.INTERVIEW, null);
-        applicationStage2.updateStageStatus(StageStatus.PASS);
-
-        var app3 = createApplication(member, "쿠팡", "백엔드 개발자", StageType.INTERVIEW);
-        var applicationStage3 = createApplicationStage(app3, StageType.INTERVIEW, null);
-
-        var condition = SearchCondition.builder()
-                .stageTypes(List.of(StageType.INTERVIEW, StageType.DOCUMENT))
-                .stageResult(List.of(StageResult.STAGE_PASS))
-                .build();
-        var cursor = Cursor.of(null, 20);
-
-        // when
-        PageResponse<ApplicationSummaryResponse> response = applicationReader.findApplications(condition, cursor, member.getId());
-
-        // then
-        assertThat(response.contents()).hasSize(2);
-        assertThat(response.contents()).extracting(
-                ApplicationSummaryResponse::company
-        ).containsExactlyInAnyOrder(
-                "네이버",
-                "라인"
-        );
-    }
-
-    @Test
-    void 랜덤_StageType_으로_다양한_지원서를_생성하고_조회한다() {
-        // given
-        int size = 20;
-        createRandomApplications(member, size);
-
-        var condition = SearchCondition.builder().build();
-        var cursor = Cursor.of(null, 10);
-
-        // when
-        PageResponse<ApplicationSummaryResponse> response = applicationReader.findApplications(condition, cursor, member.getId());
-
-        // then
-        assertThat(response.contents()).hasSize(cursor.limit());
-        assertThat(response.hasNext()).isTrue();
-        assertThat(response.nextCursorId()).isNotNull();
     }
 
     private Application createApplicationWithStage(

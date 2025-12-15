@@ -43,7 +43,7 @@ public class ApplicationQueryDslRepository {
                         Expressions.nullExpression(LocalDateTime.class)
                 ))
                 .from(application)
-                .join(applicationStage).on(
+                .leftJoin(applicationStage).on(
                         applicationStage.application.id.eq(application.id)
                                 .and(applicationStage.stageType.eq(application.currentStageType))  // 현재 전형만
                 )
@@ -112,7 +112,7 @@ public class ApplicationQueryDslRepository {
         if (submissionStatus == null || submissionStatus.isEmpty()) {
             return null;
         }
-        if (!stageTypes.contains(StageType.DOCUMENT)) {
+        if (stageTypes == null || !stageTypes.contains(StageType.DOCUMENT)) {
             return null;
         }
         return applicationStage.submissionStatus.in(submissionStatus);
@@ -126,8 +126,8 @@ public class ApplicationQueryDslRepository {
         List<BooleanExpression> conditions = stageResults.stream()
                 .map(result -> switch (result) {
                     case STAGE_PASS -> applicationStage.stageStatus.eq(StageStatus.PASS);
-                    case FINAL_PASS -> applicationStage.stageType.eq(StageType.FINAL_PASS);
-                    case FINAL_FAIL -> applicationStage.stageType.eq(StageType.FINAL_FAIL);
+                    case FINAL_PASS -> application.currentStageType.eq(StageType.FINAL_PASS);
+                    case FINAL_FAIL -> application.currentStageType.eq(StageType.FINAL_FAIL);
                 })
                 .toList();
 
