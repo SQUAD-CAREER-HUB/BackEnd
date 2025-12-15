@@ -236,7 +236,6 @@ class ApplicationReaderIntegrationTest extends IntegrationTestSupport {
         var naverApp = createApplicationWithStage(member, "네이버", "프론트엔드 개발자", StageType.DOCUMENT);
 
         var condition = SearchCondition.builder().build();
-        ;
         var cursor = Cursor.of(null, 20);
 
         // when
@@ -266,7 +265,6 @@ class ApplicationReaderIntegrationTest extends IntegrationTestSupport {
         // given
         createRandomApplications(member, 15);
         var condition = SearchCondition.builder().build();
-        ;
         var firstCursor = Cursor.of(null, 10);
 
         // when - 첫 페이지
