@@ -116,7 +116,8 @@ public class ApplicationController extends ApplicationDocsController {
     @Override
     @GetMapping("/v1/applications/in-progress")
     public ResponseEntity<PageResponse<ApplicationSummaryResponse>> getInProgressApplications(@LoginMember Long memberId) {
-        return ResponseEntity.ok().build();
+        // TODO: 진행 중인 지원서 목록 조회 구현 필요
+        return ResponseEntity.ok(PageResponse.mock());
     }
 
 }
