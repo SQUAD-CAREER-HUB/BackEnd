@@ -452,15 +452,10 @@ class ApplicationServiceIntegrationTest extends IntegrationTestSupport {
                 applicationInfo.submittedAt(),
                 null
         );
+
+        // ApplicationStage 검증
         List<ApplicationStage> stages = applicationStageRepository.findByApplicationId(applicationId);
-        assertThat(stages).hasSize(2);
-
-        var finalStage = stages.stream()
-                .filter(s -> s.getStageType() == StageType.FINAL_PASS)
-                .findFirst()
-                .orElseThrow();
-
-        assertThat(finalStage.getStageName()).isEqualTo(StageType.FINAL_PASS.getDescription());
+        assertThat(stages).isEmpty();
     }
 
     @Test
@@ -506,14 +501,8 @@ class ApplicationServiceIntegrationTest extends IntegrationTestSupport {
         );
         // ApplicationStage 검증
         List<ApplicationStage> stages = applicationStageRepository.findByApplicationId(applicationId);
-        assertThat(stages).hasSize(2);
+        assertThat(stages).isEmpty();
 
-        var finalStage = stages.stream()
-                .filter(s -> s.getStageType() == StageType.FINAL_FAIL)
-                .findFirst()
-                .orElseThrow();
-
-        assertThat(finalStage.getStageName()).isEqualTo(StageType.FINAL_FAIL.getDescription());
     }
 
     @Test

@@ -19,10 +19,8 @@ public enum StageType {
     private final int order;
     private final String description;
 
-    public List<StageType> getPreviousStages() {
-        return Arrays.stream(values())
-                .filter(type -> type.order < this.order)
-                .toList();
+    public boolean isFinalStage() {
+        return this == FINAL_PASS || this == FINAL_FAIL;
     }
 
 }
