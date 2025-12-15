@@ -118,13 +118,12 @@ public class ApplicationQueryDslRepository {
     private BooleanExpression searchByStageResult(StageResult stageResult) {
         if (stageResult == null) {
             return null;
-        } else if (stageResult == StageResult.STAGE_PASS) {
-            return applicationStage.stageStatus.eq(StageStatus.PASS);
-        } else if (stageResult == StageResult.FINAL_PASS) {
-            return applicationStage.stageType.eq(StageType.FINAL_PASS);
-        } else {
-            return applicationStage.stageType.eq(StageType.FINAL_FAIL);
         }
+        return switch (stageResult) {
+            case STAGE_PASS -> applicationStage.stageStatus.eq(StageStatus.PASS);
+            case FINAL_PASS -> applicationStage.stageType.eq(StageType.FINAL_PASS);
+            case FINAL_FAIL -> applicationStage.stageType.eq(StageType.FINAL_FAIL);
+        };
     }
 
     private BooleanExpression paginationCondition(Long lastCursorId) {
