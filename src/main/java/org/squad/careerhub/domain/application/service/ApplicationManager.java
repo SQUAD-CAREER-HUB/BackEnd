@@ -42,7 +42,7 @@ public class ApplicationManager {
                 newApplicationInfo.deadline(),
                 newApplicationInfo.submittedAt()
         ));
-
+        // NOTE: 최종 합격 또는 불합격 일 경우엔 전형 단계 생성이 불필요하다고 생각하여 생성하지 않음
         createStageIfNotFinal(application, newStage);
 
         return application;
