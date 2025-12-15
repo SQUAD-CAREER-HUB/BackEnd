@@ -90,8 +90,9 @@ public class ApplicationController extends ApplicationDocsController {
     @Override
     @GetMapping("/v1/applications/statistics")
     public ResponseEntity<ApplicationStatisticsResponse> getApplicationStatistics(@LoginMember Long memberId) {
+        ApplicationStatisticsResponse response = applicationService.getApplicationStatic(memberId);
 
-        return ResponseEntity.ok(ApplicationStatisticsResponse.mock());
+        return ResponseEntity.ok(response);
     }
 
     @Override

@@ -7,23 +7,29 @@ import lombok.Builder;
 @Builder
 public record ApplicationStatisticsResponse(
         @Schema(description = "전체 지원 개수", example = "16")
-        int totalApplications,
+        int totalApplicationCount,
 
-        @Schema(description = "면접 전형 중인 개수", example = "6")
-        int interviewInProgress,
+        @Schema(description = "면접 전형 지원서 개수", example = "6")
+        int interviewStageCount,
 
-        @Schema(description = "서류 제출 필요한 개수", example = "2")
-        int documentPending,
+        @Schema(description = "기타 전형 지원서 개수", example = "2")
+        int etcStageCount,
 
-        @Schema(description = "최종 합격 개수", example = "1")
-        int finalPassed
+        @Schema(description = "최종 합격 지원서 개수", example = "1")
+        int finalPassedCount
 ) {
-    public static ApplicationStatisticsResponse mock() {
+
+    public static ApplicationStatisticsResponse of(
+            int totalApplicationCount,
+            int interviewStageCount,
+            int etcStageCount,
+            int finalPassedCount
+    ) {
         return ApplicationStatisticsResponse.builder()
-                .totalApplications(16)
-                .interviewInProgress(6)
-                .documentPending(2)
-                .finalPassed(1)
+                .totalApplicationCount(totalApplicationCount)
+                .interviewStageCount(interviewStageCount)
+                .etcStageCount(etcStageCount)
+                .finalPassedCount(finalPassedCount)
                 .build();
     }
 

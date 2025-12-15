@@ -3,6 +3,7 @@ package org.squad.careerhub.domain.application.controller;
 import static org.squad.careerhub.global.error.ErrorStatus.BAD_REQUEST;
 import static org.squad.careerhub.global.error.ErrorStatus.FORBIDDEN_ERROR;
 import static org.squad.careerhub.global.error.ErrorStatus.INTERNAL_SERVER_ERROR;
+import static org.squad.careerhub.global.error.ErrorStatus.NOT_FOUND;
 import static org.squad.careerhub.global.error.ErrorStatus.UNAUTHORIZED_ERROR;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -231,8 +232,8 @@ public abstract class ApplicationDocsController {
                     
                     #### 지원 통계 항목
                     - 전체 지원서 수
-                    - 면접 전형중인 지원서 수
-                    - 서류 제출 필요한 지원서 수
+                    - 면접 전형 단계인 지원서 수
+                    - 기타 전형 단계인 지원서 수
                     - 최종 합격한 지원서 수
                     """
     )
@@ -246,11 +247,10 @@ public abstract class ApplicationDocsController {
     )
     @ApiExceptions(values = {
             UNAUTHORIZED_ERROR,
+            NOT_FOUND,
             INTERNAL_SERVER_ERROR
     })
-    public abstract ResponseEntity<ApplicationStatisticsResponse> getApplicationStatistics(
-            Long memberId
-    );
+    public abstract ResponseEntity<ApplicationStatisticsResponse> getApplicationStatistics(Long memberId);
 
     @Operation(
             summary = "진행 중인 지원 내역 조회 - JWT O",
