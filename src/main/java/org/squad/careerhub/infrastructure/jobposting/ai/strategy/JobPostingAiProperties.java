@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 @ConfigurationProperties(prefix = "careerhub.job-posting.ai")
 public class JobPostingAiProperties {
 
-    private AiProviderType primary = AiProviderType.QWEN;
+    private AiProviderType primary = AiProviderType.DEEPSEEK;
 
     private boolean fallbackEnabled = true;
 

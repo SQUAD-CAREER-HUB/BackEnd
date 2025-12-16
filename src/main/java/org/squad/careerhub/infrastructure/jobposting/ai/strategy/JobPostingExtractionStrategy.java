@@ -1,5 +1,9 @@
 package org.squad.careerhub.infrastructure.jobposting.ai.strategy;
 
+import java.util.EnumMap;
+import java.util.List;
+import java.util.Map;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
@@ -8,51 +12,50 @@ import org.squad.careerhub.domain.jobposting.service.dto.response.JobPostingExtr
 import org.squad.careerhub.domain.jobposting.service.port.JobPostingExtractionPort;
 import org.squad.careerhub.global.error.CareerHubException;
 import org.squad.careerhub.global.error.ErrorStatus;
+import org.squad.careerhub.infrastructure.jobposting.ai.adapter.AiJobPostingExtractor;
 
+@Slf4j
 @Component
 @Qualifier("jobPostingExtractionStrategy")
 @Primary
 public class JobPostingExtractionStrategy implements JobPostingExtractionPort {
 
-    private final JobPostingExtractionPort geminiExtractor;
-    private final JobPostingExtractionPort solarExtractor;
-    private final JobPostingExtractionPort qwenExtractor;
+    private final Map<AiProviderType, AiJobPostingExtractor> extractorMap;
     private final JobPostingAiProperties properties;
 
     public JobPostingExtractionStrategy(
-        @Qualifier("geminiJobPostingExtractor") JobPostingExtractionPort geminiExtractor,
-        @Qualifier("solarJobPostingExtractor") JobPostingExtractionPort solarExtractor,
-        @Qualifier("qwenJobPostingExtractor") JobPostingExtractionPort qwenExtractor,
+        List<AiJobPostingExtractor> extractors,
         JobPostingAiProperties properties
     ) {
-        this.geminiExtractor = geminiExtractor;
-        this.solarExtractor = solarExtractor;
-        this.qwenExtractor = qwenExtractor;
+        this.extractorMap = new EnumMap<>(AiProviderType.class);
+        for (AiJobPostingExtractor e : extractors) {
+            AiProviderType type = e.providerType();
+            AiJobPostingExtractor prev = this.extractorMap.put(type, e);
+            if (prev != null) {
+                throw new IllegalStateException("Duplicate extractor for type=" + type);
+            }
+        }
         this.properties = properties;
     }
 
     @Override
     public JobPostingExtractResponse extractFromContent(JobPostingContentReadResult content) {
-        JobPostingExtractionPort primary = getExtractor(properties.getPrimary());
+        AiJobPostingExtractor primary = getExtractor(properties.getPrimary());
 
         try {
             return primary.extractFromContent(content);
         } catch (CareerHubException e) {
-            // 예: Gemini quota 초과 → SOLAR로 fallback
             if (properties.isFallbackEnabled() && shouldFallback(e)) {
-                JobPostingExtractionPort fallback = getExtractor(properties.getFallback());
-                return fallback.extractFromContent(content);
+                return getExtractor(properties.getFallback()).extractFromContent(content);
             }
             throw e;
         }
     }
 
-    private JobPostingExtractionPort getExtractor(AiProviderType type) {
-        return switch (type) {
-            case QWEN -> qwenExtractor;
-            case GEMINI -> geminiExtractor;
-            case SOLAR -> solarExtractor;
-        };
+    private AiJobPostingExtractor getExtractor(AiProviderType type) {
+        AiJobPostingExtractor port = extractorMap.get(type);
+        if (port == null) throw new IllegalStateException("No extractor registered for type=" + type);
+        return port;
     }
 
     private boolean shouldFallback(CareerHubException e) {
