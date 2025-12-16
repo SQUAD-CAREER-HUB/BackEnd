@@ -132,7 +132,7 @@ class ApplicationReaderIntegrationTest extends IntegrationTestSupport {
         var secPage = applicationReader.findBeforeDeadlineApplications(member.getId(), new Cursor(lastCursorId, 20));
 
         // then
-        // 첫번쨰 페이지
+        // 첫번째 페이지
         assertThat(firstPage).isNotNull().extracting(
                 PageResponse::hasNext,
                 PageResponse::nextCursorId
@@ -145,7 +145,7 @@ class ApplicationReaderIntegrationTest extends IntegrationTestSupport {
                 .extracting(BeforeDeadlineApplicationResponse::submissionStatus)
                 .contains(SubmissionStatus.SUBMITTED, SubmissionStatus.NOT_SUBMITTED);
 
-        // 두번쨰 페이지
+        // 두번째 페이지
         assertThat(secPage).isNotNull().extracting(
                 PageResponse::hasNext,
                 PageResponse::nextCursorId
@@ -159,6 +159,7 @@ class ApplicationReaderIntegrationTest extends IntegrationTestSupport {
                 .contains(SubmissionStatus.SUBMITTED, SubmissionStatus.NOT_SUBMITTED);
 
     }
+
     private List<Application> createBulkApplications(Member member, StageType stageType, int count) {
         List<Application> applications = new ArrayList<>();
 
