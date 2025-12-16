@@ -23,6 +23,8 @@ import org.squad.careerhub.domain.application.entity.StageType;
 import org.squad.careerhub.domain.application.service.dto.response.ApplicationDetailResponse;
 import org.squad.careerhub.domain.application.service.dto.response.ApplicationPageResponse;
 import org.squad.careerhub.domain.application.service.dto.response.ApplicationStatisticsResponse;
+import org.squad.careerhub.domain.application.repository.dto.BeforeDeadlineApplicationResponse;
+import org.squad.careerhub.global.support.PageResponse;
 import org.squad.careerhub.global.swagger.ApiExceptions;
 
 @Tag(name = "Application", description = "지원서 관련 API 문서")
@@ -253,29 +255,31 @@ public abstract class ApplicationDocsController {
     public abstract ResponseEntity<ApplicationStatisticsResponse> getApplicationStatistics(Long memberId);
 
     @Operation(
-            summary = "진행 중인 지원 내역 조회 - JWT O",
+            summary = "마감되지 않은 서류 전형 지원서 내역 조회 - JWT O",
             description = """
-                    ## 마감되지 않은(진행 중인) 지원 카드 목록을 조회합니다.<br><br>
-                    - 다음 면접 날짜 정보는 포함되지 않습니다.<br><br>
+                    ## 마감되지 않은 서류 전형 지원서 목록을 조회합니다.<br><br>
                     
                     - **[페이징 방식]**<br>
                       - 커서 기반 페이징 사용<br>
-                      - 한 페이지당 N(프론트와 협의) 개의 지원 카드 조회<br><br>
+                      - 기본값: 10개의 지원 카드 조회<br><br>
                     """
-    )
-    @ApiResponse(
-            responseCode = "200",
-            description = "진행 중인 지원 내역 조회 성공",
-            content = @Content(
-                    mediaType = MediaType.APPLICATION_JSON_VALUE,
-                    schema = @Schema(implementation = ApplicationPageResponse.class)
-            )
     )
     @ApiExceptions(values = {
             UNAUTHORIZED_ERROR,
+            FORBIDDEN_ERROR,
             INTERNAL_SERVER_ERROR
     })
-    public abstract ResponseEntity<ApplicationPageResponse> getInProgressApplications(
+    public abstract ResponseEntity<PageResponse<BeforeDeadlineApplicationResponse>> findBeforeDeadlineApplications(
+            @Parameter(
+                    description = "마지막으로 조회한 지원 카드 ID (다음 페이지 커서)",
+                    example = "10"
+            )
+            Long lastCursorId,
+            @Parameter(
+                    description = "한 페이지당 조회할 지원 카드 개수",
+                    example = "10"
+            )
+            int size,
             Long memberId
     );
 

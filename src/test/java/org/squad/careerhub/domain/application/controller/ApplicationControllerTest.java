@@ -9,6 +9,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import java.time.LocalDate;
+import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -22,7 +23,9 @@ import org.squad.careerhub.domain.application.entity.ApplicationMethod;
 import org.squad.careerhub.domain.application.entity.StageType;
 import org.squad.careerhub.domain.application.entity.SubmissionStatus;
 import org.squad.careerhub.domain.application.service.dto.response.ApplicationStatisticsResponse;
+import org.squad.careerhub.domain.application.repository.dto.BeforeDeadlineApplicationResponse;
 import org.squad.careerhub.global.annotation.TestMember;
+import org.squad.careerhub.global.support.PageResponse;
 
 class ApplicationControllerTest extends ControllerTestSupport {
 
@@ -58,6 +61,34 @@ class ApplicationControllerTest extends ControllerTestSupport {
                 .hasStatus(HttpStatus.CREATED);
 
         verify(applicationService).createApplication(any(), any(), any(), any(), any());
+    }
+
+    @TestMember
+    @Test
+    void 마감_되지_않은_서류전형의_지원서_조회_요청을_한다() {
+        // given
+        given(applicationService.findBeforeDeadlineApplications(any(), any()))
+                .willReturn(PageResponse.<BeforeDeadlineApplicationResponse>builder()
+                        .contents(List.of(new BeforeDeadlineApplicationResponse(
+                                1L,
+                                "c",
+                                "p",
+                                LocalDate.now(),
+                                LocalDate.now().plusDays(2),
+                                SubmissionStatus.SUBMITTED))
+                        )
+                        .hasNext(false)
+                        .nextCursorId(null)
+                        .build());
+        // when & then
+        assertThat(mvcTester.get().uri("/v1/applications/before-deadline")
+                .param("size", "10"))
+                .apply(print())
+                .hasStatus(HttpStatus.OK)
+                .bodyJson()
+                .hasPathSatisfying("$.hasNext", v -> v.assertThat().isEqualTo(false))
+                .hasPathSatisfying("$.nextCursorId", v -> v.assertThat().isNull())
+                .hasPathSatisfying("$.contents", v -> v.assertThat().isNotEmpty());
     }
 
     private ApplicationCreateRequest createApplicationCreateRequest2() {

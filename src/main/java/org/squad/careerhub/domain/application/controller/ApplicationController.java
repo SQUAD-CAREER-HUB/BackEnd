@@ -21,7 +21,10 @@ import org.squad.careerhub.domain.application.service.ApplicationService;
 import org.squad.careerhub.domain.application.service.dto.response.ApplicationDetailResponse;
 import org.squad.careerhub.domain.application.service.dto.response.ApplicationPageResponse;
 import org.squad.careerhub.domain.application.service.dto.response.ApplicationStatisticsResponse;
+import org.squad.careerhub.domain.application.repository.dto.BeforeDeadlineApplicationResponse;
 import org.squad.careerhub.global.annotation.LoginMember;
+import org.squad.careerhub.global.support.Cursor;
+import org.squad.careerhub.global.support.PageResponse;
 
 @RequiredArgsConstructor
 @RestController
@@ -96,9 +99,18 @@ public class ApplicationController extends ApplicationDocsController {
     }
 
     @Override
-    @GetMapping("/v1/applications/in-progress")
-    public ResponseEntity<ApplicationPageResponse> getInProgressApplications(@LoginMember Long memberId) {
-        return ResponseEntity.ok(ApplicationPageResponse.inProgressMock());
+    @GetMapping("/v1/applications/before-deadline")
+    public ResponseEntity<PageResponse<BeforeDeadlineApplicationResponse>> findBeforeDeadlineApplications(
+            @RequestParam(required = false) Long lastCursorId,
+            @RequestParam(required = false, defaultValue = "10") int size,
+            @LoginMember Long memberId
+    ) {
+        PageResponse<BeforeDeadlineApplicationResponse> response = applicationService.findBeforeDeadlineApplications(
+                memberId,
+                Cursor.of(lastCursorId, size)
+        );
+
+        return ResponseEntity.ok(response);
     }
 
 }

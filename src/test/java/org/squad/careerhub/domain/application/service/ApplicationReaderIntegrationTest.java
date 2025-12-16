@@ -5,7 +5,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ThreadLocalRandom;
 import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -13,20 +12,28 @@ import org.springframework.transaction.annotation.Transactional;
 import org.squad.careerhub.IntegrationTestSupport;
 import org.squad.careerhub.domain.application.entity.Application;
 import org.squad.careerhub.domain.application.entity.ApplicationMethod;
+import org.squad.careerhub.domain.application.entity.ApplicationStage;
 import org.squad.careerhub.domain.application.entity.StageType;
+import org.squad.careerhub.domain.application.entity.SubmissionStatus;
 import org.squad.careerhub.domain.application.repository.ApplicationJpaRepository;
+import org.squad.careerhub.domain.application.repository.ApplicationStageJpaRepository;
+import org.squad.careerhub.domain.application.repository.dto.BeforeDeadlineApplicationResponse;
 import org.squad.careerhub.domain.application.service.dto.response.ApplicationStatisticsResponse;
 import org.squad.careerhub.domain.member.entity.Member;
 import org.squad.careerhub.domain.member.entity.SocialProvider;
 import org.squad.careerhub.domain.member.repository.MemberJpaRepository;
+import org.squad.careerhub.global.support.Cursor;
+import org.squad.careerhub.global.support.PageResponse;
 
 @RequiredArgsConstructor
 @Transactional
 class ApplicationReaderIntegrationTest extends IntegrationTestSupport {
 
-    final ApplicationReader applicationReader;
-    final ApplicationJpaRepository applicationJpaRepository;
     final MemberJpaRepository memberJpaRepository;
+    final ApplicationJpaRepository applicationJpaRepository;
+    final ApplicationStageJpaRepository applicationStageJpaRepository;
+    final ApplicationReader applicationReader;
+
     Member member;
 
     @BeforeEach
@@ -85,6 +92,74 @@ class ApplicationReaderIntegrationTest extends IntegrationTestSupport {
         ).containsExactly(0,0,0,0);
     }
 
+    @Test
+    void 마감_되지_않은_서류_전형_지원서를_조회한다() {
+        // given
+        createBulkApplicationsWithStage(member, StageType.DOCUMENT, 10);
+        createBulkApplicationsWithStage(member, StageType.ETC, 10);
+
+        // when
+        var response = applicationReader.findBeforeDeadlineApplications(member.getId(), new Cursor(null, 20));
+
+        // then
+        assertThat(response).isNotNull().extracting(
+                PageResponse::hasNext,
+                PageResponse::nextCursorId
+        ).containsExactly(
+                false,
+                null
+        );
+
+        // 모든 지원서의 데드라인이 미래인지 검증
+        assertThat(response.contents())
+                .allMatch(app -> !app.deadline().isBefore(LocalDate.now()));
+
+        // 제출 상태 검증
+        assertThat(response.contents()).hasSize(10)
+                .extracting(BeforeDeadlineApplicationResponse::submissionStatus)
+                .contains(SubmissionStatus.SUBMITTED, SubmissionStatus.NOT_SUBMITTED);
+    }
+
+    @Test
+    void 커서_페이지네이션_작동을_확인한다() {
+        // given
+        createBulkApplicationsWithStage(member, StageType.DOCUMENT, 40);
+        createBulkApplicationsWithStage(member, StageType.ETC, 10);
+
+        // when
+        var firstPage = applicationReader.findBeforeDeadlineApplications(member.getId(), new Cursor(null, 20));
+        Long lastCursorId = firstPage.contents().getLast().applicationId();
+        var secPage = applicationReader.findBeforeDeadlineApplications(member.getId(), new Cursor(lastCursorId, 20));
+
+        // then
+        // 첫번째 페이지
+        assertThat(firstPage).isNotNull().extracting(
+                PageResponse::hasNext,
+                PageResponse::nextCursorId
+        ).containsExactly(
+                true,
+                lastCursorId
+        );
+
+        assertThat(firstPage.contents())
+                .extracting(BeforeDeadlineApplicationResponse::submissionStatus)
+                .contains(SubmissionStatus.SUBMITTED, SubmissionStatus.NOT_SUBMITTED);
+
+        // 두번째 페이지
+        assertThat(secPage).isNotNull().extracting(
+                PageResponse::hasNext,
+                PageResponse::nextCursorId
+        ).containsExactly(
+                false,
+                null
+        );
+
+        assertThat(secPage.contents())
+                .extracting(BeforeDeadlineApplicationResponse::submissionStatus)
+                .contains(SubmissionStatus.SUBMITTED, SubmissionStatus.NOT_SUBMITTED);
+
+    }
+
     private List<Application> createBulkApplications(Member member, StageType stageType, int count) {
         List<Application> applications = new ArrayList<>();
 
@@ -104,6 +179,35 @@ class ApplicationReaderIntegrationTest extends IntegrationTestSupport {
         }
 
         return applicationJpaRepository.saveAll(applications);
+    }
+
+    private List<Application> createBulkApplicationsWithStage(Member member, StageType stageType, int count) {
+        List<Application> applications = new ArrayList<>();
+
+        for (int i = 0; i < count; i++) {
+            Application app = Application.create(
+                    member,
+                    "https://example.com/job/" + i,
+                    "회사" + i,
+                    "포지션" + i,
+                    "지역" + i,
+                    stageType,
+                    ApplicationMethod.values()[i % ApplicationMethod.values().length],
+                    LocalDate.now().plusDays(30),
+                    LocalDate.now()
+            );
+
+            applications.add(applicationJpaRepository.save(app));
+
+            applicationStageJpaRepository.save(ApplicationStage.create(
+                    app,
+                    stageType,
+                    stageType.getDescription(),
+                    SubmissionStatus.values()[i % SubmissionStatus.values().length]
+            ));
+        }
+
+        return applications;
     }
 
 }
