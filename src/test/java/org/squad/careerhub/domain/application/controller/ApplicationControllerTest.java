@@ -21,6 +21,7 @@ import org.squad.careerhub.domain.application.controller.dto.StageRequest;
 import org.squad.careerhub.domain.application.entity.ApplicationMethod;
 import org.squad.careerhub.domain.application.entity.StageType;
 import org.squad.careerhub.domain.application.entity.SubmissionStatus;
+import org.squad.careerhub.domain.application.service.dto.response.ApplicationStatisticsResponse;
 import org.squad.careerhub.global.annotation.TestMember;
 
 class ApplicationControllerTest extends ControllerTestSupport {
@@ -81,6 +82,29 @@ class ApplicationControllerTest extends ControllerTestSupport {
                                 .build()
                 )
                 .build();
+    }
+
+    @TestMember
+    @Test
+    void 지원서_통계를_조회한다() {
+        // given
+        var response = ApplicationStatisticsResponse.builder()
+                .totalApplicationCount(100)
+                .interviewStageCount(30)
+                .etcStageCount(20)
+                .finalPassedCount(25)
+                .build();
+        given(applicationService.getApplicationStatic(any())).willReturn(response);
+
+        // when & then
+        assertThat(mvcTester.get().uri("/v1/applications/statistics"))
+                .apply(print())
+                .hasStatusOk()
+                .bodyJson()
+                .hasPathSatisfying("$.totalApplicationCount", v -> v.assertThat().isEqualTo(response.totalApplicationCount()))
+                .hasPathSatisfying("$.interviewStageCount", v -> v.assertThat().isEqualTo(response.interviewStageCount()))
+                .hasPathSatisfying("$.etcStageCount", v -> v.assertThat().isEqualTo(response.etcStageCount()))
+                .hasPathSatisfying("$.finalPassedCount", v -> v.assertThat().isEqualTo(response.finalPassedCount()));
     }
 
 }

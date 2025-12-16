@@ -10,6 +10,7 @@ import org.squad.careerhub.domain.application.entity.StageType;
 import org.squad.careerhub.domain.application.service.dto.NewApplicationInfo;
 import org.squad.careerhub.domain.application.service.dto.NewJobPosting;
 import org.squad.careerhub.domain.application.service.dto.NewStage;
+import org.squad.careerhub.domain.application.service.dto.response.ApplicationStatisticsResponse;
 import org.squad.careerhub.domain.schedule.service.InterviewScheduleManager;
 
 @RequiredArgsConstructor
@@ -17,6 +18,7 @@ import org.squad.careerhub.domain.schedule.service.InterviewScheduleManager;
 public class ApplicationService {
 
     private final ApplicationManager applicationManager;
+    private final ApplicationReader applicationReader;
     private final ApplicationPolicyValidator applicationPolicyValidator;
     private final ApplicationFileManager applicationFileManager;
     private final InterviewScheduleManager interviewScheduleManager;
@@ -59,6 +61,10 @@ public class ApplicationService {
         }
 
         return application.getId();
+    }
+
+    public ApplicationStatisticsResponse getApplicationStatic(Long authorId) {
+        return applicationReader.getApplicationStatistics(authorId);
     }
 
 }
