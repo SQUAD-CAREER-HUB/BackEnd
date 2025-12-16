@@ -2,10 +2,12 @@ package org.squad.careerhub.domain.application.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import org.squad.careerhub.domain.application.entity.Application;
 import org.squad.careerhub.domain.application.repository.ApplicationJpaRepository;
 import org.squad.careerhub.domain.application.service.dto.NewApplicationInfo;
 import org.squad.careerhub.domain.application.service.dto.NewJobPosting;
+import org.squad.careerhub.domain.application.service.dto.NewStage;
 import org.squad.careerhub.domain.member.entity.Member;
 import org.squad.careerhub.domain.member.service.MemberReader;
 
@@ -15,26 +17,35 @@ public class ApplicationManager {
 
     private final ApplicationJpaRepository applicationJpaRepository;
     private final MemberReader memberReader;
+    private final ApplicationStageManager applicationStageManager;
 
-    public Application create(
+    /**
+     * 지원서와 해당 전형을 생성합니다.
+     **/
+    @Transactional
+    public Application createWithStage(
             NewJobPosting newJobPosting,
             NewApplicationInfo newApplicationInfo,
+            NewStage newStage,
             Long memberId
     ) {
         Member author = memberReader.find(memberId);
 
-        return applicationJpaRepository.save(Application.create(
+        Application application = applicationJpaRepository.save(Application.create(
                 author,
                 newJobPosting.jobPostingUrl(),
                 newJobPosting.company(),
                 newJobPosting.position(),
                 newJobPosting.jobLocation(),
-                newApplicationInfo.applicationStatus(),
+                newStage.stageType(),
                 newApplicationInfo.applicationMethod(),
                 newApplicationInfo.deadline(),
-                newApplicationInfo.submittedAt(),
-                newApplicationInfo.memo()
+                newApplicationInfo.submittedAt()
         ));
+
+        applicationStageManager.create(application, newStage);
+
+        return application;
     }
 
 }

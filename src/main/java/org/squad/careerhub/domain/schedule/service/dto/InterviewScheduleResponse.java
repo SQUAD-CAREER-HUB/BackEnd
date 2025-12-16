@@ -20,12 +20,12 @@ public record InterviewScheduleResponse(
     @Schema(
         description = "면접 유형",
         example = "TECH",
-        allowableValues = {"TECH", "FIT", "EXECUTIVE", "DESIGN", "TEST", "OTHER"}
+        allowableValues = {"TECH", "FIT", "EXECUTIVE", "DESIGN", "TEST", "ETC"}
     )
     InterviewType type,
 
     @Schema(
-        description = "기타 면접 유형 상세 (type= OTHER 일 때만 사용)",
+        description = "기타 면접 유형 상세 (type= ETC 일 때만 사용)",
         example = "인성 + 기술 면접"
     )
     String typeDetail,

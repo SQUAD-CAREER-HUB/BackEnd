@@ -4,7 +4,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalDate;
 import java.util.List;
 import lombok.Builder;
-import org.squad.careerhub.domain.application.entity.ApplicationStatus;
+import org.squad.careerhub.domain.application.entity.StageType;
 
 @Schema(description = "지원서 페이지 응답 DTO")
 @Builder
@@ -24,7 +24,7 @@ public record ApplicationPageResponse(
                 .applicationId(1L)
                 .company("Naver")
                 .position("Backend Developer")
-                .applicationStatus(ApplicationStatus.DOCUMENT_SUBMITTED.getDescription())
+                .currentStageType(StageType.DOCUMENT.getDescription())
                 .deadline(LocalDate.of(2025, 3, 25))
                 .submittedAt(LocalDate.of(2025, 3, 20))
                 .nextInterviewDate(LocalDate.of(2025, 4, 1))
@@ -34,7 +34,7 @@ public record ApplicationPageResponse(
                 .applicationId(2L)
                 .company("Kakao")
                 .position("Backend Developer")
-                .applicationStatus(ApplicationStatus.INTERVIEW_SCHEDULED.getDescription())
+                .currentStageType(StageType.INTERVIEW.getDescription())
                 .deadline(LocalDate.of(2025, 4, 10))
                 .submittedAt(LocalDate.of(2025, 3, 28))
                 .nextInterviewDate(LocalDate.of(2025, 4, 1))
@@ -52,7 +52,7 @@ public record ApplicationPageResponse(
                 .applicationId(1L)
                 .company("Naver")
                 .position("Backend Developer")
-                .applicationStatus(ApplicationStatus.DOCUMENT_SUBMITTED.getDescription())
+                .currentStageType(StageType.DOCUMENT.getDescription())
                 .deadline(LocalDate.of(2025, 3, 25))
                 .submittedAt(LocalDate.of(2025, 3, 20))
                 .build();
@@ -61,7 +61,7 @@ public record ApplicationPageResponse(
                 .applicationId(2L)
                 .company("Kakao")
                 .position("Backend Developer")
-                .applicationStatus(ApplicationStatus.INTERVIEW_SCHEDULED.getDescription())
+                .currentStageType(StageType.INTERVIEW.getDescription())
                 .deadline(LocalDate.of(2025, 4, 10))
                 .submittedAt(LocalDate.of(2025, 3, 28))
                 .build();

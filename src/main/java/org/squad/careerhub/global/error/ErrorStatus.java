@@ -18,8 +18,10 @@ public enum ErrorStatus {
     NOT_FOUND_MEMBER (404, "회원을 찾을 수 없습니다."),
 
     // APPLICATION
-    INVALID_MEMO_RULE     (400, "지원서 생성 시 기타 전형 진행 중인 경우에만 메모를 작성해야 합니다."),
-    NOT_FOUND_APPLICATION (404, "지원서를 찾을 수 없습니다."),
+    INVALID_MEMO_RULE          (400, "지원서 생성 시 기타 전형 진행 중인 경우에만 메모를 작성해야 합니다."),
+    INVALID_ETC_STAGE_RULE     (400, "지원서 생성 시 기타 전형 진행 중인 경우에만 기타 전형 정보를 입력해야 합니다."),
+    INVALID_SCHEDULE_TYPE_RULE (400, "지원서 작성 시 전형 단계가 면접 유형일 경우에만 면접 일정 생성이 가능합니다."),
+    NOT_FOUND_APPLICATION      (404, "지원서를 찾을 수 없습니다."),
 
     // REVIEW
     INTERVIEW_QUESTION_NOT_BELONG_TO_REVIEW (403, "해당 면접 후기에 속하지 않는 질문입니다."),

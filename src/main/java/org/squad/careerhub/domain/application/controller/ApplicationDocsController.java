@@ -3,6 +3,7 @@ package org.squad.careerhub.domain.application.controller;
 import static org.squad.careerhub.global.error.ErrorStatus.BAD_REQUEST;
 import static org.squad.careerhub.global.error.ErrorStatus.FORBIDDEN_ERROR;
 import static org.squad.careerhub.global.error.ErrorStatus.INTERNAL_SERVER_ERROR;
+import static org.squad.careerhub.global.error.ErrorStatus.NOT_FOUND;
 import static org.squad.careerhub.global.error.ErrorStatus.UNAUTHORIZED_ERROR;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -18,10 +19,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.multipart.MultipartFile;
 import org.squad.careerhub.domain.application.controller.dto.ApplicationCreateRequest;
 import org.squad.careerhub.domain.application.controller.dto.ApplicationUpdateRequest;
-import org.squad.careerhub.domain.application.entity.ApplicationStatus;
+import org.squad.careerhub.domain.application.entity.StageType;
 import org.squad.careerhub.domain.application.service.dto.response.ApplicationDetailResponse;
 import org.squad.careerhub.domain.application.service.dto.response.ApplicationPageResponse;
 import org.squad.careerhub.domain.application.service.dto.response.ApplicationStatisticsResponse;
+import org.squad.careerhub.domain.application.repository.dto.BeforeDeadlineApplicationResponse;
+import org.squad.careerhub.global.support.PageResponse;
 import org.squad.careerhub.global.swagger.ApiExceptions;
 
 @Tag(name = "Application", description = "지원서 관련 API 문서")
@@ -29,12 +32,28 @@ public abstract class ApplicationDocsController {
 
     @Operation(
             summary = "지원 카드 등록 - JWT O",
-            description = "새로운 지원 카드를 등록합니다."
+            description = """
+                    ### 새로운 지원 카드를 등록합니다.
+                    - 면접 일정 및 기타 전형 일정도 함께 등록할 수 있습니다.<br><br>
+                    
+                    - **[요청 형식]** <br>
+                      - **Content-Type**: multipart/form-data<br>
+                      - JSON 데이터와 파일을 함께 전송합니다.<br><br>
+                    
+                    - **[요청 파라미터]**<br>
+                      - **request** : 지원 카드 등록 데이터 (JSON 형식, Part name: "request")<br>
+                      - **files**: 첨부 파일 목록 (선택 사항, 최대 5개, Part name: "files")<br><br>
+                    
+                    - **[제약 사항]** <br>
+                        - 동일한 채용 공고에 대해 중복 지원할 수 없습니다.<br>
+                        - 면접 일정은 면접 전형 단계가 있을 때만 등록할 수 있습니다.<br>
+                        - 기타 전형 일정은 기타 전형 단계가 있을 때만 등록할 수 있습니다.<br>
+                    """
     )
     @RequestBody(
             description = "지원 카드 등록 요청",
             content = @Content(
-                    mediaType = MediaType.APPLICATION_JSON_VALUE,
+                    mediaType = MediaType.MULTIPART_FORM_DATA_VALUE,
                     schema = @Schema(implementation = ApplicationCreateRequest.class)
             )
     )
@@ -49,6 +68,11 @@ public abstract class ApplicationDocsController {
     })
     public abstract ResponseEntity<Void> create(
             ApplicationCreateRequest request,
+            @Parameter(
+                    description = "첨부 파일 목록 (선택 사항, 최대 5개)",
+                    content = @Content(mediaType = MediaType.MULTIPART_FORM_DATA_VALUE)
+            )
+            List<MultipartFile> files,
             Long memberId
     );
 
@@ -151,22 +175,22 @@ public abstract class ApplicationDocsController {
     @Operation(
             summary = "지원 카드 목록 조회 - JWT O",
             description = """
-                ### 검색어, 지원 상태 필터를 통해 지원 카드 목록을 조회합니다.<br><br>
-                
-                - **[페이징 방식]**<br>
-                  - 커서 기반 페이징 사용<br>
-                  - 한 페이지당 기본 20개의 지원 카드 조회<br>
-                
-                - **[요청 파라미터]**<br>
-                  - **query**: 검색어 (선택 사항, 회사명 검색)<br>
-                  - **applicationStatus**: 지원 상태 필터 (필수)<br>
-                  - **lastCursorId**: 마지막으로 조회한 지원 카드 ID (첫 페이지는 null, 다음 페이지는 이전 응답의 nextCursorId 사용)<br><br>
-                
-                - **[사용 예시]**<br>
-                  1. 첫 페이지 조회: /v1/applications?applicationStatus=ALL<br>
-                  2. 다음 페이지 조회: /v1/applications?applicationStatus=ALL&lastCursorId=20<br>
-                  3. 검색어 포함: /v1/applications?query=네이버&applicationStatus=ALL
-                """
+                    ### 검색어, 지원 상태 필터를 통해 지원 카드 목록을 조회합니다.<br><br>
+                    
+                    - **[페이징 방식]**<br>
+                      - 커서 기반 페이징 사용<br>
+                      - 한 페이지당 기본 20개의 지원 카드 조회<br>
+                    
+                    - **[요청 파라미터]**<br>
+                      - **query**: 검색어 (선택 사항, 회사명 검색)<br>
+                      - **stageType**: 지원 상태 필터 (필수)<br>
+                      - **lastCursorId**: 마지막으로 조회한 지원 카드 ID (첫 페이지는 null, 다음 페이지는 이전 응답의 nextCursorId 사용)<br><br>
+                    
+                    - **[사용 예시]**<br>
+                      1. 첫 페이지 조회: /v1/applications?stageType=ALL<br>
+                      2. 다음 페이지 조회: /v1/applications?stageType=ALL&lastCursorId=20<br>
+                      3. 검색어 포함: /v1/applications?query=네이버&stageType=ALL
+                    """
     )
     @ApiResponse(
             responseCode = "200",
@@ -189,11 +213,11 @@ public abstract class ApplicationDocsController {
             String query,
 
             @Parameter(
-                    description = "지원 상태 필터",
+                    description = "현재 지원서 전형 단계",
                     example = "ALL (기본값)",
                     required = true
             )
-            ApplicationStatus applicationStatus,
+            StageType stageType,
 
             @Parameter(
                     description = "마지막으로 조회한 지원 카드 ID (다음 페이지 커서)",
@@ -206,14 +230,14 @@ public abstract class ApplicationDocsController {
     @Operation(
             summary = "지원 현황 통계 조회 - JWT O",
             description = """
-                ## 사용자의 전체 지원 현황 통계를 조회합니다.
-                
-                #### 지원 통계 항목
-                - 전체 지원서 수
-                - 면접 전형중인 지원서 수
-                - 서류 제출 필요한 지원서 수
-                - 최종 합격한 지원서 수
-                """
+                    ## 사용자의 전체 지원 현황 통계를 조회합니다.
+                    
+                    #### 지원 통계 항목
+                    - 전체 지원서 수
+                    - 면접 전형 단계인 지원서 수
+                    - 기타 전형 단계인 지원서 수
+                    - 최종 합격한 지원서 수
+                    """
     )
     @ApiResponse(
             responseCode = "200",
@@ -225,36 +249,37 @@ public abstract class ApplicationDocsController {
     )
     @ApiExceptions(values = {
             UNAUTHORIZED_ERROR,
+            NOT_FOUND,
             INTERNAL_SERVER_ERROR
     })
-    public abstract ResponseEntity<ApplicationStatisticsResponse> getApplicationStatistics(
-            Long memberId
-    );
+    public abstract ResponseEntity<ApplicationStatisticsResponse> getApplicationStatistics(Long memberId);
 
     @Operation(
-            summary = "진행 중인 지원 내역 조회 - JWT O",
+            summary = "마감되지 않은 서류 전형 지원서 내역 조회 - JWT O",
             description = """
-                ## 마감되지 않은(진행 중인) 지원 카드 목록을 조회합니다.<br><br>
-                - 다음 면접 날짜 정보는 포함되지 않습니다.<br><br>
-                
-                - **[페이징 방식]**<br>
-                  - 커서 기반 페이징 사용<br>
-                  - 한 페이지당 N(프론트와 협의) 개의 지원 카드 조회<br><br>
-                """
-    )
-    @ApiResponse(
-            responseCode = "200",
-            description = "진행 중인 지원 내역 조회 성공",
-            content = @Content(
-                    mediaType = MediaType.APPLICATION_JSON_VALUE,
-                    schema = @Schema(implementation = ApplicationPageResponse.class)
-            )
+                    ## 마감되지 않은 서류 전형 지원서 목록을 조회합니다.<br><br>
+                    
+                    - **[페이징 방식]**<br>
+                      - 커서 기반 페이징 사용<br>
+                      - 기본값: 10개의 지원 카드 조회<br><br>
+                    """
     )
     @ApiExceptions(values = {
             UNAUTHORIZED_ERROR,
+            FORBIDDEN_ERROR,
             INTERNAL_SERVER_ERROR
     })
-    public abstract ResponseEntity<ApplicationPageResponse> getInProgressApplications(
+    public abstract ResponseEntity<PageResponse<BeforeDeadlineApplicationResponse>> findBeforeDeadlineApplications(
+            @Parameter(
+                    description = "마지막으로 조회한 지원 카드 ID (다음 페이지 커서)",
+                    example = "10"
+            )
+            Long lastCursorId,
+            @Parameter(
+                    description = "한 페이지당 조회할 지원 카드 개수",
+                    example = "10"
+            )
+            int size,
             Long memberId
     );
 

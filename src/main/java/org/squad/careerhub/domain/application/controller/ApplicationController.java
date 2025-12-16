@@ -10,19 +10,21 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import org.squad.careerhub.domain.application.controller.dto.ApplicationCreateRequest;
 import org.squad.careerhub.domain.application.controller.dto.ApplicationUpdateRequest;
-import org.squad.careerhub.domain.application.entity.ApplicationStatus;
+import org.squad.careerhub.domain.application.entity.StageType;
 import org.squad.careerhub.domain.application.service.ApplicationService;
 import org.squad.careerhub.domain.application.service.dto.response.ApplicationDetailResponse;
 import org.squad.careerhub.domain.application.service.dto.response.ApplicationPageResponse;
 import org.squad.careerhub.domain.application.service.dto.response.ApplicationStatisticsResponse;
+import org.squad.careerhub.domain.application.repository.dto.BeforeDeadlineApplicationResponse;
 import org.squad.careerhub.global.annotation.LoginMember;
+import org.squad.careerhub.global.support.Cursor;
+import org.squad.careerhub.global.support.PageResponse;
 
 @RequiredArgsConstructor
 @RestController
@@ -33,12 +35,15 @@ public class ApplicationController extends ApplicationDocsController {
     @Override
     @PostMapping("/v1/applications")
     public ResponseEntity<Void> create(
-            @Valid @RequestBody ApplicationCreateRequest request,
+            @Valid @RequestPart ApplicationCreateRequest request,
+            @RequestPart(required = false) List<MultipartFile> files,
             @LoginMember Long memberId
     ) {
         applicationService.createApplication(
                 request.toNewJobPosting(),
                 request.toNewApplicationInfo(),
+                request.toNewStage(),
+                files,
                 memberId
         );
 
@@ -78,7 +83,7 @@ public class ApplicationController extends ApplicationDocsController {
     @GetMapping("/v1/applications")
     public ResponseEntity<ApplicationPageResponse> getApplications(
             @RequestParam(required = false) String query,
-            @RequestParam ApplicationStatus applicationStatus,
+            @RequestParam StageType stageType,
             @RequestParam(required = false) Long lastCursorId,
             @LoginMember Long memberId
     ) {
@@ -88,14 +93,24 @@ public class ApplicationController extends ApplicationDocsController {
     @Override
     @GetMapping("/v1/applications/statistics")
     public ResponseEntity<ApplicationStatisticsResponse> getApplicationStatistics(@LoginMember Long memberId) {
+        ApplicationStatisticsResponse response = applicationService.getApplicationStatic(memberId);
 
-        return ResponseEntity.ok(ApplicationStatisticsResponse.mock());
+        return ResponseEntity.ok(response);
     }
 
     @Override
-    @GetMapping("/v1/applications/in-progress")
-    public ResponseEntity<ApplicationPageResponse> getInProgressApplications(@LoginMember Long memberId) {
-        return ResponseEntity.ok(ApplicationPageResponse.inProgressMock());
+    @GetMapping("/v1/applications/before-deadline")
+    public ResponseEntity<PageResponse<BeforeDeadlineApplicationResponse>> findBeforeDeadlineApplications(
+            @RequestParam(required = false) Long lastCursorId,
+            @RequestParam(required = false, defaultValue = "10") int size,
+            @LoginMember Long memberId
+    ) {
+        PageResponse<BeforeDeadlineApplicationResponse> response = applicationService.findBeforeDeadlineApplications(
+                memberId,
+                Cursor.of(lastCursorId, size)
+        );
+
+        return ResponseEntity.ok(response);
     }
 
 }
