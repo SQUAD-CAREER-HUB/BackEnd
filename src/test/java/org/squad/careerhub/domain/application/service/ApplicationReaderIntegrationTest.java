@@ -16,6 +16,7 @@ import org.squad.careerhub.domain.application.entity.Application;
 import org.squad.careerhub.domain.application.entity.ApplicationMethod;
 import org.squad.careerhub.domain.application.entity.ApplicationStage;
 import org.squad.careerhub.domain.application.entity.StageResult;
+import org.squad.careerhub.domain.application.entity.StageStatus;
 import org.squad.careerhub.domain.application.entity.StageType;
 import org.squad.careerhub.domain.application.entity.SubmissionStatus;
 import org.squad.careerhub.domain.application.repository.ApplicationJpaRepository;
@@ -135,7 +136,8 @@ class ApplicationReaderIntegrationTest extends IntegrationTestSupport {
         ).containsExactly(
                 "카카오",
                 "백엔드 개발자",
-                StageType.DOCUMENT.getDescription()
+                StageType.DOCUMENT.getDescription(),
+                StageStatus.WAITING.name()
         );
     }
 

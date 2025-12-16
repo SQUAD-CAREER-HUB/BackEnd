@@ -40,7 +40,7 @@ public class ApplicationQueryDslRepository {
                         application.company,
                         application.position,
                         application.currentStageType,
-                        applicationStage.stageStatus.stringValue(),
+                        applicationStage.stageStatus,
                         application.submittedAt,
                         application.deadline,
                         Expressions.nullExpression(LocalDateTime.class)
