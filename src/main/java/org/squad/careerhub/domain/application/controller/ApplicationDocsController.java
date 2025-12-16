@@ -277,8 +277,7 @@ public abstract class ApplicationDocsController {
             Long lastCursorId,
             @Parameter(
                     description = "한 페이지당 조회할 지원 카드 개수",
-                    example = "10",
-                    required = true
+                    example = "10"
             )
             int size,
             Long memberId
