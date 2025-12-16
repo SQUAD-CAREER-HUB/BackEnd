@@ -1,30 +1,19 @@
 package org.squad.careerhub.domain.jobposting;
 
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.http.HttpStatus;
 import org.squad.careerhub.ControllerTestSupport;
-import org.squad.careerhub.domain.jobposting.controller.JobPostingController;
-import org.squad.careerhub.domain.jobposting.service.JobPostingService;
 import org.squad.careerhub.domain.jobposting.service.dto.response.JobPostingExtractResponse;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.test.web.servlet.MockMvc;
 import org.squad.careerhub.global.annotation.TestMember;
 
-@WebMvcTest(JobPostingController.class)
 class JobPostingControllerTest extends ControllerTestSupport {
-
-    @Autowired
-    MockMvc mockMvc;
-
-    @MockitoBean
-    JobPostingService jobPostingService;
 
     @TestMember
     @Test
@@ -37,15 +26,25 @@ class JobPostingControllerTest extends ControllerTestSupport {
             .thenReturn(mockResponse);
 
         // when & then
-        mockMvc.perform(get("/v1/job-postings")
-                    .param("url", url)
-            ).andExpect(status().isOk());
+        assertThat(
+            mvcTester.get()
+                .uri("/v1/job-postings")
+                .param("url", url)
+        )
+            .apply(print())
+            .hasStatus(HttpStatus.OK);
+
+        verify(jobPostingService).extractJobPosting(url);
     }
 
     @TestMember
     @Test
-    void url_파라미터가_없으면_400을_반환한다() throws Exception {
-        mockMvc.perform(get("/v1/job-postings"))
-            .andExpect(status().isBadRequest());
+    void url_파라미터가_없으면_400을_반환한다() {
+        assertThat(
+            mvcTester.get()
+                .uri("/v1/job-postings")
+        )
+            .apply(print())
+            .hasStatus(HttpStatus.BAD_REQUEST);
     }
 }
