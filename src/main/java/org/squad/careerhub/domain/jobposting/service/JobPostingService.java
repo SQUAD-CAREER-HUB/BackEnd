@@ -10,7 +10,6 @@ import org.squad.careerhub.domain.jobposting.service.port.JobPostingExtractionPo
 @RequiredArgsConstructor
 @Service
 public class JobPostingService {
-    private final JobPostingExtractionPort jobPostingExtractionPort;
     private final JobPostingValidator jobPostingValidator;
     private final JobPostingManager jobPostingManager;
 

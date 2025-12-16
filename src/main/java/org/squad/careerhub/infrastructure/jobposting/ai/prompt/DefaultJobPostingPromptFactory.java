@@ -16,7 +16,7 @@ public class DefaultJobPostingPromptFactory implements JobPostingPromptFactory {
      - content를 통한 웹 페이지에서 가져온 정보만 추출해야해. 절대 지어내거나 만들어내면 안된다.
      - 무조건 주어진 정보로만 정보를 추출해야해 한국어가 아닌 다른 언어로 번역하는건 절대 금지야.
      - 출력은 반드시 JSON 형식이어야 하고, 내가 지정한 필드만 포함해야 한다.
-     - 회사명, 직무명, 마감일, 근무지, 주요업무, 자격요건, 우대사항, 채용 전형을 한국어 그대로 추출한다.
+     - 회사명, 직무명, 마감일, 근무지, 채용 전형을 한국어 그대로 추출한다.
      - 마감일 정보를 못 찾거나 없거나 상시채용이면 deadline은 null로 둔다.
      - 마감일 정보를 찾은 경우 "yyyy-MM-dd HH:mm:ss"로 표현한다.
      - 회사명, 직무명, 근무지 정보를 못 찾거나 없으면 "-"로 둔다.
@@ -59,9 +59,6 @@ public class DefaultJobPostingPromptFactory implements JobPostingPromptFactory {
             "deadline": string or null,
             "workplace": string,
             "recruitmentProcess": [string, ...] or [],
-            "mainTasks": [string, ...] or [],
-            "requiredQualifications": [string, ...] or [],
-            "preferredQualifications": [string, ...] or [],
             "status": "SUCCESS" | "PARTIAL" | "FAILED"
           }
           

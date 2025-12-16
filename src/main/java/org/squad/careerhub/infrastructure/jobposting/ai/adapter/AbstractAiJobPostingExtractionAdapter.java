@@ -56,14 +56,12 @@ public abstract class AbstractAiJobPostingExtractionAdapter implements JobPostin
         JobPostingExtractStatus status = mapStatus(aiResult.status());
 
         return JobPostingExtractResponse.builder()
+            .url(content.content().url())
             .company(aiResult.company())
             .position(aiResult.position())
             .deadline(aiResult.deadline())
             .workplace(aiResult.workplace())
             .recruitmentProcess(aiResult.recruitmentProcess())
-            .mainTasks(aiResult.mainTasks())
-            .requiredQualifications(aiResult.requiredQualifications())
-            .preferredQualifications(aiResult.preferredQualifications())
             .status(status)
             .build();
     }

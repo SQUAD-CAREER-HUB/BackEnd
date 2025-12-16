@@ -13,7 +13,6 @@ import org.squad.careerhub.domain.jobposting.service.dto.response.JobPostingExtr
 @Component
 public class JobPostingManager {
 
-    @Qualifier("jobPostingExtractionStrategy")
     private final JobPostingExtractionPort jobPostingExtractionPort;
     private final JobPostingContentReaderPort jobPostingContentReaderPort;
 
