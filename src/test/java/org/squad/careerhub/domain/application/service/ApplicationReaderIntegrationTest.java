@@ -121,7 +121,7 @@ class ApplicationReaderIntegrationTest extends IntegrationTestSupport {
     }
 
     @Test
-    void 커서_페이지네이선_작동을_확인한다() {
+    void 커서_페이지네이션_작동을_확인한다() {
         // given
         createBulkApplicationsWithStage(member, StageType.DOCUMENT, 40);
         createBulkApplicationsWithStage(member, StageType.ETC, 10);
