@@ -8,8 +8,5 @@ public record JobPostingAiResult(
     String deadline,
     String workplace,
     List<String> recruitmentProcess,
-    List<String> mainTasks,
-    List<String> requiredQualifications,
-    List<String> preferredQualifications,
     String status
 ) { }
