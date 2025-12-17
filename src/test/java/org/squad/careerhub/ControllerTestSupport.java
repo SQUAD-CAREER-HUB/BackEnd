@@ -11,6 +11,8 @@ import org.squad.careerhub.domain.application.controller.ApplicationController;
 import org.squad.careerhub.domain.application.service.ApplicationService;
 import org.squad.careerhub.domain.community.interviewreview.controller.InterviewReviewController;
 import org.squad.careerhub.domain.community.interviewreview.service.InterviewReviewService;
+import org.squad.careerhub.domain.jobposting.controller.JobPostingController;
+import org.squad.careerhub.domain.jobposting.service.JobPostingService;
 import org.squad.careerhub.global.security.TestSecurityConfig;
 
 @ActiveProfiles("test")
@@ -18,7 +20,8 @@ import org.squad.careerhub.global.security.TestSecurityConfig;
 @WebMvcTest(
         controllers = {
                 ApplicationController.class,
-                InterviewReviewController.class
+                InterviewReviewController.class,
+                JobPostingController.class
         })
 public abstract class ControllerTestSupport {
 
@@ -33,5 +36,9 @@ public abstract class ControllerTestSupport {
 
     @MockitoBean
     protected ApplicationService applicationService;
+
+    @MockitoBean
+    protected JobPostingService jobPostingService;
+
 
 }

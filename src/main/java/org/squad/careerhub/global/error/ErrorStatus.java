@@ -51,6 +51,15 @@ public enum ErrorStatus {
     FORBIDDEN_ERROR        (403, "접근 권한이 없습니다."),
     INTERNAL_SERVER_ERROR  (500, "서버 내부 에러"),
 
+    // JOB POSTING
+    URL_ERROR                       (400, "허용되지 않는 URL입니다."),
+    JOB_POSTING_ROBOTS_BLOCKED      (400, "robots.txt에 의해 크롤링이 허용되지 않는 URL입니다."),
+    JOB_POSTING_NEED_LOGIN          (400, "로그인이 필요한 채용공고입니다."),
+    JOB_POSTING_JS_RENDER_REQUIRED  (400, "JS 렌더링이 필요한 채용공고라 현재 방식으로는 분석할 수 없습니다."),
+    JOB_POSTING_READ_FAILED         (400, "채용공고 내용을 가져오지 못했습니다."),
+    JOB_POSTING_EXTRACTION_FAILED   (400, "채용공고 정보 추출에 실패했습니다."),
+    JOB_POSTING_AI_FAILED           (500, "채용공고 AI 분석에 실패하였습니다."),
+    JOB_POSTING_AI_QUOTA_EXCEEDED   (429, "채용공고 분석 AI 무료 사용량이 초과되었습니다. 잠시 후 다시 시도해주세요.")
     ;
 
     private final int statusCode;
