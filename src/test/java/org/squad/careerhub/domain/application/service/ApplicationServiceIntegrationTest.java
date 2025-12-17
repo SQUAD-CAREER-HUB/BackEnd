@@ -412,10 +412,10 @@ class ApplicationServiceIntegrationTest extends IntegrationTestSupport {
     }
 
     @Test
-    void 최종합격_전형_지원서가_정상_생성된다() {
+    void 지원종료_단계의_지원서가_정상_생성된다() {
         // given
-        var finalPassNewStage = NewStage.builder()
-                .stageType(StageType.FINAL_PASS)
+        var closeNewStage = NewStage.builder()
+                .stageType(StageType.APPLICATION_CLOSE)
                 .newInterviewSchedules(List.of())
                 .build();
         var jobPosting = createJobPosting("현대자동차", "자율주행 엔지니어", null);
@@ -425,7 +425,7 @@ class ApplicationServiceIntegrationTest extends IntegrationTestSupport {
         var applicationId = applicationService.createApplication(
                 jobPosting,
                 applicationInfo,
-                finalPassNewStage,
+                closeNewStage,
                 List.of(),
                 testMember.getId()
         );
@@ -447,73 +447,13 @@ class ApplicationServiceIntegrationTest extends IntegrationTestSupport {
                 jobPosting.position(),
                 jobPosting.jobPostingUrl(),
                 applicationInfo.applicationMethod(),
-                finalPassNewStage.stageType(),
+                closeNewStage.stageType(),
                 applicationInfo.deadline(),
                 applicationInfo.submittedAt(),
                 null
         );
         List<ApplicationStage> stages = applicationStageRepository.findByApplicationId(applicationId);
-        assertThat(stages).hasSize(2);
-
-        var finalStage = stages.stream()
-                .filter(s -> s.getStageType() == StageType.FINAL_PASS)
-                .findFirst()
-                .orElseThrow();
-
-        assertThat(finalStage.getStageName()).isEqualTo(StageType.FINAL_PASS.getDescription());
-    }
-
-    @Test
-    void 최종_불합격_전형_지원서가_정상_생성된다() {
-        // given
-        var finalFailNewStage = NewStage.builder()
-                .stageType(StageType.FINAL_FAIL)
-                .newInterviewSchedules(List.of())
-                .build();
-        var jobPosting = createJobPosting("현대자동차", "자율주행 엔지니어", null);
-        var applicationInfo = createApplicationInfo();
-
-        // when
-        var applicationId = applicationService.createApplication(
-                jobPosting,
-                applicationInfo,
-                finalFailNewStage,
-                List.of(),
-                testMember.getId()
-        );
-
-        // then
-        // Application 검증
-        var application = applicationRepository.findById(applicationId).orElseThrow();
-        assertThat(application).extracting(
-                Application::getCompany,
-                Application::getPosition,
-                Application::getJobPostingUrl,
-                Application::getApplicationMethod,
-                Application::getCurrentStageType,
-                Application::getDeadline,
-                Application::getSubmittedAt,
-                Application::getMemo
-        ).containsExactly(
-                jobPosting.company(),
-                jobPosting.position(),
-                jobPosting.jobPostingUrl(),
-                applicationInfo.applicationMethod(),
-                finalFailNewStage.stageType(),
-                applicationInfo.deadline(),
-                applicationInfo.submittedAt(),
-                null
-        );
-        // ApplicationStage 검증
-        List<ApplicationStage> stages = applicationStageRepository.findByApplicationId(applicationId);
-        assertThat(stages).hasSize(2);
-
-        var finalStage = stages.stream()
-                .filter(s -> s.getStageType() == StageType.FINAL_FAIL)
-                .findFirst()
-                .orElseThrow();
-
-        assertThat(finalStage.getStageName()).isEqualTo(StageType.FINAL_FAIL.getDescription());
+        assertThat(stages).isEmpty();
     }
 
     @Test

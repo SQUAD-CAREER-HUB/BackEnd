@@ -43,9 +43,15 @@ public class ApplicationManager {
                 newApplicationInfo.submittedAt()
         ));
 
-        applicationStageManager.create(application, newStage);
+        createStageIfNotClose(application, newStage);
 
         return application;
+    }
+
+    private void createStageIfNotClose(Application application, NewStage stage) {
+        if (!stage.stageType().isApplicationClose()) {
+            applicationStageManager.create(application, stage);
+        }
     }
 
 }
