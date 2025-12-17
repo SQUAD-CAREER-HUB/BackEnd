@@ -39,6 +39,9 @@ public class Application extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private StageType currentStageType;
 
+    @Enumerated(EnumType.STRING)
+    private ApplicationStatus applicationStatus;
+
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private ApplicationMethod applicationMethod;
@@ -70,6 +73,7 @@ public class Application extends BaseEntity {
         application.position = requireNonNull(position);
         application.jobLocation = requireNonNull(jobLocation);
         application.currentStageType = requireNonNull(currentStageType);
+        application.applicationStatus = currentStageType != StageType.APPLICATION_CLOSE ? ApplicationStatus.IN_PROGRESS : null;
         application.applicationMethod = requireNonNull(applicationMethod);
         application.deadline = requireNonNull(deadline);
         application.submittedAt = submittedAt;
