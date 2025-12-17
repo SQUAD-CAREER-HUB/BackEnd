@@ -145,42 +145,9 @@ class ApplicationStageManagerUnitTest extends TestDoubleSupport {
         verify(applicationStageJpaRepository, times(2)).save(any());
     }
 
-    @Test
-    void 최종_전형은_FINAL_타입으로_저장된다() {
-        // given
-        var finalNewStage = NewStage.builder()
-                .stageType(StageType.FINAL_PASS)
-                .build();
-
-        var etcStage = ApplicationStage.create(
-                testApplication,
-                StageType.FINAL_PASS,
-                StageType.FINAL_PASS.getDescription(),
-                null
-        );
-        given(applicationStageJpaRepository.save(any())).willReturn(etcStage);
-        // when
-        var applicationStage = applicationStageManager.create(testApplication, finalNewStage);
-
-        // then
-        assertThat(applicationStage).extracting(
-                ApplicationStage::getStageStatus,
-                ApplicationStage::getStageType,
-                ApplicationStage::getStageName,
-                ApplicationStage::getSubmissionStatus
-
-        ).containsExactly(
-                StageStatus.WAITING,
-                finalNewStage.stageType(),
-                finalNewStage.stageType().getDescription(),
-                null
-        );
-
-        verify(applicationStageJpaRepository, times(2)).save(any());
-    }
 
     @ParameterizedTest
-    @EnumSource(value = StageType.class, names = {"INTERVIEW", "FINAL_PASS", "FINAL_FAIL", "ETC"})
+    @EnumSource(value = StageType.class, names = {"INTERVIEW", "ETC"})
     void 서류_외_모든_전형은_서류_PASS_를_자동_생성한다(StageType stageType) {
         // given
         NewStage.NewStageBuilder builder = NewStage.builder()
