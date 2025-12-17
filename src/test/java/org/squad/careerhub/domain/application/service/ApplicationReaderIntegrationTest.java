@@ -13,6 +13,7 @@ import org.squad.careerhub.IntegrationTestSupport;
 import org.squad.careerhub.domain.application.entity.Application;
 import org.squad.careerhub.domain.application.entity.ApplicationMethod;
 import org.squad.careerhub.domain.application.entity.ApplicationStage;
+import org.squad.careerhub.domain.application.entity.ApplicationStatus;
 import org.squad.careerhub.domain.application.entity.StageType;
 import org.squad.careerhub.domain.application.entity.SubmissionStatus;
 import org.squad.careerhub.domain.application.repository.ApplicationJpaRepository;
@@ -50,11 +51,11 @@ class ApplicationReaderIntegrationTest extends IntegrationTestSupport {
     @Test
     void 전체_지원서_개수와_각_전형별_지원서_개수를_조회한다() {
         // given
-        var finalDocsApplications = createBulkApplications(member, StageType.DOCUMENT, 20);
-        var etcApplications = createBulkApplications(member, StageType.ETC, 20);
-        var interviewApplications = createBulkApplications(member, StageType.INTERVIEW, 20);
-        var finalPassApplications = createBulkApplications(member, StageType.FINAL_PASS, 20);
-        var finalFailApplications = createBulkApplications(member, StageType.FINAL_FAIL, 20);
+        var finalDocsApplications = createBulkApplications(member, StageType.DOCUMENT,ApplicationStatus.FINAL_PASS, 20);
+        var etcApplications = createBulkApplications(member, StageType.ETC, ApplicationStatus.FINAL_PASS, 20);
+        var interviewApplications = createBulkApplications(member, StageType.INTERVIEW, ApplicationStatus.FINAL_PASS, 20);
+        var finalPassApplications = createBulkApplications(member, StageType.APPLICATION_CLOSE, ApplicationStatus.FINAL_PASS, 20);
+        var finalFailApplications = createBulkApplications(member, StageType.APPLICATION_CLOSE, ApplicationStatus.FINAL_FAIL, 20);
 
         int totalCount = finalDocsApplications.size()
                 + etcApplications.size()
@@ -67,14 +68,18 @@ class ApplicationReaderIntegrationTest extends IntegrationTestSupport {
         // then
         assertThat(applicationStatistics).extracting(
                 ApplicationStatisticsResponse::totalApplicationCount,
+                ApplicationStatisticsResponse::docStageCount,
                 ApplicationStatisticsResponse::interviewStageCount,
                 ApplicationStatisticsResponse::etcStageCount,
-                ApplicationStatisticsResponse::finalPassedCount
+                ApplicationStatisticsResponse::finalPassedCount,
+                ApplicationStatisticsResponse::finalFailedCount
         ).containsExactly(
                 totalCount,
+                finalDocsApplications.size(),
                 interviewApplications.size(),
                 etcApplications.size(),
-                finalPassApplications.size()
+                finalPassApplications.size(),
+                finalFailApplications.size()
         );
     }
 
@@ -160,7 +165,7 @@ class ApplicationReaderIntegrationTest extends IntegrationTestSupport {
 
     }
 
-    private List<Application> createBulkApplications(Member member, StageType stageType, int count) {
+    private List<Application> createBulkApplications(Member member, StageType stageType, ApplicationStatus applicationStatus,int count) {
         List<Application> applications = new ArrayList<>();
 
         for (int i = 0; i < count; i++) {
@@ -176,6 +181,10 @@ class ApplicationReaderIntegrationTest extends IntegrationTestSupport {
                     LocalDate.now()
             );
             applications.add(app);
+        }
+
+        if(stageType == StageType.APPLICATION_CLOSE) {
+            applications.forEach(app -> app.updateApplicationStatus(applicationStatus));
         }
 
         return applicationJpaRepository.saveAll(applications);

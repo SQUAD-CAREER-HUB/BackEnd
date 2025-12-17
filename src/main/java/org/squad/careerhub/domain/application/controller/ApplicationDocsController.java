@@ -234,9 +234,11 @@ public abstract class ApplicationDocsController {
                     
                     #### 지원 통계 항목
                     - 전체 지원서 수
+                    - 서류 전형 단계인 지원서 수
                     - 면접 전형 단계인 지원서 수
                     - 기타 전형 단계인 지원서 수
                     - 최종 합격한 지원서 수
+                    - 최종 불합격한 지원서 수
                     """
     )
     @ApiResponse(
