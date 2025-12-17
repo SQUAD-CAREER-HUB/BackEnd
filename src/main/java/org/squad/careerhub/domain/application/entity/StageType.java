@@ -9,9 +9,12 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum StageType {
 
-    DOCUMENT   (1, "서류 전형"),
-    ETC        (2, "기타 전형"),
-    INTERVIEW  (3, "면접 전형"),
+    DOCUMENT          (1, "서류 전형"),
+    ETC               (2, "기타 전형"),
+    INTERVIEW         (3, "면접 전형"),
+    APPLICATION_CLOSE (4, "지원 종료"),
+
+    // TODO: 관련 API 변경 후 추후 삭제 예정
     FINAL_PASS (4, "최종 합격"),
     FINAL_FAIL (4, "최종 불합격"),
     ;
@@ -23,6 +26,10 @@ public enum StageType {
         return Arrays.stream(values())
                 .filter(type -> type.order < this.order)
                 .toList();
+    }
+
+    public boolean isApplicationClose() {
+        return this == APPLICATION_CLOSE;
     }
 
 }
