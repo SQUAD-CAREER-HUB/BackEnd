@@ -1,7 +1,5 @@
 package org.squad.careerhub.domain.application.entity;
 
-import java.util.Arrays;
-import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -14,19 +12,10 @@ public enum StageType {
     INTERVIEW         (3, "면접 전형"),
     APPLICATION_CLOSE (4, "지원 종료"),
 
-    // TODO: 관련 API 변경 후 추후 삭제 예정
-    FINAL_PASS (4, "최종 합격"),
-    FINAL_FAIL (4, "최종 불합격"),
     ;
 
     private final int order;
     private final String description;
-
-    public List<StageType> getPreviousStages() {
-        return Arrays.stream(values())
-                .filter(type -> type.order < this.order)
-                .toList();
-    }
 
     public boolean isApplicationClose() {
         return this == APPLICATION_CLOSE;
