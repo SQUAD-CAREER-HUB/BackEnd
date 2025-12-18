@@ -3,7 +3,7 @@ package org.squad.careerhub.domain.application.controller.dto;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import java.time.LocalDateTime;
-import org.squad.careerhub.domain.application.service.dto.NewEtcSchedule;
+import org.squad.careerhub.domain.schedule.service.dto.NewEtcSchedule;
 
 @Schema(description = "기타 전형 생성 요청 DTO")
 public record EtcScheduleCreateRequest(
