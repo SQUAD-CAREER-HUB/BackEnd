@@ -50,13 +50,6 @@ public abstract class ApplicationDocsController {
                         - 기타 전형 일정은 기타 전형 단계가 있을 때만 등록할 수 있습니다.<br>
                     """
     )
-    @RequestBody(
-            description = "지원 카드 등록 요청",
-            content = @Content(
-                    mediaType = MediaType.MULTIPART_FORM_DATA_VALUE,
-                    schema = @Schema(implementation = ApplicationCreateRequest.class)
-            )
-    )
     @ApiResponse(
             responseCode = "201",
             description = "지원 카드 등록 성공"
@@ -234,9 +227,11 @@ public abstract class ApplicationDocsController {
                     
                     #### 지원 통계 항목
                     - 전체 지원서 수
+                    - 서류 전형 단계인 지원서 수
                     - 면접 전형 단계인 지원서 수
                     - 기타 전형 단계인 지원서 수
                     - 최종 합격한 지원서 수
+                    - 최종 불합격한 지원서 수
                     """
     )
     @ApiResponse(

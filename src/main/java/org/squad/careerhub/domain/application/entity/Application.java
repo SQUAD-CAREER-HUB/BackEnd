@@ -106,4 +106,9 @@ public class Application extends BaseEntity {
         return LocalDate.now().isAfter(this.deadline);
     }
 
+    // Test를 위한 업데이트 메서드
+    public void updateApplicationStatus(ApplicationStatus applicationStatus) {
+        this.applicationStatus = applicationStatus;
+    }
+
 }
