@@ -12,7 +12,7 @@ import org.squad.careerhub.domain.application.service.dto.NewJobPosting;
 import org.squad.careerhub.domain.application.service.dto.NewStage;
 import org.squad.careerhub.domain.application.repository.dto.BeforeDeadlineApplicationResponse;
 import org.squad.careerhub.domain.application.service.dto.response.ApplicationStatisticsResponse;
-import org.squad.careerhub.domain.schedule.service.InterviewScheduleManager;
+import org.squad.careerhub.domain.schedule.service.ScheduleManager;
 import org.squad.careerhub.global.support.Cursor;
 import org.squad.careerhub.global.support.PageResponse;
 
@@ -24,7 +24,7 @@ public class ApplicationService {
     private final ApplicationReader applicationReader;
     private final ApplicationPolicyValidator applicationPolicyValidator;
     private final ApplicationFileManager applicationFileManager;
-    private final InterviewScheduleManager interviewScheduleManager;
+    private final ScheduleManager scheduleManager;
 
     /**
      * 지원서를 생성합니다.
@@ -55,12 +55,12 @@ public class ApplicationService {
 
         // 면접 전형일 경우 면접 일정 생성
         if (newStage.stageType() == StageType.INTERVIEW) {
-            interviewScheduleManager.createInterviewSchedules();
+            scheduleManager.createInterviewSchedules(application, newStage.newInterviewSchedules());
         }
 
         // 기타 전형일 경우 기타 유형 일정 생성
         if (newStage.stageType() == StageType.ETC) {
-            interviewScheduleManager.createEtcSchedules();
+            scheduleManager.createEtcSchedule(application, newStage.newEtcSchedule());
         }
 
         return application.getId();

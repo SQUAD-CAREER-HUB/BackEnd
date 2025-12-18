@@ -6,7 +6,7 @@ import org.squad.careerhub.domain.application.entity.Application;
 import org.squad.careerhub.domain.application.entity.ApplicationStage;
 import org.squad.careerhub.domain.application.entity.StageType;
 import org.squad.careerhub.domain.application.repository.ApplicationStageJpaRepository;
-import org.squad.careerhub.domain.application.service.dto.NewEtcSchedule;
+import org.squad.careerhub.domain.schedule.service.dto.NewEtcSchedule;
 import org.squad.careerhub.domain.application.service.dto.NewStage;
 
 @RequiredArgsConstructor

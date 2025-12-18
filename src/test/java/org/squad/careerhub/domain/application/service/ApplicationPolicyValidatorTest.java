@@ -9,9 +9,9 @@ import org.mockito.InjectMocks;
 import org.squad.careerhub.TestDoubleSupport;
 import org.squad.careerhub.domain.application.entity.StageType;
 import org.squad.careerhub.domain.application.entity.SubmissionStatus;
-import org.squad.careerhub.domain.application.service.dto.NewEtcSchedule;
 import org.squad.careerhub.domain.application.service.dto.NewStage;
 import org.squad.careerhub.domain.schedule.enums.InterviewType;
+import org.squad.careerhub.domain.schedule.service.dto.NewEtcSchedule;
 import org.squad.careerhub.domain.schedule.service.dto.NewInterviewSchedule;
 import org.squad.careerhub.global.error.CareerHubException;
 import org.squad.careerhub.global.error.ErrorStatus;
@@ -27,22 +27,29 @@ class ApplicationPolicyValidatorTest extends TestDoubleSupport {
         var etcNewStage = new NewStage(
                 StageType.ETC,
                 null,
-                new NewEtcSchedule("코딩 테스트", LocalDateTime.now()),
+            new NewEtcSchedule(StageType.ETC, "코딩 테스트", LocalDateTime.now(), "온라인", "www.zoom.com"),
                 List.of()
         );
 
         var documentStage = new NewStage(
                 StageType.DOCUMENT,
                 SubmissionStatus.SUBMITTED,
-                new NewEtcSchedule("코딩 테스트", LocalDateTime.now()),
+            new NewEtcSchedule(StageType.ETC, "코딩 테스트", LocalDateTime.now(), "온라인", "www.zoom.com"),
                 List.of()
         );
 
         var interviewStage = new NewStage(
                 StageType.INTERVIEW,
                 null,
-                new NewEtcSchedule("코딩 테스트", LocalDateTime.now()),
-                List.of(new NewInterviewSchedule("1차 면접", InterviewType.EXECUTIVE, LocalDateTime.now(), "서울 본사"))
+                new NewEtcSchedule(StageType.ETC, "코딩 테스트", LocalDateTime.now(), "온라인", "www.zoom.com"),
+            List.of(new NewInterviewSchedule(
+                StageType.INTERVIEW,
+                InterviewType.EXECUTIVE,
+                null,
+                LocalDateTime.now(),
+                "서울 본사",
+                null
+            ))
         );
 
         // when & then
@@ -65,21 +72,41 @@ class ApplicationPolicyValidatorTest extends TestDoubleSupport {
                 StageType.ETC,
                 null,
                 null,
-                List.of(new NewInterviewSchedule("1차 면접", InterviewType.EXECUTIVE, LocalDateTime.now(), "서울 본사"))
+                List.of(new NewInterviewSchedule(
+                    StageType.INTERVIEW,
+                    InterviewType.EXECUTIVE,
+                    null,
+                    LocalDateTime.now(),
+                    "서울 본사",
+                    null))
         );
 
         var documentStage = new NewStage(
                 StageType.DOCUMENT,
                 SubmissionStatus.SUBMITTED,
                 null,
-                List.of(new NewInterviewSchedule("1차 면접", InterviewType.EXECUTIVE, LocalDateTime.now(), "서울 본사"))
+            List.of(new NewInterviewSchedule(
+                StageType.INTERVIEW,
+                InterviewType.EXECUTIVE,
+                null,
+                LocalDateTime.now(),
+                "서울 본사",
+                null
+            ))
         );
 
         var interviewStage = new NewStage(
                 StageType.INTERVIEW,
                 null,
                 null,
-                List.of(new NewInterviewSchedule("1차 면접", InterviewType.EXECUTIVE, LocalDateTime.now(), "서울 본사"))
+            List.of(new NewInterviewSchedule(
+                StageType.INTERVIEW,
+                InterviewType.EXECUTIVE,
+                null,
+                LocalDateTime.now(),
+                "서울 본사",
+                null
+            ))
         );
 
         // when & then

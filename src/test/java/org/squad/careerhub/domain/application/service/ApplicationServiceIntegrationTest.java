@@ -3,6 +3,7 @@ package org.squad.careerhub.domain.application.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -28,13 +29,13 @@ import org.squad.careerhub.domain.application.entity.SubmissionStatus;
 import org.squad.careerhub.domain.application.repository.ApplicationJpaRepository;
 import org.squad.careerhub.domain.application.repository.ApplicationStageJpaRepository;
 import org.squad.careerhub.domain.application.service.dto.NewApplicationInfo;
-import org.squad.careerhub.domain.application.service.dto.NewEtcSchedule;
 import org.squad.careerhub.domain.application.service.dto.NewJobPosting;
 import org.squad.careerhub.domain.application.service.dto.NewStage;
 import org.squad.careerhub.domain.member.entity.Member;
 import org.squad.careerhub.domain.member.entity.SocialProvider;
 import org.squad.careerhub.domain.member.repository.MemberJpaRepository;
-import org.squad.careerhub.domain.schedule.service.InterviewScheduleManager;
+import org.squad.careerhub.domain.schedule.service.ScheduleManager;
+import org.squad.careerhub.domain.schedule.service.dto.NewEtcSchedule;
 import org.squad.careerhub.global.error.CareerHubException;
 import org.squad.careerhub.global.error.ErrorStatus;
 
@@ -48,7 +49,7 @@ class ApplicationServiceIntegrationTest extends IntegrationTestSupport {
     final MemberJpaRepository memberRepository;
 
     @MockitoBean
-    InterviewScheduleManager interviewScheduleManager;
+    ScheduleManager ScheduleManager;
 
     @MockitoBean
     ApplicationFileManager applicationFileManager;
@@ -149,8 +150,8 @@ class ApplicationServiceIntegrationTest extends IntegrationTestSupport {
         );
 
         // then
-        verify(interviewScheduleManager, never()).createInterviewSchedules();
-        verify(interviewScheduleManager, never()).createEtcSchedules();
+        verify(ScheduleManager, never()).createInterviewSchedules(any(Application.class), anyList());
+        verify(ScheduleManager, never()).createEtcSchedule(any(Application.class), any(NewEtcSchedule.class));
     }
 
     @Test
@@ -243,15 +244,18 @@ class ApplicationServiceIntegrationTest extends IntegrationTestSupport {
         );
 
         // then
-        verify(interviewScheduleManager).createInterviewSchedules();
-        verify(interviewScheduleManager, never()).createEtcSchedules();
+        verify(ScheduleManager, times(1))
+            .createInterviewSchedules(any(Application.class), anyList());
+        verify(ScheduleManager, never())
+            .createEtcSchedule(any(Application.class), any(NewEtcSchedule.class));
     }
 
     @Test
     void 기타_전형_지원서가_정상_생성된다() {
         // given
         var customStageName = "코딩테스트";
-        var etcSchedule = new NewEtcSchedule(customStageName, LocalDateTime.now().plusDays(3));
+        var etcSchedule = new NewEtcSchedule(StageType.ETC, "코딩테스트",
+            LocalDateTime.now().plusDays(3), "서울특별시 강남구", null);
         var etcNewStage = NewStage.builder()
                 .stageType(StageType.ETC)
                 .newEtcSchedule(etcSchedule)
@@ -355,7 +359,8 @@ class ApplicationServiceIntegrationTest extends IntegrationTestSupport {
     @Test
     void 기타_전형은_기타_일정_생성_Manager를_호출한다() {
         // given
-        var etcSchedule = new NewEtcSchedule("과제제출", LocalDateTime.now());
+        var etcSchedule = new NewEtcSchedule(StageType.ETC, "과제 전형",
+            LocalDateTime.now().plusDays(3), "서울특별시 강남구", null);
         var etcNewStage = NewStage.builder()
                 .stageType(StageType.ETC)
                 .submissionStatus(SubmissionStatus.NOT_SUBMITTED)
@@ -373,14 +378,14 @@ class ApplicationServiceIntegrationTest extends IntegrationTestSupport {
         );
 
         // then
-        verify(interviewScheduleManager).createEtcSchedules();
-        verify(interviewScheduleManager, never()).createInterviewSchedules();
+        verify(ScheduleManager).createEtcSchedule(any(Application.class), any(NewEtcSchedule.class));
+        verify(ScheduleManager, never()).createInterviewSchedules(any(Application.class), anyList());
     }
 
     @Test
     void 기타_전형도_서류_PASS가_자동_생성된다() {
         // given
-        var etcSchedule = new NewEtcSchedule("인적성검사", LocalDateTime.now());
+        var etcSchedule = new NewEtcSchedule(StageType.ETC, "코딩 테스트", LocalDateTime.now(), "온라인", "www.zoom.com");
         var etcStage = NewStage.builder()
                 .stageType(StageType.ETC)
                 .newEtcSchedule(etcSchedule)

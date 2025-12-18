@@ -21,8 +21,8 @@ import org.squad.careerhub.domain.application.entity.StageStatus;
 import org.squad.careerhub.domain.application.entity.StageType;
 import org.squad.careerhub.domain.application.entity.SubmissionStatus;
 import org.squad.careerhub.domain.application.repository.ApplicationStageJpaRepository;
-import org.squad.careerhub.domain.application.service.dto.NewEtcSchedule;
 import org.squad.careerhub.domain.application.service.dto.NewStage;
+import org.squad.careerhub.domain.schedule.service.dto.NewEtcSchedule;
 
 class ApplicationStageManagerUnitTest extends TestDoubleSupport {
 
@@ -111,7 +111,7 @@ class ApplicationStageManagerUnitTest extends TestDoubleSupport {
     void 기타_전형도_2번_저장된다_서류_PASS_기타() {
         // given
         var customStageName = "코딩테스트";
-        var etcSchedule = new NewEtcSchedule(customStageName, LocalDateTime.now());
+        var etcSchedule = new NewEtcSchedule(StageType.ETC, "코딩 테스트", LocalDateTime.now(), "온라인", "www.zoom.com");
         var etcNewStage = NewStage.builder()
                 .stageType(StageType.ETC)
                 .newEtcSchedule(etcSchedule)
@@ -155,7 +155,7 @@ class ApplicationStageManagerUnitTest extends TestDoubleSupport {
                 .submissionStatus(SubmissionStatus.SUBMITTED);
 
         if (stageType == StageType.ETC) {
-            builder.newEtcSchedule(new NewEtcSchedule("커스텀", LocalDateTime.now()));
+            builder.newEtcSchedule(new NewEtcSchedule(StageType.ETC, "코딩 테스트", LocalDateTime.now(), "온라인", "www.zoom.com"));
         }
 
         var stage = builder.build();
