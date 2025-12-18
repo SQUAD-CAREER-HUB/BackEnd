@@ -5,8 +5,8 @@ spring:
     active: local
   config:
     import:
-      - application-db.yml
       - application-oauth.yml
+      - application-s3.yml
   web:
     resources:
       add-mappings: false
