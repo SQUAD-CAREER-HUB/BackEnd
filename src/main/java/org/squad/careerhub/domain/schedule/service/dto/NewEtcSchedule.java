@@ -3,15 +3,12 @@ package org.squad.careerhub.domain.schedule.service.dto;
 import java.time.LocalDateTime;
 import lombok.Builder;
 import org.squad.careerhub.domain.application.entity.StageType;
-import org.squad.careerhub.domain.schedule.enums.InterviewType;
 
 @Builder
-public record NewInterviewSchedule(
+public record NewEtcSchedule(
     StageType stageType,
-    InterviewType interviewType,
-    String typeDetail,
+    String stageName,
     LocalDateTime scheduledAt,
     String location,
     String link
-) {
-}
+) { }
