@@ -1,4 +1,4 @@
-package org.squad.careerhub.domain.schedule.controller.dto;
+package org.squad.careerhub.domain.application.controller.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
@@ -16,16 +16,10 @@ import org.squad.careerhub.domain.schedule.service.dto.NewInterviewSchedule;
 public record InterviewScheduleCreateRequest(
 
     @Schema(
-        description = "지원서 ID",
-        example = "1"
-    )
-    @NotNull Long applicationId,
-
-    @Schema(
-            description = "면접 유형",
-            example = "TECH",
-            allowableValues = {"TECH", "FIT", "EXECUTIVE", "TASK", "TEST", "ETC"},
-            implementation = InterviewType.class
+        description = "면접 유형",
+        example = "TECH",
+        allowableValues = {"TECH", "FIT", "EXECUTIVE", "TASK", "TEST", "ETC"},
+        implementation = InterviewType.class
     )
     @NotNull(message = "면접 유형은 필수 값입니다.")
     InterviewType type,
@@ -37,8 +31,8 @@ public record InterviewScheduleCreateRequest(
     String typeDetail,
 
     @Schema(
-            description = "면접 일시 (ISO8601, LocalDateTime)",
-            example = "2025-12-10T19:00:00"
+        description = "면접 일시 (ISO8601, LocalDateTime)",
+        example = "2025-12-10T19:00:00"
     )
     @NotNull(message = "면접 일시는 필수 값입니다.")
     LocalDateTime scheduledAt,
@@ -53,7 +47,7 @@ public record InterviewScheduleCreateRequest(
     )
     @Size(max = 512) String link
 
-    ) {
+) {
 
     public NewInterviewSchedule toNewInterviewSchedule() {
         return NewInterviewSchedule.builder()
@@ -65,11 +59,4 @@ public record InterviewScheduleCreateRequest(
             .link(link)
             .build();
     }
-
-    public ApplicationInfo toApplicationInfo() {
-        return ApplicationInfo.builder()
-            .applicationId(applicationId)
-            .build();
-    }
-
 }
