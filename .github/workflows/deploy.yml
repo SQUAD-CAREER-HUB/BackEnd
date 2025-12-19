@@ -2,7 +2,7 @@ name: careerhub
 on:
   push:
     branches:
-      - Setting/#46
+      - 'Setting/#46'
   pull_request:
     branches:
       - main
@@ -68,7 +68,8 @@ jobs:
             cd ~/careerhub
             
             # .env 파일 생성
-            cat > .env << 'EOF'
+            cat > .env << EOF
+
             DOCKER_USERNAME=${{ secrets.DOCKER_USERNAME }}
             MYSQL_ROOT_PASSWORD=${{ secrets.MYSQL_ROOT_PASSWORD }}
             MYSQL_USER=${{ secrets.MYSQL_USERNAME }}
@@ -76,7 +77,7 @@ jobs:
             EOF
 
             # docker-compose.yml 생성
-            cat > docker-compose.yml << 'EOF'
+            cat > docker-compose.yml << EOF
             ${{ secrets.DOCKER_COMPOSE_YML }}
             EOF
 
