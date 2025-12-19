@@ -147,7 +147,7 @@ public class Schedule extends BaseEntity {
      */
     public void update(
         StageType stageType,
-        String title,
+        String stageName,
         LocalDateTime datetime,
         String location,
         String link,
