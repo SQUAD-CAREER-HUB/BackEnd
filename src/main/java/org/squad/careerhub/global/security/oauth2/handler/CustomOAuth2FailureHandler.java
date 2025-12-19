@@ -21,7 +21,7 @@ public class CustomOAuth2FailureHandler extends SimpleUrlAuthenticationFailureHa
     ) throws IOException {
         log.info("[Auth] OAuth2 소셜 로그인에 실패했습니다. : {}", exception.getMessage());
 
-        String redirectUrl = UriComponentsBuilder.fromUriString("http://localhost:5173")
+        String redirectUrl = UriComponentsBuilder.fromUriString("https://api.kwaktaepung.shop/oauth/fail")
                 .build()
                 .toUriString();
 
