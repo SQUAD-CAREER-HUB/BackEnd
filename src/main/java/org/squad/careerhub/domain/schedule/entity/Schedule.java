@@ -63,7 +63,6 @@ public class Schedule extends BaseEntity {
     @Column(name = "link")
     private String link;
 
-
     @Enumerated(EnumType.STRING)
     @Column(name = "stage_status", nullable = false, length = 20)
     private StageStatus stageStatus;
