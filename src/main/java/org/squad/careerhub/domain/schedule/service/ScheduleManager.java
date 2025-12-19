@@ -27,6 +27,7 @@ public class ScheduleManager {
         NewInterviewSchedule newInterviewSchedule
     ) {
         requireNonNull(newInterviewSchedule);
+        requireNonNull(application);
 
         return scheduleJpaRepository.save(Schedule.interviewCreate(
             application,
@@ -46,6 +47,7 @@ public class ScheduleManager {
         List<NewInterviewSchedule> newInterviewSchedules
     ) {
         requireNonNull(application);
+        requireNonNull(newInterviewSchedules);
 
         List<Schedule> schedules = newInterviewSchedules.stream()
             .map(cmd -> Schedule.interviewCreate(
@@ -72,6 +74,7 @@ public class ScheduleManager {
         Application application,
         NewEtcSchedule newEtcSchedule
     ) {
+        requireNonNull(newEtcSchedule);
         requireNonNull(application);
 
         return scheduleJpaRepository.save(Schedule.etcCreate(
