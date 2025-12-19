@@ -6,7 +6,6 @@ import jakarta.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 import lombok.Builder;
 import org.squad.careerhub.domain.schedule.enums.InterviewResult;
-import org.squad.careerhub.domain.schedule.enums.InterviewStatus;
 import org.squad.careerhub.domain.schedule.enums.InterviewType;
 
 @Schema(description = "면접 일정 수정 요청 DTO (PATCH – 부분 수정)")
@@ -31,14 +30,7 @@ public record InterviewScheduleUpdateRequest(
     String typeDetail,
 
     @Schema(
-        description = "면접 상태",
-        example = "SCHEDULED",
-        allowableValues = {"SCHEDULED", "DONE", "CANCELED", "NONAPPEARANCE"}
-    )
-    InterviewStatus status,
-
-    @Schema(
-        description = "면접 결과 상태 (PENDING 대기/ PASS 합격/ FAIL 불합격)",
+        description = "면접 결과 상태 (WAITING 대기/ PASS 합격/ FAIL 불합격)",
         example = "PASS"
     )
     InterviewResult result,
