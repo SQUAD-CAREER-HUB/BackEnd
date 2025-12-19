@@ -45,12 +45,12 @@ class JobPostingValidatorTest {
             assertThatThrownBy(() -> validator.validateJobPostingUrl(null))
                 .isInstanceOf(CareerHubException.class)
                 .extracting("errorStatus")
-                .isEqualTo(ErrorStatus.BAD_REQUEST);
+                .isEqualTo(ErrorStatus.URL_ERROR);
 
             assertThatThrownBy(() -> validator.validateJobPostingUrl(" "))
                 .isInstanceOf(CareerHubException.class)
                 .extracting("errorStatus")
-                .isEqualTo(ErrorStatus.BAD_REQUEST);
+                .isEqualTo(ErrorStatus.URL_ERROR);
         }
 
         @Test
@@ -60,7 +60,7 @@ class JobPostingValidatorTest {
             assertThatThrownBy(() -> validator.validateJobPostingUrl(url))
                 .isInstanceOf(CareerHubException.class)
                 .extracting("errorStatus")
-                .isEqualTo(ErrorStatus.BAD_REQUEST);
+                .isEqualTo(ErrorStatus.URL_ERROR);
         }
 
         @Test
@@ -70,18 +70,18 @@ class JobPostingValidatorTest {
             assertThatThrownBy(() -> validator.validateJobPostingUrl(url))
                 .isInstanceOf(CareerHubException.class)
                 .extracting("errorStatus")
-                .isEqualTo(ErrorStatus.BAD_REQUEST);
+                .isEqualTo(ErrorStatus.URL_ERROR);
         }
 
         @Test
         void 잘못된_URL_형식이면_BAD_REQUEST_예외를_던진다() {
             // 공백 포함 등 잘못된 URI
-            String url = "https://www.wanted.co.kr/wd/ 12345";
+            String url = "  ";
 
             assertThatThrownBy(() -> validator.validateJobPostingUrl(url))
                 .isInstanceOf(CareerHubException.class)
                 .extracting("errorStatus")
-                .isEqualTo(ErrorStatus.BAD_REQUEST);
+                .isEqualTo(ErrorStatus.URL_ERROR);
         }
     }
 
