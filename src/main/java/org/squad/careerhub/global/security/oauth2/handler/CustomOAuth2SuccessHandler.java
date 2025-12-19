@@ -41,7 +41,7 @@ public class CustomOAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHa
     }
 
     private String createRedirectUrl(TokenResponse tokenResponse) {
-        return UriComponentsBuilder.fromUriString("https://api.kwaktaepung.shop/oauth/success")
+        return UriComponentsBuilder.fromUriString("http://localhost:3000")
                 .queryParam(TokenType.ACCESS.getValue(), tokenResponse.accessToken())
                 .queryParam(TokenType.REFRESH.getValue(), tokenResponse.refreshToken())
                 .build()
