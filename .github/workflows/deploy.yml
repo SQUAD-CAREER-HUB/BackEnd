@@ -76,7 +76,9 @@ jobs:
             EOF
 
             # docker-compose.yml 생성
-            echo "${{ secrets.DOCKER_COMPOSE_YML }}" > docker-compose.yml
+            cat > docker-compose.yml << EOF
+            ${{ secrets.DOCKER_COMPOSE_YML }}
+            EOF
 
             # 최신 이미지 받기
             docker-compose pull
