@@ -25,7 +25,7 @@ public class SwaggerConfig {
                 .addSecurityItem(globalSecurityRequirement())
                 .components(components())
                 .servers(List.of(
-                        server("Development Server", "http://localhost:8080")
+                        server("Development Server", "https://api.kwaktaepung.shop")
                 ));
     }
 
