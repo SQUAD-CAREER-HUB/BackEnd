@@ -37,7 +37,7 @@ public abstract class ScheduleDocsController {
         description = "면접 일정 생성 성공",
         content = @Content(
             mediaType = MediaType.APPLICATION_JSON_VALUE,
-            schema = @Schema(implementation = InterviewScheduleResponse.class)
+            schema = @Schema(implementation = ScheduleResponse.class)
         )
     )
     @ApiExceptions(values = {
