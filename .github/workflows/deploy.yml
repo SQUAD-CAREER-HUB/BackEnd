@@ -63,7 +63,7 @@ jobs:
           username: ${{ secrets.EC2_USERNAME }}
           key: ${{ secrets.EC2_PRIVATE_KEY }}
           port: 22
-          script_stop: true
+#          script_stop: true
           script: |
             cd ~/careerhub
             
@@ -73,6 +73,10 @@ jobs:
             MYSQL_ROOT_PASSWORD=${{ secrets.MYSQL_ROOT_PASSWORD }}
             MYSQL_USER=${{ secrets.MYSQL_USERNAME }}
             MYSQL_PASSWORD=${{ secrets.MYSQL_PASSWORD }}
+            EOF
+
+            cat > docker-compose.yml << EOF
+            ${{ secrets.DOCKER_COMPOSE_YML }}
             EOF
             
             # 최신 이미지 받기
