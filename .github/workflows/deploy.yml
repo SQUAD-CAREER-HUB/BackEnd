@@ -74,18 +74,15 @@ jobs:
             MYSQL_USER=${{ secrets.MYSQL_USERNAME }}
             MYSQL_PASSWORD=${{ secrets.MYSQL_PASSWORD }}
             EOF
-            
+
+            # docker-compose.yml 생성
+            echo "${{ secrets.DOCKER_COMPOSE_YML }}" > docker-compose.yml
+
             # 최신 이미지 받기
-            docker-compose pull app
-            
+            docker-compose pull
+
             # Docker Compose로 전체 스택 실행
-            docker-compose up -d
+            docker-compose up -d --remove-orphans
             
             # 사용하지 않는 이미지 정리
             docker image prune -af
-
-#            docker stop careerhub || true
-#            docker rm careerhub || true
-#            docker pull ${{ secrets.DOCKER_USERNAME }}/careerhub:latest
-#            docker run -d --name careerhub -p 8080:8080 --restart unless-stopped ${{ secrets.DOCKER_USERNAME }}/careerhub:latest
-#
