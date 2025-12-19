@@ -66,16 +66,20 @@ jobs:
           script_stop: true
           script: |
             cd ~/careerhub
-
+            
+            # .env 파일 생성
             cat > .env << EOF
             DOCKER_USERNAME=${{ secrets.DOCKER_USERNAME }}
             MYSQL_ROOT_PASSWORD=${{ secrets.MYSQL_ROOT_PASSWORD }}
             MYSQL_USER=${{ secrets.MYSQL_USERNAME }}
             MYSQL_PASSWORD=${{ secrets.MYSQL_PASSWORD }}
             EOF
-  
-            docker-compose pull
-  
-            docker-compose up -d --remove-orphans
-  
+            
+            # 최신 이미지 받기
+            docker-compose pull app
+            
+            # Docker Compose로 전체 스택 실행
+            docker-compose up -d
+            
+            # 사용하지 않는 이미지 정리
             docker image prune -af
