@@ -48,7 +48,17 @@ public class ScheduleManager {
         requireNonNull(application);
 
         List<Schedule> schedules = newInterviewSchedules.stream()
-            .map(cmd -> createInterviewSchedule(application, cmd))
+            .map(cmd -> Schedule.interviewCreate(
+                application,
+                StageType.INTERVIEW,
+                cmd.interviewType(),
+                cmd.typeDetail(),
+                cmd.scheduledAt(),
+                cmd.location(),
+                cmd.link(),
+                StageStatus.WAITING,
+                application.getApplicationStatus()
+            ))
             .toList();
 
         scheduleJpaRepository.saveAll(schedules);
