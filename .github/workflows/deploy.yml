@@ -77,7 +77,8 @@ jobs:
             EOF
 
             # docker-compose.yml 생성
-            cat > docker-compose.yml << EOF
+            cat > docker-compose.yml << 'EOF'
+
             ${{ secrets.DOCKER_COMPOSE_YML }}
             EOF
 
