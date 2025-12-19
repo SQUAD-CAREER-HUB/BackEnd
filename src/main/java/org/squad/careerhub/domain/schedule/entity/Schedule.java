@@ -162,7 +162,7 @@ public class Schedule extends BaseEntity {
         this.location = normalize(location);
         this.link = normalize(link);
         this.interviewType = interviewType;
-        this.interviewTypeDetail = interviewTypeDetail;
+        this.interviewTypeDetail = normalize(interviewTypeDetail);
         this.stageStatus = requireNonNull(stageStatus);
 
         this.submissionStatus = (stageType == StageType.DOCUMENT) ? submissionStatus : null;
