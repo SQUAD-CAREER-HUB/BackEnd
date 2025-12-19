@@ -82,7 +82,7 @@ jobs:
             docker-compose pull app
             
             # Docker Compose로 전체 스택 실행
-            docker-compose up -d
+            docker-compose up -d --force-recreate --no-deps app
             
             # 사용하지 않는 이미지 정리
             docker image prune -af
