@@ -118,4 +118,8 @@ jobs:
             
             docker-compose pull app
             docker-compose up -d --force-recreate --no-deps app
-            docker image prune -af
+            # careerhub 관련 오래된 이미지만 삭제 (latest 제외)
+            docker images "${{ secrets.DOCKER_USERNAME }}/careerhub" --format "{{.ID}} {{.Tag}}" | \
+            grep -v "latest" | \
+            awk '{print $1}' | \
+            xargs -r docker rmi -f || true
