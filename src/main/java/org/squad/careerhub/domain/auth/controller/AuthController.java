@@ -25,31 +25,4 @@ public class AuthController extends AuthDocsController {
         );
     }
 
-    @GetMapping("/oauth/success")
-    public String oauthSuccess(
-            @RequestParam String accessToken,
-            @RequestParam String refreshToken
-    ) {
-        return String.format("""
-        <html>
-        <body>
-            <h2>✅ 로그인 성공!</h2>
-            <p><strong>Access Token:</strong><br>%s</p>
-            <p><strong>Refresh Token:</strong><br>%s</p>
-        </body>
-        </html>
-        """, accessToken, refreshToken);
-    }
-
-    @GetMapping("/oauth/fail")
-    public String oauthFail() {
-        return """
-        <html>
-        <body>
-            <h2>✅ 로그인 실패!</h2>
-        </body>
-        </html>
-        """;
-    }
-
 }
