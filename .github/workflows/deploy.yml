@@ -74,10 +74,6 @@ jobs:
             MYSQL_PASSWORD=${{ secrets.MYSQL_PASSWORD }}
             EOF
   
-            cat > docker-compose.yml << EOF
-            ${{ secrets.DOCKER_COMPOSE_YML }}
-            EOF
-  
             docker-compose pull
   
             docker-compose up -d --remove-orphans
