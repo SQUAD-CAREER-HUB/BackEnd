@@ -39,7 +39,7 @@ public record StageRequest(
         return NewStage.builder()
                 .stageType(stageType)
                 .submissionStatus(submissionStatus)
-                .finalapplicationStatus(finalApplicationStatus)
+                .finalApplicationStatus(finalApplicationStatus)
                 .newEtcSchedule(toNewEtcSchedule())
                 .newInterviewSchedules(toNewInterviewSchedules())
                 .build();

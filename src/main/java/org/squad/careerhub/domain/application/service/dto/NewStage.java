@@ -11,7 +11,7 @@ import org.squad.careerhub.domain.schedule.service.dto.NewInterviewSchedule;
 public record NewStage(
         StageType stageType,
         SubmissionStatus submissionStatus,
-        ApplicationStatus finalapplicationStatus,
+        ApplicationStatus finalApplicationStatus,
         NewEtcSchedule newEtcSchedule,
         List<NewInterviewSchedule> newInterviewSchedules
 ) {

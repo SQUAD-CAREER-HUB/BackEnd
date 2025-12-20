@@ -48,7 +48,7 @@ class ApplicationPolicyValidatorTest extends TestDoubleSupport {
 
         var finalStage = NewStage.builder()
                 .stageType(StageType.APPLICATION_CLOSE)
-                .finalapplicationStatus(ApplicationStatus.FINAL_PASS)
+                .finalApplicationStatus(ApplicationStatus.FINAL_PASS)
                 .newEtcSchedule(new NewEtcSchedule("코딩 테스트", LocalDateTime.now(), LocalDateTime.now().plusDays(2)))
                 .newInterviewSchedules(
                         List.of(new NewInterviewSchedule("1차 면접", InterviewType.EXECUTIVE, LocalDateTime.now(), "서울 본사"))
@@ -99,7 +99,7 @@ class ApplicationPolicyValidatorTest extends TestDoubleSupport {
 
         var finalStage = NewStage.builder()
                 .stageType(StageType.APPLICATION_CLOSE)
-                .finalapplicationStatus(ApplicationStatus.FINAL_PASS)
+                .finalApplicationStatus(ApplicationStatus.FINAL_PASS)
                 .newInterviewSchedules(
                         List.of(new NewInterviewSchedule("1차 면접", InterviewType.EXECUTIVE, LocalDateTime.now(), "서울 본사"))
                 )
@@ -126,7 +126,7 @@ class ApplicationPolicyValidatorTest extends TestDoubleSupport {
         // given
         var etcNewStage = NewStage.builder()
                 .stageType(StageType.ETC)
-                .finalapplicationStatus(ApplicationStatus.FINAL_PASS)
+                .finalApplicationStatus(ApplicationStatus.FINAL_PASS)
                 .newInterviewSchedules(
                         List.of()
                 )
@@ -135,7 +135,7 @@ class ApplicationPolicyValidatorTest extends TestDoubleSupport {
         var documentStage = NewStage.builder()
                 .stageType(StageType.DOCUMENT)
                 .submissionStatus(SubmissionStatus.SUBMITTED)
-                .finalapplicationStatus(ApplicationStatus.FINAL_PASS)
+                .finalApplicationStatus(ApplicationStatus.FINAL_PASS)
                 .newInterviewSchedules(
                         List.of()
                 )
@@ -143,7 +143,7 @@ class ApplicationPolicyValidatorTest extends TestDoubleSupport {
 
         var interviewStage = NewStage.builder()
                 .stageType(StageType.INTERVIEW)
-                .finalapplicationStatus(ApplicationStatus.FINAL_PASS)
+                .finalApplicationStatus(ApplicationStatus.FINAL_PASS)
                 .newInterviewSchedules(
                         List.of()
                 )
@@ -151,7 +151,7 @@ class ApplicationPolicyValidatorTest extends TestDoubleSupport {
 
         var finalStage = NewStage.builder()
                 .stageType(StageType.APPLICATION_CLOSE)
-                .finalapplicationStatus(ApplicationStatus.FINAL_PASS)
+                .finalApplicationStatus(ApplicationStatus.FINAL_PASS)
                 .newInterviewSchedules(
                         List.of()
                 )
@@ -159,12 +159,12 @@ class ApplicationPolicyValidatorTest extends TestDoubleSupport {
         // when & then
         applicationPolicyValidator.validateNewStage(finalStage);
 
-        // 기타 전형과 서류 전형에 면접 일정이 포함된 경우 예외 발생
-        assertThatThrownBy(() -> applicationPolicyValidator.validateNewStage(etcNewStage))
+        // 서류전형, 기타 전형, 서류 전형에 면접 일정이 포함된 경우 예외 발생
+        assertThatThrownBy(() -> applicationPolicyValidator.validateNewStage(documentStage))
                 .isInstanceOf(CareerHubException.class)
                 .hasMessage(ErrorStatus.INVALID_FINAL_APPLICATION_STATUS_RULE.getMessage());
 
-        assertThatThrownBy(() -> applicationPolicyValidator.validateNewStage(documentStage))
+        assertThatThrownBy(() -> applicationPolicyValidator.validateNewStage(etcNewStage))
                 .isInstanceOf(CareerHubException.class)
                 .hasMessage(ErrorStatus.INVALID_FINAL_APPLICATION_STATUS_RULE.getMessage());
 

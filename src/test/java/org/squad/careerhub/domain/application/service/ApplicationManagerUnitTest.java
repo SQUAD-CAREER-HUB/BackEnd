@@ -53,7 +53,7 @@ class ApplicationManagerUnitTest extends TestDoubleSupport {
         var newApplicationInfo = createNewApplicationInfo();
         var newStage = NewStage.builder()
                 .stageType(StageType.APPLICATION_CLOSE)
-                .finalapplicationStatus(ApplicationStatus.FINAL_PASS)
+                .finalApplicationStatus(ApplicationStatus.FINAL_PASS)
                 .newInterviewSchedules(List.of())
                 .build();
 
@@ -115,7 +115,7 @@ class ApplicationManagerUnitTest extends TestDoubleSupport {
                 newJobPosting.position(),
                 newJobPosting.jobLocation(),
                 newStage.stageType(),
-                newStage.finalapplicationStatus(),
+                newStage.finalApplicationStatus(),
                 newApplicationInfo.applicationMethod(),
                 newApplicationInfo.deadline(),
                 newApplicationInfo.submittedAt()

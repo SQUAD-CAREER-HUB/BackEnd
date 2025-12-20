@@ -2,7 +2,6 @@ package org.squad.careerhub.domain.application.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-import org.squad.careerhub.domain.application.entity.StageType;
 import org.squad.careerhub.domain.application.service.dto.NewStage;
 import org.squad.careerhub.global.error.CareerHubException;
 import org.squad.careerhub.global.error.ErrorStatus;
@@ -25,7 +24,7 @@ public class ApplicationPolicyValidator {
         }
 
         // 지원서 최종 상태는 지원 종료 단계에서만 입력 가능
-        if (newStage.finalapplicationStatus() != null && !newStage.stageType().isApplicationClose()) {
+        if (newStage.finalApplicationStatus() != null && !newStage.stageType().isApplicationClose()) {
             throw new CareerHubException(ErrorStatus.INVALID_FINAL_APPLICATION_STATUS_RULE);
         }
     }
