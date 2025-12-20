@@ -11,15 +11,19 @@ public record EtcScheduleCreateRequest(
         @NotBlank(message = "전형 이름은 필수 입력 항목입니다.")
         String stageName,
 
-        @Schema(description = "전형 일정", example = "2025-03-25T14:30:00")
-        LocalDateTime scheduledAt
+        @Schema(description = "전형 시작 일시", example = "2025-03-25T14:30:00")
+        LocalDateTime startedAt,
+
+        @Schema(description = "전형 종료 일시", example = "2025-03-27T14:30:00")
+        LocalDateTime endedAt
 ) {
 
-        public NewEtcSchedule toNewEtcSchedule() {
-            return NewEtcSchedule.builder()
-                    .stageName(stageName)
-                    .scheduledAt(scheduledAt)
-                    .build();
-        }
+    public NewEtcSchedule toNewEtcSchedule() {
+        return NewEtcSchedule.builder()
+                .stageName(stageName)
+                .startedAt(startedAt)
+                .endedAt(endedAt)
+                .build();
+    }
 
 }

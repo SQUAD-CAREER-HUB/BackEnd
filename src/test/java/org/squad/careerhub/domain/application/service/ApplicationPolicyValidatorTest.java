@@ -27,21 +27,21 @@ class ApplicationPolicyValidatorTest extends TestDoubleSupport {
         var etcNewStage = new NewStage(
                 StageType.ETC,
                 null,
-                new NewEtcSchedule("코딩 테스트", LocalDateTime.now()),
+                new NewEtcSchedule("코딩 테스트", LocalDateTime.now(), LocalDateTime.now().plusDays(2)),
                 List.of()
         );
 
         var documentStage = new NewStage(
                 StageType.DOCUMENT,
                 SubmissionStatus.SUBMITTED,
-                new NewEtcSchedule("코딩 테스트", LocalDateTime.now()),
+                new NewEtcSchedule("코딩 테스트", LocalDateTime.now(), LocalDateTime.now().plusDays(2)),
                 List.of()
         );
 
         var interviewStage = new NewStage(
                 StageType.INTERVIEW,
                 null,
-                new NewEtcSchedule("코딩 테스트", LocalDateTime.now()),
+                new NewEtcSchedule("코딩 테스트", LocalDateTime.now(), LocalDateTime.now().plusDays(2)),
                 List.of(new NewInterviewSchedule("1차 면접", InterviewType.EXECUTIVE, LocalDateTime.now(), "서울 본사"))
         );
 
