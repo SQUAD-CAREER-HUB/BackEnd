@@ -42,6 +42,7 @@ public enum ErrorStatus {
     NOT_FOUND_FILE         (404, "파일이 존재하지 않습니다."),
     AWS_S3_ERROR           (500, "AWS S3 내부 에러"),
     FAILED_TO_UPLOAD_FILE  (500, "파일 업로드에 실패하였습니다."),
+    FILE_SIZE_EXCEEDED     (500, "파일 크기가 허용된 최대 크기를 초과하였습니다."),
 
     // ETC
     BAD_REQUEST_ARGUMENT   (400, "유효하지 않은 인자입니다."),

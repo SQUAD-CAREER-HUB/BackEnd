@@ -34,7 +34,7 @@ class ApplicationFileManagerUnitTest extends TestDoubleSupport {
         var application = mock(Application.class);
 
         var fileInfo = new FileResponse("http://example.com/file1.png", "file1.png", "image/png");
-        given(fileProvider.uploadImages(any())).willReturn(List.of(fileInfo));
+        given(fileProvider.uploadFiles(any())).willReturn(List.of(fileInfo));
 
         var multipartFile = mock(MultipartFile.class);
 
