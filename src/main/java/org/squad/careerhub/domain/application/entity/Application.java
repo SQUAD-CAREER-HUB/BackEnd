@@ -61,10 +61,13 @@ public class Application extends BaseEntity {
             String position,
             String jobLocation,
             StageType currentStageType,
+            ApplicationStatus applicationStatus,
             ApplicationMethod applicationMethod,
             LocalDate deadline,
             LocalDate submittedAt
     ) {
+        ApplicationStatus currentApplicationStatus = currentStageType == StageType.APPLICATION_CLOSE ?
+                applicationStatus : ApplicationStatus.IN_PROGRESS;
         Application application = new Application();
 
         application.author = author;
@@ -73,7 +76,7 @@ public class Application extends BaseEntity {
         application.position = requireNonNull(position);
         application.jobLocation = requireNonNull(jobLocation);
         application.currentStageType = requireNonNull(currentStageType);
-        application.applicationStatus = currentStageType != StageType.APPLICATION_CLOSE ? ApplicationStatus.IN_PROGRESS : null;
+        application.applicationStatus = currentApplicationStatus;
         application.applicationMethod = requireNonNull(applicationMethod);
         application.deadline = requireNonNull(deadline);
         application.submittedAt = submittedAt;

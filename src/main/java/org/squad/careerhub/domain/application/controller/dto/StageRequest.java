@@ -5,6 +5,7 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import java.util.List;
 import lombok.Builder;
+import org.squad.careerhub.domain.application.entity.ApplicationStatus;
 import org.squad.careerhub.domain.application.entity.StageType;
 import org.squad.careerhub.domain.application.entity.SubmissionStatus;
 import org.squad.careerhub.domain.application.service.dto.NewEtcSchedule;
@@ -22,6 +23,9 @@ public record StageRequest(
         @Schema(description = "서류 제출 상태 (서류 전형일 때만 입력)", example = "NOT_SUBMITTED")
         SubmissionStatus submissionStatus,
 
+        @Schema(description = "지원서 최종 상태 (지원 종료 일 때만 입력)", example = "FINAL_PASS | FINAL_FAIL")
+        ApplicationStatus finalApplicationStatus,
+
         @Schema(description = "기타 전형 일정 (기타 전형일 때만 입력)")
         @Valid
         EtcScheduleCreateRequest etcSchedule,
@@ -35,6 +39,7 @@ public record StageRequest(
         return NewStage.builder()
                 .stageType(stageType)
                 .submissionStatus(submissionStatus)
+                .finalapplicationStatus(finalApplicationStatus)
                 .newEtcSchedule(toNewEtcSchedule())
                 .newInterviewSchedules(toNewInterviewSchedules())
                 .build();
