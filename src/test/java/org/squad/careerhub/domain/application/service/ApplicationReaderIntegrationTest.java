@@ -176,6 +176,7 @@ class ApplicationReaderIntegrationTest extends IntegrationTestSupport {
                     "포지션" + i,
                     "지역" + i,
                     stageType,
+                    applicationStatus,
                     ApplicationMethod.values()[i % ApplicationMethod.values().length],
                     LocalDate.now().plusDays(30),
                     LocalDate.now()
@@ -201,6 +202,7 @@ class ApplicationReaderIntegrationTest extends IntegrationTestSupport {
                     "포지션" + i,
                     "지역" + i,
                     stageType,
+                    ApplicationStatus.FINAL_PASS,
                     ApplicationMethod.values()[i % ApplicationMethod.values().length],
                     LocalDate.now().plusDays(30),
                     LocalDate.now()

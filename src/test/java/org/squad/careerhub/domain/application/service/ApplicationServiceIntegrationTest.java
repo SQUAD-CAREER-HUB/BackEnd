@@ -251,7 +251,7 @@ class ApplicationServiceIntegrationTest extends IntegrationTestSupport {
     void 기타_전형_지원서가_정상_생성된다() {
         // given
         var customStageName = "코딩테스트";
-        var etcSchedule = new NewEtcSchedule(customStageName, LocalDateTime.now().plusDays(3));
+        var etcSchedule = new NewEtcSchedule(customStageName, LocalDateTime.now(), LocalDateTime.now().plusDays(3));
         var etcNewStage = NewStage.builder()
                 .stageType(StageType.ETC)
                 .newEtcSchedule(etcSchedule)
@@ -355,7 +355,7 @@ class ApplicationServiceIntegrationTest extends IntegrationTestSupport {
     @Test
     void 기타_전형은_기타_일정_생성_Manager를_호출한다() {
         // given
-        var etcSchedule = new NewEtcSchedule("과제제출", LocalDateTime.now());
+        var etcSchedule = new NewEtcSchedule("과제제출", LocalDateTime.now(), LocalDateTime.now().plusDays(5));
         var etcNewStage = NewStage.builder()
                 .stageType(StageType.ETC)
                 .submissionStatus(SubmissionStatus.NOT_SUBMITTED)
@@ -380,7 +380,7 @@ class ApplicationServiceIntegrationTest extends IntegrationTestSupport {
     @Test
     void 기타_전형도_서류_PASS가_자동_생성된다() {
         // given
-        var etcSchedule = new NewEtcSchedule("인적성검사", LocalDateTime.now());
+        var etcSchedule = new NewEtcSchedule("인적성검사", LocalDateTime.now(), LocalDateTime.now().plusDays(4));
         var etcStage = NewStage.builder()
                 .stageType(StageType.ETC)
                 .newEtcSchedule(etcSchedule)

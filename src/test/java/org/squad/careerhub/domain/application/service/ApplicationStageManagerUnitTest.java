@@ -111,7 +111,7 @@ class ApplicationStageManagerUnitTest extends TestDoubleSupport {
     void 기타_전형도_2번_저장된다_서류_PASS_기타() {
         // given
         var customStageName = "코딩테스트";
-        var etcSchedule = new NewEtcSchedule(customStageName, LocalDateTime.now());
+        var etcSchedule = new NewEtcSchedule(customStageName, LocalDateTime.now(), LocalDateTime.now().plusDays(2));
         var etcNewStage = NewStage.builder()
                 .stageType(StageType.ETC)
                 .newEtcSchedule(etcSchedule)
@@ -155,7 +155,7 @@ class ApplicationStageManagerUnitTest extends TestDoubleSupport {
                 .submissionStatus(SubmissionStatus.SUBMITTED);
 
         if (stageType == StageType.ETC) {
-            builder.newEtcSchedule(new NewEtcSchedule("커스텀", LocalDateTime.now()));
+            builder.newEtcSchedule(new NewEtcSchedule("커스텀", LocalDateTime.now(), LocalDateTime.now().plusDays(2)));
         }
 
         var stage = builder.build();

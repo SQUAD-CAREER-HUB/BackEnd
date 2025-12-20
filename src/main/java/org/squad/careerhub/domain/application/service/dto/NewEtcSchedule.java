@@ -6,7 +6,8 @@ import lombok.Builder;
 @Builder
 public record NewEtcSchedule(
         String stageName,
-        LocalDateTime scheduledAt
+        LocalDateTime startedAt,
+        LocalDateTime endedAt
 ) {
 
 }

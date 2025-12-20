@@ -27,6 +27,7 @@ class ApplicationTest {
                 "PositionName",
                 "JobLocation",
                 StageType.DOCUMENT,
+                ApplicationStatus.FINAL_FAIL,
                 ApplicationMethod.EMAIL,
                 LocalDate.of(2024, 12, 31),
                 LocalDate.of(2024, 10, 1)
@@ -69,6 +70,7 @@ class ApplicationTest {
                 "PositionName",
                 "JobLocation",
                 StageType.APPLICATION_CLOSE,
+                ApplicationStatus.FINAL_PASS,
                 ApplicationMethod.EMAIL,
                 LocalDate.of(2024, 12, 31),
                 LocalDate.of(2024, 10, 1)
@@ -93,7 +95,7 @@ class ApplicationTest {
                 "PositionName",
                 "JobLocation",
                 StageType.APPLICATION_CLOSE,
-                null,
+                ApplicationStatus.FINAL_PASS,
                 ApplicationMethod.EMAIL,
                 LocalDate.of(2024, 12, 31),
                 LocalDate.of(2024, 10, 1),
