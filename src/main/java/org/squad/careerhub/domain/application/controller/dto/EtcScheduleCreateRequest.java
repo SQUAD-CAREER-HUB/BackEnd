@@ -2,6 +2,7 @@ package org.squad.careerhub.domain.application.controller.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 import org.squad.careerhub.domain.application.service.dto.NewEtcSchedule;
 
@@ -12,6 +13,7 @@ public record EtcScheduleCreateRequest(
         String stageName,
 
         @Schema(description = "전형 시작 일시", example = "2025-03-25T14:30:00")
+        @NotNull(message = "전형 시작 일시는 필수 입력 항목입니다.")
         LocalDateTime startedAt,
 
         @Schema(description = "전형 종료 일시", example = "2025-03-27T14:30:00")

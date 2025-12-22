@@ -21,7 +21,7 @@ public class ApplicationFileManager {
             return;
         }
 
-        List<FileResponse> fileResponses = fileProvider.uploadImages(multipartFiles);
+        List<FileResponse> fileResponses = fileProvider.uploadFiles(multipartFiles);
 
         List<ApplicationAttachment> attachments = fileResponses.stream()
                 .map(fileResponse -> ApplicationAttachment.create(
