@@ -32,7 +32,7 @@ public class S3Provider implements FileProvider {
 
     @Value("${cloud.aws.s3.dir}")
     private String dir;
-
+    // NOTE: 추후 보안 문제로 pre-signed URL 방식 || CloudFront + S3 방식으로 변경 고려
     public List<FileResponse> uploadFiles(List<MultipartFile> files) {
         List<FileResponse> uploadedFiles = new ArrayList<>();
         for (MultipartFile file : files) {
