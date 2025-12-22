@@ -2,10 +2,14 @@ package org.squad.careerhub.infrastructure.s3;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
@@ -20,6 +24,7 @@ import software.amazon.awssdk.services.s3.model.GetUrlRequest;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import software.amazon.awssdk.services.s3.model.S3Exception;
 
+@Slf4j
 @RequiredArgsConstructor
 @Component
 public class S3Provider implements FileProvider {
@@ -56,15 +61,19 @@ public class S3Provider implements FileProvider {
                 .build();
     }
 
-    public void deleteFiles(List<String> imageUrls) {
-        imageUrls.forEach(this::deleteFile);
+    public void deleteFiles(List<String> fileUrls) {
+        fileUrls.forEach(this::deleteFile);
     }
 
-    public void deleteFile(String imageUrl) {
+    public void deleteFile(String fileUrl) {
         try {
+            String key = extractKeyFromUrl(fileUrl);
+
+            log.info("[AWS] Deleting S3 object - bucket: {}, key: [{}]", bucket, key);
+
             DeleteObjectRequest request = DeleteObjectRequest.builder()
                     .bucket(bucket)
-                    .key(imageUrl)
+                    .key(fileUrl)
                     .build();
             s3Client.deleteObject(request);
         } catch (S3Exception e) {
@@ -75,8 +84,8 @@ public class S3Provider implements FileProvider {
     }
 
     private void uploadFileToS3(MultipartFile file, String fileName, S3Client s3Client) {
-        try {
-            InputStream is = file.getInputStream();
+        // 항상 InputStream이 닫히도록 try-with-resources를 사용합니다
+        try (InputStream is = file.getInputStream()) {
             RequestBody requestBody = RequestBody.fromInputStream(is, file.getSize());
 
             PutObjectRequest putObjectRequest = PutObjectRequest.builder()
@@ -85,10 +94,11 @@ public class S3Provider implements FileProvider {
                     .contentType(file.getContentType())
                     .contentLength(file.getSize())
                     .build();
+
             s3Client.putObject(putObjectRequest, requestBody);
 
-            is.close();
         } catch (IOException | S3Exception e) {
+            log.error("[AWS] Failed to upload file to S3: {}", fileName, e);
             throw new CareerHubException(ErrorStatus.FAILED_TO_UPLOAD_FILE);
         }
     }
@@ -104,6 +114,20 @@ public class S3Provider implements FileProvider {
                 .build();
 
         return String.valueOf(s3Client.utilities().getUrl(getUrlRequest));
+    }
+
+    private String extractKeyFromUrl(String imageUrl) {
+        try {
+            URI uri = new URI(imageUrl);
+            String encodedPath = uri.getPath();
+            String decodedPath = URLDecoder.decode(encodedPath, StandardCharsets.UTF_8);
+            String keyWithSpaces = decodedPath.replace("+", " "); // "+"를 공백으로 변환
+
+            return keyWithSpaces.substring(1); // 맨 앞 "/" 제거
+        } catch (Exception e) {
+            log.warn("[AWS] Invalid S3 URL: {}", imageUrl);
+            throw new CareerHubException(ErrorStatus.INVALID_S3_URL);
+        }
     }
 
 }

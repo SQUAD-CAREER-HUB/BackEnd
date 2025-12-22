@@ -39,6 +39,7 @@ public enum ErrorStatus {
 
     // AWS
     INVALID_FILE_EXTENSION (400, "지원하지 않는 파일 확장자입니다."),
+    INVALID_S3_URL         (400, "AWS S3 URL이 올바르지 않습니다."),
     NOT_FOUND_FILE         (404, "파일이 존재하지 않습니다."),
     AWS_S3_ERROR           (500, "AWS S3 내부 에러"),
     FAILED_TO_UPLOAD_FILE  (500, "파일 업로드에 실패하였습니다."),
