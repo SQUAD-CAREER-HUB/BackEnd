@@ -152,9 +152,13 @@ public class ApplicationQueryDslRepository {
 
     // DOCUMENT 전형일 경우에만 필터링 가능
     private BooleanExpression searchBySubmissionStatus(List<StageType> stageTypes, List<SubmissionStatus> submissionStatus) {
-        if (submissionStatus == null || !stageTypes.contains(StageType.DOCUMENT)) {
+        if (submissionStatus == null || submissionStatus.isEmpty()) {
             return null;
         }
+        if (stageTypes == null || !stageTypes.contains(StageType.DOCUMENT)) {
+            return null;
+        }
+
         return applicationStage.submissionStatus.in(submissionStatus);
     }
 
