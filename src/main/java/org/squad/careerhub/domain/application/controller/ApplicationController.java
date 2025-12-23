@@ -19,12 +19,12 @@ import org.squad.careerhub.domain.application.controller.dto.ApplicationUpdateRe
 import org.squad.careerhub.domain.application.entity.StageResult;
 import org.squad.careerhub.domain.application.entity.StageType;
 import org.squad.careerhub.domain.application.entity.SubmissionStatus;
+import org.squad.careerhub.domain.application.repository.dto.BeforeDeadlineApplicationResponse;
 import org.squad.careerhub.domain.application.service.ApplicationService;
 import org.squad.careerhub.domain.application.service.dto.SearchCondition;
 import org.squad.careerhub.domain.application.service.dto.response.ApplicationDetailResponse;
 import org.squad.careerhub.domain.application.service.dto.response.ApplicationStatisticsResponse;
 import org.squad.careerhub.domain.application.service.dto.response.ApplicationSummaryResponse;
-import org.squad.careerhub.domain.application.repository.dto.BeforeDeadlineApplicationResponse;
 import org.squad.careerhub.global.annotation.LoginMember;
 import org.squad.careerhub.global.support.Cursor;
 import org.squad.careerhub.global.support.PageResponse;
@@ -87,8 +87,8 @@ public class ApplicationController extends ApplicationDocsController {
     public ResponseEntity<PageResponse<ApplicationSummaryResponse>> findApplications(
             @RequestParam(required = false) String query,
             @RequestParam(required = false) List<StageType> stageType,
-            @RequestParam(required = false) SubmissionStatus submissionStatus,
-            @RequestParam(required = false) StageResult stageResult,
+            @RequestParam(required = false) List<SubmissionStatus> submissionStatus,
+            @RequestParam(required = false) List<StageResult> stageResult,
             @RequestParam(required = false) Long lastCursorId,
             @RequestParam(required = false, defaultValue = "20") int size,
             @LoginMember Long memberId

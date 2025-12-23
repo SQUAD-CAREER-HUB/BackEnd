@@ -10,8 +10,8 @@ import org.squad.careerhub.domain.application.entity.SubmissionStatus;
 public record SearchCondition(
         String query,
         List<StageType> stageTypes,
-        SubmissionStatus submissionStatus,
-        StageResult stageResult
+        List<SubmissionStatus> submissionStatus,
+        List<StageResult> stageResult
 ) {
 
 }
