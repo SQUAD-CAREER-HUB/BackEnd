@@ -3,6 +3,7 @@ package org.squad.careerhub.infrastructure.jobposting.strategy;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
+import static org.mockito.Mockito.clearInvocations;
 import static org.mockito.Mockito.times;
 
 import java.util.List;
@@ -20,8 +21,6 @@ import org.squad.careerhub.infrastructure.jobposting.ai.adapter.AiJobPostingExtr
 import org.squad.careerhub.infrastructure.jobposting.ai.strategy.AiProviderType;
 import org.squad.careerhub.infrastructure.jobposting.ai.strategy.JobPostingAiProperties;
 import org.squad.careerhub.infrastructure.jobposting.ai.strategy.JobPostingExtractionStrategy;
-
-import static org.mockito.Mockito.clearInvocations;
 
 class JobPostingExtractionStrategyTest extends TestDoubleSupport {
 

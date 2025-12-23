@@ -1,11 +1,9 @@
 package org.squad.careerhub.domain.jobposting.service;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.squad.careerhub.domain.jobposting.service.dto.JobPostingContentReadResult;
 import org.squad.careerhub.domain.jobposting.service.dto.response.JobPostingExtractResponse;
-import org.squad.careerhub.domain.jobposting.service.port.JobPostingExtractionPort;
 
 @RequiredArgsConstructor
 @Service
