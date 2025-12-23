@@ -7,7 +7,7 @@ import lombok.Builder;
 @Schema(description = "서류 전형 정보 DTO")
 @Builder
 public record DocsStage(
-        @Schema(description = "마감일", example = "2024-12-31T23:59:59")
+        @Schema(description = "마감일")
         LocalDate deadline,
 
         @Schema(description = "지원 방법", example = "온라인 제출")
