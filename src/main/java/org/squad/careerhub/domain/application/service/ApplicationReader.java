@@ -1,9 +1,7 @@
 package org.squad.careerhub.domain.application.service;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Map;
 import java.util.function.Function;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -33,22 +31,21 @@ public class ApplicationReader {
             Long memberId
     ) {
         // Application 목록 조회 (limit + 1개)
-        List<ApplicationSummaryResponse> applications = applicationQueryDslRepository.findApplications(searchCondition, cursor,
-                memberId);
+        List<ApplicationSummaryResponse> applications = applicationQueryDslRepository.findApplications(
+                searchCondition,
+                cursor,
+                memberId
+        );
 
         boolean hasNext = hasNextPage(applications, cursor.limit());
         List<ApplicationSummaryResponse> currentPageApplications = getCurrentPageData(applications, cursor.limit());
 
-        // 면접 일정 조회 및 병합
-        List<ApplicationSummaryResponse> applicationsWithInterview = enrichWithUpcomingInterviews(currentPageApplications);
-
         // 다음 커서 계산
-        Long nextCursorId = calculateNextCursor(applicationsWithInterview, hasNext, ApplicationSummaryResponse::applicationId);
+        Long nextCursorId = calculateNextCursor(currentPageApplications, hasNext, ApplicationSummaryResponse::applicationId);
 
-        return new PageResponse<>(applicationsWithInterview, hasNext, nextCursorId);
+        return new PageResponse<>(currentPageApplications, hasNext, nextCursorId);
     }
 
-    // NOTE: 한방 쿼리로 처리해야 될 지 고민해보기
     // NOTE: 한방 쿼리로 처리해야 될 지 고민해보기 (트래픽이 많은 API임. 성능 중요)
     @Transactional(readOnly = true)
     public ApplicationStatisticsResponse getApplicationStatistics(Long authorId) {
@@ -122,23 +119,6 @@ public class ApplicationReader {
             return null;
         }
         return idExtractor.apply(items.getLast());
-    }
-
-    // 각 Application에 다가오는 면접 일정 정보 추가
-    private List<ApplicationSummaryResponse> enrichWithUpcomingInterviews(List<ApplicationSummaryResponse> applications) {
-        if (applications.isEmpty()) {
-            return applications;
-        }
-
-        List<Long> applicationIds = applications.stream()
-                .map(ApplicationSummaryResponse::applicationId)
-                .toList();
-
-        Map<Long, LocalDateTime> upcomingInterviews = applicationQueryDslRepository.findUpcomingInterviews(applicationIds);
-
-        return applications.stream()
-                .map(app -> app.withNextInterview(upcomingInterviews.get(app.applicationId())))
-                .toList();
     }
 
 }

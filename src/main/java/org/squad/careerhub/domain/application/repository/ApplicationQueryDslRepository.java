@@ -3,28 +3,25 @@ package org.squad.careerhub.domain.application.repository;
 import static com.querydsl.core.types.Projections.constructor;
 import static org.squad.careerhub.domain.application.entity.QApplication.application;
 import static org.squad.careerhub.domain.application.entity.QApplicationStage.applicationStage;
-import static org.squad.careerhub.domain.schedule.entity.QInterviewSchedule.interviewSchedule;
+import static org.squad.careerhub.domain.schedule.entity.QSchedule.schedule;
 
-import com.querydsl.core.Tuple;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
-import com.querydsl.core.types.dsl.Expressions;
+import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import java.time.LocalDateTime;
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.StringUtils;
+import org.squad.careerhub.domain.application.entity.ApplicationStatus;
 import org.squad.careerhub.domain.application.entity.StageResult;
 import org.squad.careerhub.domain.application.entity.StageStatus;
 import org.squad.careerhub.domain.application.entity.StageType;
 import org.squad.careerhub.domain.application.entity.SubmissionStatus;
+import org.squad.careerhub.domain.application.repository.dto.BeforeDeadlineApplicationResponse;
 import org.squad.careerhub.domain.application.service.dto.SearchCondition;
 import org.squad.careerhub.domain.application.service.dto.response.ApplicationSummaryResponse;
-import org.squad.careerhub.domain.application.repository.dto.BeforeDeadlineApplicationResponse;
 import org.squad.careerhub.global.entity.EntityStatus;
 import org.squad.careerhub.global.support.Cursor;
 
@@ -34,19 +31,37 @@ public class ApplicationQueryDslRepository {
 
     private final JPAQueryFactory jpaQueryFactory;
 
-    public List<ApplicationSummaryResponse> findApplications(SearchCondition searchCondition, Cursor cursor, Long memberId) {
+    public List<ApplicationSummaryResponse> findApplications(
+            SearchCondition searchCondition,
+            Cursor cursor,
+            Long memberId
+    ) {
         return jpaQueryFactory.select(constructor(ApplicationSummaryResponse.class,
-                        application.id,
+                        application.id.as("applicationId"),
                         application.company,
                         application.position,
                         application.currentStageType,
-                        applicationStage.stageStatus,
-                        application.submittedAt,
+                        applicationStage.stageStatus.as("currentStageStatus"),
+                        application.applicationStatus,
                         application.deadline,
-                        Expressions.nullExpression(LocalDateTime.class)
+                        application.applicationMethod,
+                        schedule.stageName,
+                        schedule.location,
+                        schedule.startedAt
                 ))
                 .from(application)
-                .leftJoin(applicationStage).on(applicationStage.application.id.eq(application.id))
+                .leftJoin(applicationStage).on(applicationStage.application.id.eq(application.id)
+                        .and(applicationStage.stageType.eq(application.currentStageType))
+                ).leftJoin(schedule).on(schedule.application.id.eq(application.id)
+                        .and(schedule.stageType.eq(application.currentStageType))
+                        // 가장 빠른 일정만
+                        .and(schedule.startedAt.eq(
+                                JPAExpressions
+                                        .select(schedule.startedAt.min())
+                                        .from(schedule)
+                                        .where(schedule.application.id.eq(application.id)
+                                                .and(schedule.stageType.eq(application.currentStageType)))
+                        )))
                 .where(
                         memberEq(memberId),
                         searchByKeyword(searchCondition.query()),
@@ -56,34 +71,9 @@ public class ApplicationQueryDslRepository {
                         paginationCondition(cursor.lastCursorId()),
                         isActive()
                 )
-                .groupBy(application.id)
                 .orderBy(application.id.desc())
                 .limit(cursor.limit() + 1)
                 .fetch();
-    }
-
-    // 가장 가까운 면접 일정 조회
-    public Map<Long, LocalDateTime> findUpcomingInterviews(List<Long> applicationIds) {
-        LocalDateTime now = LocalDateTime.now();
-
-        List<Tuple> results = jpaQueryFactory
-                .select(
-                        interviewSchedule.application.id,
-                        interviewSchedule.scheduledAt.min()
-                )
-                .from(interviewSchedule)
-                .where(
-                        interviewSchedule.application.id.in(applicationIds),
-                        interviewSchedule.scheduledAt.goe(now)
-                )
-                .groupBy(interviewSchedule.application.id)
-                .fetch();
-
-        return results.stream()
-                .collect(Collectors.toMap(
-                        tuple -> tuple.get(interviewSchedule.application.id),
-                        tuple -> tuple.get(interviewSchedule.scheduledAt.min())
-                ));
     }
 
     public List<BeforeDeadlineApplicationResponse> findBeforeDeadLineFromApplication(
@@ -161,23 +151,26 @@ public class ApplicationQueryDslRepository {
     }
 
     // DOCUMENT 전형일 경우에만 필터링 가능
-    private BooleanExpression searchBySubmissionStatus(List<StageType> stageTypes, SubmissionStatus submissionStatus) {
+    private BooleanExpression searchBySubmissionStatus(List<StageType> stageTypes, List<SubmissionStatus> submissionStatus) {
         if (submissionStatus == null || !stageTypes.contains(StageType.DOCUMENT)) {
             return null;
         }
-        return applicationStage.submissionStatus.eq(submissionStatus);
+        return applicationStage.submissionStatus.in(submissionStatus);
     }
 
-    private BooleanExpression searchByStageResult(StageResult stageResult) {
-        if (stageResult == null) {
+    private BooleanExpression searchByStageResult(List<StageResult> stageResults) {
+        if (stageResults == null || stageResults.isEmpty()) {
             return null;
-        } else if (stageResult == StageResult.STAGE_PASS) {
-            return applicationStage.stageStatus.eq(StageStatus.PASS);
-        } else if (stageResult == StageResult.FINAL_PASS) {
-            return applicationStage.stageType.eq(StageType.FINAL_PASS);
-        } else {
-            return applicationStage.stageType.eq(StageType.FINAL_FAIL);
         }
+
+        return stageResults.stream()
+                .map(stageResult -> switch (stageResult) {
+                    case STAGE_PASS -> applicationStage.stageStatus.eq(StageStatus.PASS);
+                    case FINAL_PASS -> application.applicationStatus.eq(ApplicationStatus.FINAL_PASS);
+                    case FINAL_FAIL -> application.applicationStatus.eq(ApplicationStatus.FINAL_FAIL);
+                })
+                .reduce(BooleanExpression::or)
+                .orElse(null);
     }
 
     private BooleanExpression paginationCondition(Long lastCursorId) {

@@ -4,6 +4,8 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import lombok.Builder;
+import org.squad.careerhub.domain.application.entity.ApplicationMethod;
+import org.squad.careerhub.domain.application.entity.ApplicationStatus;
 import org.squad.careerhub.domain.application.entity.StageStatus;
 import org.squad.careerhub.domain.application.entity.StageType;
 
@@ -25,50 +27,46 @@ public record ApplicationSummaryResponse(
         @Schema(description = "지원서 현재 전형 상태", example = "제출 완료")
         String currentStageStatus,
 
-        @Schema(description = "제출일")
-        LocalDate submittedAt,
+        @Schema(description = "지원서 상태", example = "IN_PROGRESS ㅣ FINAL_PASS ㅣ FINAL_FAIL")
+        String applicationStatus,
 
-        @Schema(description = "마감일")
-        LocalDate deadline,
+        @Schema(description = "서류 전형 응답")
+        DocsStage docsStage,
 
-        @Schema(description = "다음 면접 날짜")
-        LocalDateTime nextInterviewDate
+        @Schema(description = "기타 / 면접 전형 응답")
+        ScheduleStage scheduleStage
 ) {
 
-    // QueryDSL용 enum을 받는 생성자 (새로 추가)
     public ApplicationSummaryResponse(
             Long applicationId,
             String company,
             String position,
-            StageType currentStageTypeEnum,
-            StageStatus currentStageStatusEnum,
-            LocalDate submittedAt,
+            StageType currentStageType,
+            StageStatus currentStageStatus,
+            ApplicationStatus applicationStatus,
+            // 평탄화된 필드들
             LocalDate deadline,
-            LocalDateTime nextInterviewDate
+            ApplicationMethod applicationMethod,
+            String stageName,
+            String location,
+            LocalDateTime startedAt
     ) {
         this(
                 applicationId,
                 company,
                 position,
-                currentStageTypeEnum != null ? currentStageTypeEnum.getDescription() : null,
-                currentStageStatusEnum != null ? currentStageStatusEnum.name() : null,
-                submittedAt,
-                deadline,
-                nextInterviewDate
+                currentStageType != null ? currentStageType.getDescription() : null,
+                currentStageStatus != null ? currentStageStatus.name() : null,
+                applicationStatus != null ? applicationStatus.name() : null,
+                // 서류 전형일 때만 DocsStage 생성
+                (currentStageType == StageType.DOCUMENT)
+                        ? new DocsStage(deadline, applicationMethod.getDescription())
+                        : null,
+                // 면접/기타 전형일 때만 ScheduleStage 생성
+                (currentStageType != StageType.DOCUMENT && startedAt != null)
+                        ? new ScheduleStage(stageName, location, startedAt)
+                        : null
         );
-    }
-
-    public ApplicationSummaryResponse withNextInterview(LocalDateTime nextInterview) {
-        return ApplicationSummaryResponse.builder()
-                .applicationId(applicationId)
-                .company(company)
-                .position(position)
-                .currentStageType(currentStageType)
-                .currentStageStatus(currentStageStatus)
-                .submittedAt(submittedAt)
-                .deadline(deadline)
-                .nextInterviewDate(nextInterview)
-                .build();
     }
 
 }
