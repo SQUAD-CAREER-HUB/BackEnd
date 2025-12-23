@@ -9,6 +9,20 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ALLOW_EMPTY_PASSWORD: yes
+          MYSQL_DATABASE: careerhub
+          MYSQL_ROOT_PASSWORD: root
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd "mysqladmin ping -h localhost"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 10
     steps:
       - name: 소스코드 체크아웃
         uses: actions/checkout@v4
@@ -43,8 +57,12 @@ jobs:
       - name: Gradlew 실행 권한 부여
         run: chmod +x gradlew
 
-      - name: 테스트 실행
-        run: ./gradlew test
+      - name: 테스트 실행 (MySQL 연결)
+        run: ./gradlew test -Dspring.profiles.active=test
+        env:
+          SPRING_DATASOURCE_URL: jdbc:mysql://localhost:3306/careerhub?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Seoul
+          SPRING_DATASOURCE_USERNAME: root
+          SPRING_DATASOURCE_PASSWORD: root
 
       - name: 빌드 확인
         run: ./gradlew bootJar
