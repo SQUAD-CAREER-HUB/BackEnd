@@ -193,6 +193,7 @@ gradle-app.setting
 *.yml
 !application.yml
 !docker-compose.yml
+!docker-compose.local.yml
 !.github/workflows/deploy.yml
 !.github/workflows/pull-request.yml
 *.iml
