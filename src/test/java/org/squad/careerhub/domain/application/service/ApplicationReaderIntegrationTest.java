@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -51,7 +52,6 @@ class ApplicationReaderIntegrationTest extends IntegrationTestSupport {
     final ApplicationManager applicationManager;
     final MemberJpaRepository memberRepository;
     final ApplicationJpaRepository applicationRepository;
-    final ApplicationStageJpaRepository applicationStageRepository;
     final InterviewScheduleJpaRepository interviewScheduleRepository;
 
     Member member;
@@ -65,6 +65,10 @@ class ApplicationReaderIntegrationTest extends IntegrationTestSupport {
                 "TestUser",
                 "profile.png"
         ));
+    }
+
+    private LocalDateTime now() {
+        return LocalDateTime.now().truncatedTo(ChronoUnit.MICROS);
     }
 
     @Test
@@ -101,7 +105,8 @@ class ApplicationReaderIntegrationTest extends IntegrationTestSupport {
                         .newInterviewSchedules(List.of())
                         .build()
         );
-        var newEtcSchedule = new NewEtcSchedule("코딩 테스트", LocalDateTime.now(), LocalDateTime.now().plusHours(1));
+        var baseTime = now();
+        var newEtcSchedule = new NewEtcSchedule("코딩 테스트", baseTime, baseTime.plusHours(1));
         var etcApp = createApplication("BE",
                 NewStage.builder()
                         .stageType(StageType.ETC)
@@ -112,7 +117,7 @@ class ApplicationReaderIntegrationTest extends IntegrationTestSupport {
         createApplicationSchedule(etcApp, StageType.ETC, "코딩 테스트", null, null, newEtcSchedule.startedAt(),
                 newEtcSchedule.endedAt());
 
-        var newInterviewSchedule = new NewInterviewSchedule("임원 면접", InterviewType.EXECUTIVE, LocalDateTime.now().plusDays(1),
+        var newInterviewSchedule = new NewInterviewSchedule("임원 면접", InterviewType.EXECUTIVE, baseTime.plusDays(1),
                 "판교");
         var interviewApp = createApplication(
                 "DevOps",
@@ -297,7 +302,8 @@ class ApplicationReaderIntegrationTest extends IntegrationTestSupport {
                         .newInterviewSchedules(List.of())
                         .build()
         );
-        var newEtcSchedule = new NewEtcSchedule("코딩 테스트", LocalDateTime.now(), LocalDateTime.now().plusHours(1));
+        var baseTime = now();
+        var newEtcSchedule = new NewEtcSchedule("코딩 테스트", baseTime, baseTime.plusHours(1));
         createApplication("네이버", "백엔드 개발자",
                 NewStage.builder()
                         .stageType(StageType.ETC)
@@ -309,7 +315,7 @@ class ApplicationReaderIntegrationTest extends IntegrationTestSupport {
                 NewStage.builder()
                         .stageType(StageType.INTERVIEW)
                         .newInterviewSchedules(
-                                List.of(new NewInterviewSchedule("기술 면접", InterviewType.TECH, LocalDateTime.now().plusDays(1),
+                                List.of(new NewInterviewSchedule("기술 면접", InterviewType.TECH, baseTime.plusDays(1),
                                         "판교")))
                         .build()
         );
@@ -358,7 +364,8 @@ class ApplicationReaderIntegrationTest extends IntegrationTestSupport {
                         .newInterviewSchedules(List.of())
                         .build()
         );
-        var newEtcSchedule = new NewEtcSchedule("코딩 테스트", LocalDateTime.now(), LocalDateTime.now().plusHours(1));
+        var baseTime = now();
+        var newEtcSchedule = new NewEtcSchedule("코딩 테스트", baseTime, baseTime.plusHours(1));
         createApplication("네이버", "QA",
                 NewStage.builder()
                         .stageType(StageType.ETC)
@@ -366,7 +373,7 @@ class ApplicationReaderIntegrationTest extends IntegrationTestSupport {
                         .newInterviewSchedules(List.of())
                         .build()
         );
-        var newInterviewSchedule = new NewInterviewSchedule("기술 면접", InterviewType.TECH, LocalDateTime.now().plusDays(1), "판교");
+        var newInterviewSchedule = new NewInterviewSchedule("기술 면접", InterviewType.TECH, baseTime.plusDays(1), "판교");
         var interviewApp = createApplication("라인", "백엔드 개발자",
                 NewStage.builder()
                         .stageType(StageType.INTERVIEW)
@@ -429,7 +436,8 @@ class ApplicationReaderIntegrationTest extends IntegrationTestSupport {
                         .newInterviewSchedules(List.of())
                         .build()
         );
-        var newEtcSchedule = new NewEtcSchedule("코딩 테스트", LocalDateTime.now(), LocalDateTime.now().plusHours(1));
+        var baseTime = now();
+        var newEtcSchedule = new NewEtcSchedule("코딩 테스트", baseTime, baseTime.plusHours(1));
         createApplication("네이버", "QA",
                 NewStage.builder()
                         .stageType(StageType.ETC)
@@ -437,7 +445,7 @@ class ApplicationReaderIntegrationTest extends IntegrationTestSupport {
                         .newInterviewSchedules(List.of())
                         .build()
         );
-        var newInterviewSchedule = new NewInterviewSchedule("기술 면접", InterviewType.TECH, LocalDateTime.now().plusDays(1), "판교");
+        var newInterviewSchedule = new NewInterviewSchedule("기술 면접", InterviewType.TECH, baseTime.plusDays(1), "판교");
         var interviewApp = createApplication("라인", "백엔드 개발자",
                 NewStage.builder()
                         .stageType(StageType.INTERVIEW)
@@ -500,7 +508,8 @@ class ApplicationReaderIntegrationTest extends IntegrationTestSupport {
                         .newInterviewSchedules(List.of())
                         .build()
         );
-        var newEtcSchedule = new NewEtcSchedule("코딩 테스트", LocalDateTime.now(), LocalDateTime.now().plusHours(1));
+        var baseTime = now();
+        var newEtcSchedule = new NewEtcSchedule("코딩 테스트", baseTime, baseTime.plusHours(1));
         createApplication("네이버", "QA",
                 NewStage.builder()
                         .stageType(StageType.ETC)
@@ -508,7 +517,7 @@ class ApplicationReaderIntegrationTest extends IntegrationTestSupport {
                         .newInterviewSchedules(List.of())
                         .build()
         );
-        var newInterviewSchedule = new NewInterviewSchedule("기술 면접", InterviewType.TECH, LocalDateTime.now().plusDays(1), "판교");
+        var newInterviewSchedule = new NewInterviewSchedule("기술 면접", InterviewType.TECH, baseTime.plusDays(1), "판교");
         var interviewApp = createApplication("라인", "백엔드 개발자",
                 NewStage.builder()
                         .stageType(StageType.INTERVIEW)
@@ -588,7 +597,8 @@ class ApplicationReaderIntegrationTest extends IntegrationTestSupport {
     @Test
     void 가장_가까운_면접_일정이_포함되어_조회된다() {
         // given
-        var newInterviewSchedule = new NewInterviewSchedule("기술 면접", InterviewType.TECH, LocalDateTime.now().plusDays(1), "판교");
+        var baseTime = now();
+        var newInterviewSchedule = new NewInterviewSchedule("기술 면접", InterviewType.TECH, baseTime.plusDays(1), "판교");
         var interviewApp = createApplication("카카오", "백엔드 개발자",
                 NewStage.builder()
                         .stageType(StageType.INTERVIEW)
@@ -750,7 +760,8 @@ class ApplicationReaderIntegrationTest extends IntegrationTestSupport {
                         .newInterviewSchedules(List.of())
                         .build()
         );
-        var newEtcSchedule = new NewEtcSchedule("코딩 테스트", LocalDateTime.now(), LocalDateTime.now().plusHours(1));
+        var baseTime = now();
+        var newEtcSchedule = new NewEtcSchedule("코딩 테스트", baseTime, baseTime.plusHours(1));
         var etcApp = createApplication("네이버", "QA 개발자",
                 NewStage.builder()
                         .stageType(StageType.ETC)
@@ -758,7 +769,7 @@ class ApplicationReaderIntegrationTest extends IntegrationTestSupport {
                         .newInterviewSchedules(List.of())
                         .build()
         );
-        var newInterviewSchedule = new NewInterviewSchedule("기술 면접", InterviewType.TECH, LocalDateTime.now().plusDays(1), "판교");
+        var newInterviewSchedule = new NewInterviewSchedule("기술 면접", InterviewType.TECH, baseTime.plusDays(1), "판교");
         var interviewApp = createApplication("라인", "백엔드 개발자",
                 NewStage.builder()
                         .stageType(StageType.INTERVIEW)
