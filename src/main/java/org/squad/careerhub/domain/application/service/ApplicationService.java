@@ -64,6 +64,10 @@ public class ApplicationService {
        return applicationReader.findApplications(searchCondition, cursor, memberId);
     }
 
+    public void findApplication(Long applicationId, Long memberId) {
+        applicationReader.findApplication(applicationId, memberId);
+    }
+
     public ApplicationStatisticsResponse getApplicationStatic(Long authorId) {
         return applicationReader.getApplicationStatistics(authorId);
     }
