@@ -45,6 +45,6 @@ jobs:
 
       - name: 테스트 실행
         run: ./gradlew test
-
+        # ./gradlew test --stacktrace --info은 테스트 실행 시 자세한 로그와 오류 추적을 제공하여 문제 해결에 도움을 줍니다. 필요 시 사용하세요
       - name: 빌드 확인
         run: ./gradlew bootJar

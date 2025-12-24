@@ -2,7 +2,6 @@ package org.squad.careerhub.domain.jobposting.service;
 
 
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.Locale;
 import java.util.Set;
 import lombok.RequiredArgsConstructor;

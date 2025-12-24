@@ -1,8 +1,6 @@
 package org.squad.careerhub.domain.jobposting.service.dto;
 
 import lombok.Builder;
-import lombok.Getter;
-import org.squad.careerhub.domain.jobposting.enums.JobPostingContentReadStatus;
 
 @Builder
 public record JobPostingContent(

@@ -2,7 +2,12 @@ package org.squad.careerhub.domain.application.service.dto.response;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import lombok.Builder;
+import org.squad.careerhub.domain.application.entity.ApplicationMethod;
+import org.squad.careerhub.domain.application.entity.ApplicationStatus;
+import org.squad.careerhub.domain.application.entity.StageStatus;
+import org.squad.careerhub.domain.application.entity.StageType;
 
 @Schema(description = "지원서 요약 응답 DTO")
 @Builder
@@ -16,17 +21,52 @@ public record ApplicationSummaryResponse(
         @Schema(description = "포지션", example = "Backend Developer")
         String position,
 
-        @Schema(description = "제출일", example = "2025.03.25", type = "string", pattern = "yyyy.MM.dd")
-        LocalDate submittedAt,
-
-        @Schema(description = "마감일", example = "2025.03.25", type = "string", pattern = "yyyy.MM.dd")
-        LocalDate deadline,
-
         @Schema(description = "지원서 현재 전형 단계", example = "서류 전형")
         String currentStageType,
 
-        @Schema(description = "다음 면접 날짜", example = "2025.04.10", type = "string", pattern = "yyyy.MM.dd")
-        LocalDate nextInterviewDate
+        @Schema(description = "지원서 현재 전형 상태", example = "제출 완료")
+        String currentStageStatus,
+
+        @Schema(description = "지원서 상태", example = "IN_PROGRESS ㅣ FINAL_PASS ㅣ FINAL_FAIL")
+        String applicationStatus,
+
+        @Schema(description = "서류 전형 응답")
+        DocsStage docsStage,
+
+        @Schema(description = "기타 / 면접 전형 응답")
+        ScheduleStage scheduleStage
 ) {
+
+    public ApplicationSummaryResponse(
+            Long applicationId,
+            String company,
+            String position,
+            StageType currentStageType,
+            StageStatus currentStageStatus,
+            ApplicationStatus applicationStatus,
+            // 평탄화된 필드들
+            LocalDate deadline,
+            ApplicationMethod applicationMethod,
+            String stageName,
+            String location,
+            LocalDateTime startedAt
+    ) {
+        this(
+                applicationId,
+                company,
+                position,
+                currentStageType != null ? currentStageType.getDescription() : null,
+                currentStageStatus != null ? currentStageStatus.name() : null,
+                applicationStatus != null ? applicationStatus.name() : null,
+                // 서류 전형일 때만 DocsStage 생성
+                (currentStageType == StageType.DOCUMENT)
+                        ? new DocsStage(deadline, applicationMethod.getDescription())
+                        : null,
+                // 면접/기타 전형일 때만 ScheduleStage 생성
+                (currentStageType != StageType.DOCUMENT && startedAt != null)
+                        ? new ScheduleStage(stageName, location, startedAt)
+                        : null
+        );
+    }
 
 }
