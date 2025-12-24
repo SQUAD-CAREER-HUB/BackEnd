@@ -9,6 +9,8 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import java.time.LocalDateTime;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -23,6 +25,12 @@ import org.squad.careerhub.global.entity.BaseEntity;
  * 면접 일정 관리 Entity 자원서 생성 기능 구현을 위해 제가 면접 일정 엔티티를 추가했습니다. 변동 사항 있으시면 변경 부탁드립니다. from MunSu Kwak
  **/
 
+@Table(uniqueConstraints = {
+        @UniqueConstraint(
+                name = "uk_schedule_application_started_at", // 한 지원서에 대해 동일한 시작 일시의 일정은 하나만 존재할 수 있음
+                columnNames = {"application_id", "started_at"}
+        )
+})
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
