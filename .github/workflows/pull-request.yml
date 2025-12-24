@@ -44,7 +44,7 @@ jobs:
         run: chmod +x gradlew
 
       - name: 테스트 실행
-        run: /gradlew test --stacktrace --info
+        run: ./gradlew test --stacktrace --info
 
       - name: 빌드 확인
         run: ./gradlew bootJar
