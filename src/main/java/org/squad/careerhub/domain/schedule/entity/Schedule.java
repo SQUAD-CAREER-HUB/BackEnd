@@ -1,34 +1,33 @@
 package org.squad.careerhub.domain.schedule.entity;
 
 import static java.util.Objects.requireNonNull;
-import org.squad.careerhub.global.error.ErrorStatus;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import lombok.AccessLevel;
-import jakarta.persistence.Table;
+
+import jakarta.persistence.*;
 import java.time.LocalDateTime;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.squad.careerhub.domain.application.entity.Application;
-import org.squad.careerhub.domain.application.entity.ApplicationStatus;
-import org.squad.careerhub.domain.application.entity.StageStatus;
+import org.squad.careerhub.domain.application.entity.ApplicationStage;
 import org.squad.careerhub.domain.application.entity.StageType;
 import org.squad.careerhub.domain.application.entity.SubmissionStatus;
+import org.squad.careerhub.domain.application.entity.StageStatus;
+import org.squad.careerhub.domain.member.entity.Member;
 import org.squad.careerhub.domain.schedule.enums.InterviewType;
 import org.squad.careerhub.global.entity.BaseEntity;
-import org.squad.careerhub.domain.member.entity.Member;
+import org.squad.careerhub.global.entity.EntityStatus;
 import org.squad.careerhub.global.error.CareerHubException;
+import org.squad.careerhub.global.error.ErrorStatus;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
 @Table(
-    name = "schedule"
+    name = "schedule",
+    uniqueConstraints = {
+        @UniqueConstraint(name = "uk_stage_id_schedule_name", columnNames = {"stage_id", "schedule_name"}),
+        @UniqueConstraint(name = "uk_stage_id_started_at", columnNames = {"stage_id", "started_at"})
+    }
 )
 public class Schedule extends BaseEntity {
 
@@ -37,156 +36,148 @@ public class Schedule extends BaseEntity {
     private Member author;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "application_id", nullable = false)
-    private Application application;
+    @JoinColumn(name = "stage_id", nullable = false)
+    private ApplicationStage stage;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "stage_type", nullable = false)
-    private StageType stageType;
+    @Column(name = "schedule_name", nullable = false, length = 100)
+    private String scheduleName;
 
-    @Column(name = "stageName", length = 100)
-    private String stageName;
-
-    @Enumerated(EnumType.STRING)
-    @Column(length = 20)
-    private InterviewType interviewType;
-
-    @Column(length = 100)
-    private String interviewTypeDetail;
-
-    @Column(name = "datetime")
-    private LocalDateTime datetime;
-
-    @Column(name = "location")
     private String location;
 
-    @Column(name = "link")
-    private String link;
-
     @Enumerated(EnumType.STRING)
-    @Column(name = "stage_status", nullable = false, length = 20)
-    private StageStatus stageStatus;
+    @Column(name = "schedule_result", nullable = false, length = 20)
+    private StageStatus scheduleResult;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "submission_status", length = 20)
     private SubmissionStatus submissionStatus;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "application_status", length = 20)
-    private ApplicationStatus applicationStatus;
+    @Column(name = "started_at", nullable = false)
+    private LocalDateTime startedAt;
 
+    @Column(name = "ended_at")
+    private LocalDateTime endedAt;
 
-    public static Schedule etcCreate(
-        Application application,
-        StageType stageType,
-        String stageName,
-        LocalDateTime datetime,
+    private String link;
+
+    public static Schedule createEtc(
+        ApplicationStage stage,
+        String scheduleName,
+        LocalDateTime startedAt,
+        LocalDateTime endedAt
+    ) {
+        requireNonNull(stage);
+
+        if (stage.getStageType() != StageType.ETC) {
+            throw new CareerHubException(ErrorStatus.INVALID_SCHEDULE_TYPE_RULE);
+        }
+
+        Schedule s = new Schedule();
+        s.stage = stage;
+        s.author = requireNonNull(stage.getApplication().getAuthor());
+
+        s.scheduleName = requireNonNull(normalize(scheduleName));
+        s.startedAt = requireNonNull(startedAt);
+        s.endedAt = endedAt;
+        // ETC 생성 규칙: location 없음
+        s.location = null;
+        s.submissionStatus = null;
+        s.scheduleResult = StageStatus.WAITING;
+        return s;
+    }
+
+    public static Schedule register(
+        ApplicationStage stage,
+        String scheduleName,
         String location,
-        String link,
-        StageStatus stageStatus,
         SubmissionStatus submissionStatus,
-        ApplicationStatus applicationStatus
+        LocalDateTime startedAt,
+        LocalDateTime endedAt
     ) {
+        requireNonNull(stage);
+
+        // ETC / INTERVIEW만 지원 (원하면 DOCUMENT도 확장 가능)
+        if (stage.getStageType() == StageType.ETC) {
+            return createEtc(
+                stage,
+                scheduleName,
+                startedAt,
+                endedAt
+            );
+        }
+
+        if (stage.getStageType() == StageType.INTERVIEW) {
+            return createInterview(
+                stage,
+                scheduleName,
+                startedAt,
+                location
+            );
+        }
+
+        throw new CareerHubException(ErrorStatus.INVALID_SCHEDULE_TYPE_RULE);
+    }
+
+    public static Schedule createInterview(
+        ApplicationStage stage,
+        String scheduleName,
+        LocalDateTime startedAt,
+        String location
+    ) {
+        requireNonNull(stage);
+
+        if (stage.getStageType() != StageType.INTERVIEW) {
+            throw new CareerHubException(ErrorStatus.INVALID_SCHEDULE_TYPE_RULE);
+        }
+
         Schedule s = new Schedule();
-        s.application = requireNonNull(application);
-        s.author = requireNonNull(application.getAuthor());
-        s.stageType = requireNonNull(stageType);
-        s.stageName = normalize(stageName);
-        s.datetime = datetime;
+        s.stage = stage;
+        s.author = requireNonNull(stage.getApplication().getAuthor());
+        s.scheduleName = requireNonNull(normalize(scheduleName));
+        s.startedAt = requireNonNull(startedAt);
+        // INTERVIEW 생성 규칙: endedAt 없음
+        s.endedAt = null;
         s.location = normalize(location);
-        s.link = normalize(link);
-        s.stageStatus = requireNonNull(stageStatus);
+        s.submissionStatus = null;
+        s.scheduleResult = StageStatus.WAITING;
 
-        // DOCUMENT만 submissionStatus 허용
-        s.submissionStatus = (stageType == StageType.DOCUMENT) ? submissionStatus : null;
-        // APPLICATION_CLOSE만 applicationStatus 허용
-        s.applicationStatus =
-            (stageType == StageType.APPLICATION_CLOSE)
-                ? applicationStatus
-                : null;
-
-        s.validate();
         return s;
     }
 
-    public static Schedule interviewCreate(
-        Application application,
-        StageType stageType,
-        InterviewType interviewType,
-        String interviewTypeDetail,
-        LocalDateTime datetime,
-        String location,
-        String link,
-        StageStatus stageStatus,
-        ApplicationStatus applicationStatus
-    ) {
-        Schedule s = new Schedule();
-
-        s.application = requireNonNull(application);
-        s.author = requireNonNull(application.getAuthor());
-
-        s.stageType = requireNonNull(stageType);
-        s.interviewType = interviewType;
-        s.interviewTypeDetail = normalize(interviewTypeDetail);
-
-        s.datetime = requireNonNull(datetime);
-        s.location = normalize(location);
-        s.link = normalize(link);
-
-        s.stageStatus = requireNonNull(stageStatus);
-
-        s.applicationStatus = applicationStatus;
-
-        s.validate();
-        return s;
-    }
-
-    /**
-     * 전체 교체(update는 항상 전체 값 전달한다는 정책 기준)
-     */
     public void update(
-        StageType stageType,
-        String stageName,
-        LocalDateTime datetime,
+        String scheduleName,
         String location,
-        String link,
-        StageStatus stageStatus,
-        InterviewType interviewType,
-        String interviewTypeDetail,
+        StageStatus scheduleResult,
         SubmissionStatus submissionStatus,
-        ApplicationStatus applicationStatus
+        LocalDateTime startedAt,
+        LocalDateTime endedAt,
+        String link
     ) {
-        this.stageType = requireNonNull(stageType);
-        this.stageName = normalize(stageName);
-        this.datetime = requireNonNull(datetime);
+        this.scheduleName = requireNonNull(normalize(scheduleName));
         this.location = normalize(location);
+        this.scheduleResult = requireNonNull(scheduleResult);
+        this.submissionStatus = submissionStatus;
+        this.startedAt = requireNonNull(startedAt);
+        this.endedAt = endedAt;
         this.link = normalize(link);
-        this.interviewType = interviewType;
-        this.interviewTypeDetail = normalize(interviewTypeDetail);
-        this.stageStatus = requireNonNull(stageStatus);
-
-        this.submissionStatus = (stageType == StageType.DOCUMENT) ? submissionStatus : null;
-        this.applicationStatus = applicationStatus;
-
 
         validate();
     }
 
     private void validate() {
-        requireNonNull(this.author);
-        requireNonNull(this.application);
-        requireNonNull(this.stageType);
-
-        // author는 application.author와 동일해야 함
-        if (this.application.getAuthor() != null
-            && this.author.getId() != null
-            && this.application.getAuthor().getId() != null
-            && !this.author.getId().equals(this.application.getAuthor().getId())) {
+        // author는 stage.application.author와 동일해야 함
+        Application app = stage.getApplication();
+        if (app == null || app.getAuthor() == null) {
+            throw new CareerHubException(ErrorStatus.BAD_REQUEST);
+        }
+        if (author.getId() != null && app.getAuthor().getId() != null
+            && !author.getId().equals(app.getAuthor().getId())) {
             throw new CareerHubException(ErrorStatus.INVALID_SCHEDULE_AUTHOR_MISMATCH);
         }
 
-        // DOCUMENT가 아니면 submissionStatus는 없어야 함
-        if (this.stageType != StageType.DOCUMENT && this.submissionStatus != null) {
+        // DOCUMENT가 아니면 submissionStatus는 null이어야 함
+        StageType stageType = stage.getStageType();
+        if (stageType != StageType.DOCUMENT && submissionStatus != null) {
             throw new CareerHubException(ErrorStatus.INVALID_SUBMISSION_STATUS_RULE);
         }
     }
@@ -196,5 +187,4 @@ public class Schedule extends BaseEntity {
         String t = s.trim();
         return t.isEmpty() ? null : t;
     }
-
 }
