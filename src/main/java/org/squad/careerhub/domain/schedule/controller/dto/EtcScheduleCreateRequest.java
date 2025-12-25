@@ -24,14 +24,21 @@ public record EtcScheduleCreateRequest(
         example = "과제 전형 제출"
     )
     @NotNull
-    String stageName,
+    String scheduleName,
 
     @Schema(
-        description = "일정 일시",
+        description = "일정 시작 일시",
         example = "2025-12-05T23:59:00"
     )
     @NotNull
-    LocalDateTime scheduledAt,
+    LocalDateTime startedAt,
+
+    @Schema(
+        description = "일정 종료 일시",
+        example = "2025-12-05T23:59:00"
+    )
+    @NotNull
+    LocalDateTime endedAt,
 
     @Schema(
         description = "장소",
@@ -48,10 +55,9 @@ public record EtcScheduleCreateRequest(
     public NewEtcSchedule toNewEtcSchedule() {
         return NewEtcSchedule.builder()
             .stageType(StageType.ETC)
-            .stageName(stageName)
-            .scheduledAt(scheduledAt)
-            .location(location)
-            .link(link)
+            .scheduleName(scheduleName)
+            .startedAt(startedAt)
+            .endedAt(endedAt)
             .build();
     }
 
