@@ -11,10 +11,11 @@ import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.squad.careerhub.ControllerTestSupport;
+import org.squad.careerhub.domain.application.entity.ApplicationStatus;
+import org.squad.careerhub.domain.application.entity.StageStatus;
 import org.squad.careerhub.domain.application.entity.StageType;
 import org.squad.careerhub.domain.schedule.controller.dto.EtcScheduleCreateRequest;
 import org.squad.careerhub.domain.schedule.controller.dto.InterviewScheduleCreateRequest;
-import org.squad.careerhub.domain.schedule.enums.InterviewType;
 import org.squad.careerhub.domain.schedule.service.dto.ScheduleResponse;
 import org.squad.careerhub.global.annotation.TestMember;
 
@@ -26,15 +27,30 @@ class ScheduleControllerTest extends ControllerTestSupport {
         // given
         var request = InterviewScheduleCreateRequest.builder()
             .applicationId(10L)
-            .type(InterviewType.TECH)
-            .typeDetail("1차 기술면접")
-            .scheduledAt(LocalDateTime.of(2025, 12, 10, 19, 0))
+            .scheduleName("1차 기술면접")
+            .startedAt(LocalDateTime.of(2025, 12, 10, 19, 0))
             .location("서울")
-            .link("https://zoom.us/...")
             .build();
 
         given(scheduleService.createInterviewFromCalendar(any(), any(), any()))
-            .willReturn(ScheduleResponse.mock());
+            .willReturn(ScheduleResponse.builder()
+                .id(100L)
+                .applicationId(10L)
+                .company("Naver")
+                .position("Backend Developer")
+                .stageType(StageType.INTERVIEW)
+                .stageName("면접")
+                .scheduleName("1차 기술면접")
+                .startedAt(LocalDateTime.of(2025, 12, 10, 19, 0))
+                .endedAt(null)
+                .location("서울")
+                .stageStatus(StageStatus.WAITING)
+                .submissionStatus(null)
+                .applicationStatus(ApplicationStatus.IN_PROGRESS)
+                .createdAt(LocalDateTime.of(2025, 12, 1, 10, 0))
+                .updatedAt(LocalDateTime.of(2025, 12, 1, 10, 0))
+                .build());
+
 
         // when & then
         assertThat(
@@ -55,14 +71,29 @@ class ScheduleControllerTest extends ControllerTestSupport {
         // given
         var request = EtcScheduleCreateRequest.builder()
             .applicationId(10L)
-            .stageName("과제 제출")
-            .scheduledAt(LocalDateTime.of(2025, 12, 5, 23, 59))
-            .location("온라인")
-            .link("https://...")
+            .scheduleName("과제 제출")
+            .startedAt(LocalDateTime.of(2025, 12, 5, 23, 59))
+            .endedAt(null)
             .build();
 
         given(scheduleService.createEtcFromCalendar(any(), any(), any()))
-            .willReturn(ScheduleResponse.mockEtc());
+            .willReturn(ScheduleResponse.builder()
+                .id(200L)
+                .applicationId(10L)
+                .company("Naver")
+                .position("Backend Developer")
+                .stageType(StageType.ETC)
+                .stageName("기타")
+                .scheduleName("과제 제출")
+                .startedAt(LocalDateTime.of(2025, 12, 5, 23, 59))
+                .endedAt(null)
+                .location(null)
+                .stageStatus(StageStatus.WAITING)
+                .submissionStatus(null)
+                .applicationStatus(ApplicationStatus.IN_PROGRESS)
+                .createdAt(LocalDateTime.of(2025, 12, 1, 10, 0))
+                .updatedAt(LocalDateTime.of(2025, 12, 1, 10, 0))
+                .build());
 
         // when & then
         assertThat(
