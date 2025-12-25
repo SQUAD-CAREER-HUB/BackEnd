@@ -6,6 +6,7 @@ import java.util.function.Function;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+import org.squad.careerhub.domain.application.entity.Application;
 import org.squad.careerhub.domain.application.entity.ApplicationStatus;
 import org.squad.careerhub.domain.application.entity.StageType;
 import org.squad.careerhub.domain.application.repository.ApplicationJpaRepository;
@@ -15,6 +16,8 @@ import org.squad.careerhub.domain.application.service.dto.SearchCondition;
 import org.squad.careerhub.domain.application.service.dto.response.ApplicationStatisticsResponse;
 import org.squad.careerhub.domain.application.service.dto.response.ApplicationSummaryResponse;
 import org.squad.careerhub.global.entity.EntityStatus;
+import org.squad.careerhub.global.error.CareerHubException;
+import org.squad.careerhub.global.error.ErrorStatus;
 import org.squad.careerhub.global.support.Cursor;
 import org.squad.careerhub.global.support.PageResponse;
 
@@ -24,6 +27,11 @@ public class ApplicationReader {
 
     private final ApplicationJpaRepository applicationJpaRepository;
     private final ApplicationQueryDslRepository applicationQueryDslRepository;
+
+    public Application findApplication(Long applicationId) {
+        return applicationJpaRepository.findById(applicationId)
+            .orElseThrow(() -> new CareerHubException(ErrorStatus.NOT_FOUND));
+    }
 
     public PageResponse<ApplicationSummaryResponse> findApplications(
             SearchCondition searchCondition,
