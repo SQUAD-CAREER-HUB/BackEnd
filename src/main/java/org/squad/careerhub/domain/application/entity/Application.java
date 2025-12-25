@@ -15,6 +15,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.squad.careerhub.domain.member.entity.Member;
 import org.squad.careerhub.global.entity.BaseEntity;
+import org.squad.careerhub.global.error.CareerHubException;
+import org.squad.careerhub.global.error.ErrorStatus;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -116,6 +118,15 @@ public class Application extends BaseEntity {
 
     public void updateCurrentStageType(StageType currentStageType) {
         this.currentStageType = currentStageType;
+    }
+
+    public void validateOwnedBy(Long memberId) {
+        if (this.author == null || this.author.getId() == null) {
+            throw new CareerHubException(ErrorStatus.BAD_REQUEST);
+        }
+        if (!this.author.getId().equals(memberId)) {
+            throw new CareerHubException(ErrorStatus.FORBIDDEN_ERROR);
+        }
     }
 
 }
