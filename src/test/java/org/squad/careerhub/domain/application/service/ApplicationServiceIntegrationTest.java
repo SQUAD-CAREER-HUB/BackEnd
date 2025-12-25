@@ -255,7 +255,7 @@ class ApplicationServiceIntegrationTest extends IntegrationTestSupport {
         // given
         var customStageName = "코딩테스트";
         var etcSchedule = new NewEtcSchedule(StageType.ETC, "코딩테스트",
-            LocalDateTime.now().plusDays(3), "서울특별시 강남구", null);
+            LocalDateTime.now().plusDays(3),  null);
         var etcNewStage = NewStage.builder()
                 .stageType(StageType.ETC)
                 .newEtcSchedule(etcSchedule)
@@ -306,12 +306,10 @@ class ApplicationServiceIntegrationTest extends IntegrationTestSupport {
 
         assertThat(etcStage).extracting(
                 ApplicationStage::getStageType,
-                ApplicationStage::getStageName,
                 ApplicationStage::getStageStatus,
                 ApplicationStage::getSubmissionStatus
         ).containsExactly(
                 StageType.ETC,
-                customStageName,
                 StageStatus.WAITING,
                 null
         );
@@ -360,7 +358,7 @@ class ApplicationServiceIntegrationTest extends IntegrationTestSupport {
     void 기타_전형은_기타_일정_생성_Manager를_호출한다() {
         // given
         var etcSchedule = new NewEtcSchedule(StageType.ETC, "과제 전형",
-            LocalDateTime.now().plusDays(3), "서울특별시 강남구", null);
+            LocalDateTime.now().plusDays(3), null);
         var etcNewStage = NewStage.builder()
                 .stageType(StageType.ETC)
                 .submissionStatus(SubmissionStatus.NOT_SUBMITTED)
@@ -385,7 +383,7 @@ class ApplicationServiceIntegrationTest extends IntegrationTestSupport {
     @Test
     void 기타_전형도_서류_PASS가_자동_생성된다() {
         // given
-        var etcSchedule = new NewEtcSchedule(StageType.ETC, "코딩 테스트", LocalDateTime.now(), "온라인", "www.zoom.com");
+        var etcSchedule = new NewEtcSchedule(StageType.ETC, "코딩 테스트", LocalDateTime.now(), null);
         var etcStage = NewStage.builder()
                 .stageType(StageType.ETC)
                 .newEtcSchedule(etcSchedule)

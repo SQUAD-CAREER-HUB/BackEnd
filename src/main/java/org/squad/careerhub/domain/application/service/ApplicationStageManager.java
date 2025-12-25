@@ -43,7 +43,7 @@ public class ApplicationStageManager {
         }
 
         // 기타 전형인데 기타 일정이 null인 경우 기타 전형으로 저장
-        return newEtcSchedule != null ? newEtcSchedule.stageName() : StageType.ETC.getDescription();
+        return StageType.ETC.getDescription();
     }
 
 }
