@@ -7,8 +7,7 @@ import org.squad.careerhub.domain.application.entity.StageType;
 @Builder
 public record NewEtcSchedule(
     StageType stageType,
-    String stageName,
-    LocalDateTime scheduledAt,
-    String location,
-    String link
+    String scheduleName,
+    LocalDateTime startedAt,
+    LocalDateTime endedAt
 ) { }
