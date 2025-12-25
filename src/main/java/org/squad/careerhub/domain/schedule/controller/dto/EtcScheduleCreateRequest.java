@@ -37,7 +37,6 @@ public record EtcScheduleCreateRequest(
         description = "일정 종료 일시",
         example = "2025-12-05T23:59:00"
     )
-    @NotNull
     LocalDateTime endedAt,
 
     @Schema(
