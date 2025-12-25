@@ -15,6 +15,7 @@ import org.mockito.Mock;
 import org.squad.careerhub.TestDoubleSupport;
 import org.squad.careerhub.domain.application.entity.Application;
 import org.squad.careerhub.domain.application.entity.ApplicationMethod;
+import org.squad.careerhub.domain.application.entity.ApplicationStatus;
 import org.squad.careerhub.domain.application.entity.StageType;
 import org.squad.careerhub.domain.application.repository.ApplicationJpaRepository;
 import org.squad.careerhub.domain.application.service.dto.NewApplicationInfo;
@@ -50,12 +51,12 @@ class ApplicationManagerUnitTest extends TestDoubleSupport {
         // given
          var newJobPosting = createNewJobPosting();
         var newApplicationInfo = createNewApplicationInfo();
-        var newStage = new NewStage(
-                StageType.APPLICATION_CLOSE,
-                null,
-                null,
-                List.of()
-        );
+        var newStage = NewStage.builder()
+                .stageType(StageType.APPLICATION_CLOSE)
+                .finalApplicationStatus(ApplicationStatus.FINAL_PASS)
+                .newInterviewSchedules(List.of())
+                .build();
+
         var application = createApplication(newJobPosting, newStage, newApplicationInfo);
 
         given(memberReader.find(any())).willReturn(author);
@@ -73,12 +74,10 @@ class ApplicationManagerUnitTest extends TestDoubleSupport {
         // given
         var newJobPosting = createNewJobPosting();
         var newApplicationInfo = createNewApplicationInfo();
-        var newStage = new NewStage(
-                StageType.INTERVIEW,
-                null,
-                null,
-                List.of()
-        );
+        var newStage = NewStage.builder()
+                .stageType(StageType.INTERVIEW)
+                .newInterviewSchedules(List.of())
+                .build();
         var application = createApplication(newJobPosting, newStage, newApplicationInfo);
 
         given(memberReader.find(any())).willReturn(author);
@@ -116,6 +115,7 @@ class ApplicationManagerUnitTest extends TestDoubleSupport {
                 newJobPosting.position(),
                 newJobPosting.jobLocation(),
                 newStage.stageType(),
+                newStage.finalApplicationStatus(),
                 newApplicationInfo.applicationMethod(),
                 newApplicationInfo.deadline(),
                 newApplicationInfo.submittedAt()

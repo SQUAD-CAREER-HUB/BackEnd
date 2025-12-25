@@ -16,12 +16,15 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import org.squad.careerhub.domain.application.controller.dto.ApplicationCreateRequest;
 import org.squad.careerhub.domain.application.controller.dto.ApplicationUpdateRequest;
+import org.squad.careerhub.domain.application.entity.StageResult;
 import org.squad.careerhub.domain.application.entity.StageType;
-import org.squad.careerhub.domain.application.service.ApplicationService;
-import org.squad.careerhub.domain.application.service.dto.response.ApplicationDetailResponse;
-import org.squad.careerhub.domain.application.service.dto.response.ApplicationPageResponse;
-import org.squad.careerhub.domain.application.service.dto.response.ApplicationStatisticsResponse;
+import org.squad.careerhub.domain.application.entity.SubmissionStatus;
 import org.squad.careerhub.domain.application.repository.dto.BeforeDeadlineApplicationResponse;
+import org.squad.careerhub.domain.application.service.ApplicationService;
+import org.squad.careerhub.domain.application.service.dto.SearchCondition;
+import org.squad.careerhub.domain.application.service.dto.response.ApplicationDetailResponse;
+import org.squad.careerhub.domain.application.service.dto.response.ApplicationStatisticsResponse;
+import org.squad.careerhub.domain.application.service.dto.response.ApplicationSummaryResponse;
 import org.squad.careerhub.global.annotation.LoginMember;
 import org.squad.careerhub.global.support.Cursor;
 import org.squad.careerhub.global.support.PageResponse;
@@ -81,13 +84,27 @@ public class ApplicationController extends ApplicationDocsController {
 
     @Override
     @GetMapping("/v1/applications")
-    public ResponseEntity<ApplicationPageResponse> getApplications(
+    public ResponseEntity<PageResponse<ApplicationSummaryResponse>> findApplications(
             @RequestParam(required = false) String query,
-            @RequestParam StageType stageType,
+            @RequestParam(required = false) List<StageType> stageType,
+            @RequestParam(required = false) List<SubmissionStatus> submissionStatus,
+            @RequestParam(required = false) List<StageResult> stageResult,
             @RequestParam(required = false) Long lastCursorId,
+            @RequestParam(required = false, defaultValue = "20") int size,
             @LoginMember Long memberId
     ) {
-        return ResponseEntity.ok(ApplicationPageResponse.mock());
+        PageResponse<ApplicationSummaryResponse> response = applicationService.findApplications(
+                new SearchCondition(
+                        query,
+                        stageType,
+                        submissionStatus,
+                        stageResult
+                ),
+                Cursor.of(lastCursorId, size),
+                memberId
+        );
+
+        return ResponseEntity.ok(response);
     }
 
     @Override

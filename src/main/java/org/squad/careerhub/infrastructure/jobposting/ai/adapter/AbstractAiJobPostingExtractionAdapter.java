@@ -10,8 +10,8 @@ import org.squad.careerhub.domain.jobposting.service.dto.response.JobPostingExtr
 import org.squad.careerhub.domain.jobposting.service.port.JobPostingExtractionPort;
 import org.squad.careerhub.global.error.CareerHubException;
 import org.squad.careerhub.global.error.ErrorStatus;
-import org.squad.careerhub.infrastructure.jobposting.dto.JobPostingAiResult;
 import org.squad.careerhub.infrastructure.jobposting.ai.prompt.JobPostingPromptFactory;
+import org.squad.careerhub.infrastructure.jobposting.dto.JobPostingAiResult;
 
 @Slf4j
 @RequiredArgsConstructor

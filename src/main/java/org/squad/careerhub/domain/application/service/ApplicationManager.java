@@ -38,6 +38,7 @@ public class ApplicationManager {
                 newJobPosting.position(),
                 newJobPosting.jobLocation(),
                 newStage.stageType(),
+                newStage.finalApplicationStatus(),
                 newApplicationInfo.applicationMethod(),
                 newApplicationInfo.deadline(),
                 newApplicationInfo.submittedAt()

@@ -8,10 +8,8 @@ import org.squad.careerhub.domain.schedule.enums.InterviewType;
 @Builder
 public record NewInterviewSchedule(
     StageType stageType,
-    InterviewType interviewType,
-    String typeDetail,
-    LocalDateTime scheduledAt,
-    String location,
-    String link
+    String scheduleName,
+    LocalDateTime startedAt,
+    String location
 ) {
 }

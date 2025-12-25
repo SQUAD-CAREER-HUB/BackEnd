@@ -21,14 +21,13 @@ public enum ErrorStatus {
     INVALID_MEMO_RULE          (400, "지원서 생성 시 기타 전형 진행 중인 경우에만 메모를 작성해야 합니다."),
     INVALID_ETC_STAGE_RULE     (400, "지원서 생성 시 기타 전형 진행 중인 경우에만 기타 전형 정보를 입력해야 합니다."),
     INVALID_SCHEDULE_TYPE_RULE (400, "지원서 작성 시 전형 단계가 면접 유형일 경우에만 면접 일정 생성이 가능합니다."),
+    INVALID_FINAL_APPLICATION_STATUS_RULE (400 , "지원서 작성 시 전형 단계가 지원 종료일 경우에만 지원서 최종 상태를 입력할 수 있습니다."),
     NOT_FOUND_APPLICATION      (404, "지원서를 찾을 수 없습니다."),
 
     // REVIEW
     INTERVIEW_QUESTION_NOT_BELONG_TO_REVIEW (403, "해당 면접 후기에 속하지 않는 질문입니다."),
     NOT_FOUND_REVIEW                        (404, "리뷰를 찾을 수 없습니다."),
     NOT_FOUND_INTERVIEW_QUESTION            (404, "면접 질문을 찾을 수 없습니다."),
-
-
 
     // OAUTH
     UNSUPPORTED_OAUTH_PROVIDER (400, "지원하지 않는 OAuth 제공자입니다."),
@@ -40,9 +39,11 @@ public enum ErrorStatus {
 
     // AWS
     INVALID_FILE_EXTENSION (400, "지원하지 않는 파일 확장자입니다."),
+    INVALID_S3_URL         (400, "AWS S3 URL이 올바르지 않습니다."),
     NOT_FOUND_FILE         (404, "파일이 존재하지 않습니다."),
     AWS_S3_ERROR           (500, "AWS S3 내부 에러"),
     FAILED_TO_UPLOAD_FILE  (500, "파일 업로드에 실패하였습니다."),
+    FILE_SIZE_EXCEEDED     (500, "파일 크기가 허용된 최대 크기를 초과하였습니다."),
 
     // ETC
     BAD_REQUEST_ARGUMENT   (400, "유효하지 않은 인자입니다."),

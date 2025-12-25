@@ -61,4 +61,9 @@ public class ApplicationStage extends BaseEntity {
         );
     }
 
+    // test용 임시 전형 상태 업데이트 메서드 (예: PASS, FAIL 등)
+    public void updateStageStatus(StageStatus newStatus) {
+        this.stageStatus = newStatus;
+    }
+
 }

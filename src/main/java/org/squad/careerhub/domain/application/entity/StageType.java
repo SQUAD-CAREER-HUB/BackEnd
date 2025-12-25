@@ -21,4 +21,16 @@ public enum StageType {
         return this == APPLICATION_CLOSE;
     }
 
+    public  boolean isDocument() {
+        return this == DOCUMENT;
+    }
+
+    public boolean isEtc() {
+        return this == ETC;
+    }
+
+    public boolean isInterview() {
+        return this == INTERVIEW;
+    }
+
 }

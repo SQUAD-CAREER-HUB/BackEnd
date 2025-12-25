@@ -36,10 +36,10 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-                .csrf     (AbstractHttpConfigurer::disable)
+                .csrf(AbstractHttpConfigurer::disable)
                 .formLogin(AbstractHttpConfigurer::disable)
                 .httpBasic(AbstractHttpConfigurer::disable)
-                .logout   (AbstractHttpConfigurer::disable)
+                .logout(AbstractHttpConfigurer::disable)
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS));
         http
@@ -68,7 +68,7 @@ public class SecurityConfig {
                 .cors(
                         corsCustomizer -> corsCustomizer.configurationSource(request -> {
                             CorsConfiguration config = new CorsConfiguration();
-                            config.setAllowedOrigins(List.of("http://localhost:5173")); // 임시 URL
+                            config.setAllowedOrigins(List.of("http://localhost:3000", "https://api.kwaktaepung.shop"));
                             config.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE"));
                             config.setAllowedHeaders(List.of("*"));
                             config.setAllowCredentials(true);

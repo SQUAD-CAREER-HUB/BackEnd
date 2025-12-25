@@ -2,9 +2,8 @@ package org.squad.careerhub.infrastructure.jobposting.http;
 
 import java.net.URI;
 import java.time.Duration;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatusCode;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -18,7 +17,6 @@ import org.squad.careerhub.domain.jobposting.service.dto.JobPostingContentReadRe
 import org.squad.careerhub.domain.jobposting.service.port.JobPostingContentReaderPort;
 import org.squad.careerhub.infrastructure.jobposting.http.util.RobotsTxtChecker;
 import org.squad.careerhub.infrastructure.jobposting.http.util.SaraminUrlNormalizer;
-import reactor.core.publisher.Mono;
 
 @Component
 @RequiredArgsConstructor

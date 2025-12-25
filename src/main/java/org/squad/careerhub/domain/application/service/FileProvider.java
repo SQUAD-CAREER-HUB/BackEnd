@@ -6,6 +6,6 @@ import org.squad.careerhub.domain.application.service.dto.response.FileResponse;
 
 public interface FileProvider {
 
-    List<FileResponse> uploadImages(List<MultipartFile> files);
+    List<FileResponse> uploadFiles(List<MultipartFile> files);
 
 }
