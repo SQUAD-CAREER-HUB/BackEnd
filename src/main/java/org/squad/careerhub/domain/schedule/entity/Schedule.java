@@ -15,8 +15,8 @@ import java.time.LocalDateTime;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.squad.careerhub.domain.application.entity.Application;
-import org.squad.careerhub.domain.application.entity.StageType;
+import org.squad.careerhub.domain.application.entity.ApplicationStage;
+import org.squad.careerhub.domain.application.entity.ScheduleResult;
 import org.squad.careerhub.domain.application.entity.SubmissionStatus;
 import org.squad.careerhub.domain.member.entity.Member;
 import org.squad.careerhub.global.entity.BaseEntity;
@@ -27,10 +27,15 @@ import org.squad.careerhub.global.entity.BaseEntity;
 
 @Table(uniqueConstraints = {
         @UniqueConstraint(
-                name = "uk_schedule_application_started_at", // 한 지원서에 대해 동일한 시작 일시의 일정은 하나만 존재할 수 있음
-                columnNames = {"application_id", "started_at"}
-        )
-})
+                name = "uk_schedule_application_stage_started_at",
+                columnNames = {"application_stage_id", "startedAt"}
+
+        ),
+        @UniqueConstraint(
+                name = "uk_schedule_application_stage_schedule_name",
+                columnNames = {"application_stage_id", "scheduleName"}
+        )}
+)
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
@@ -41,22 +46,20 @@ public class Schedule extends BaseEntity {
     private Member author;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "application_id", nullable = false)
-    private Application application;
+    @JoinColumn(name = "application_stage_id", nullable = false)
+    private ApplicationStage applicationStage;
+
+    @Column(nullable = false)
+    private String scheduleName;
+
+    private String location; // 면접 전형일경우에만 값이 할당 됩니다
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "stage_type", nullable = false)
-    private StageType stageType;
-
-    @Column(name = "stageName", length = 100)
-    private String stageName;
-
-    @Column(name = "location")
-    private String location;
+    @Column(nullable = false)
+    private ScheduleResult scheduleResult;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "submission_status", length = 20)
-    private SubmissionStatus submissionStatus;
+    private SubmissionStatus submissionStatus; // 서류 전형 일정일 경우에만 값이 할당 됩니다
 
     @Column(nullable = false)
     private LocalDateTime startedAt;
@@ -65,23 +68,23 @@ public class Schedule extends BaseEntity {
 
     public static Schedule register(
             Member author,
-            Application application,
-            StageType stageType,
-            String stageName,
+            ApplicationStage applicationStage,
+            String scheduleName,
             String location,
+            ScheduleResult scheduleResult,
             SubmissionStatus submissionStatus,
             LocalDateTime startedAt,
-            LocalDateTime finishedAt
+            LocalDateTime endedAt
     ) {
         Schedule schedule = new Schedule();
-        schedule.application = requireNonNull(application);
         schedule.author = requireNonNull(author);
-        schedule.stageType = requireNonNull(stageType);
-        schedule.stageName = requireNonNull(stageName);
+        schedule.applicationStage = requireNonNull(applicationStage);
+        schedule.scheduleName = requireNonNull(scheduleName);
+        schedule.scheduleResult = requireNonNull(scheduleResult);
+        schedule.submissionStatus = submissionStatus;
         schedule.location = location;
-        schedule.submissionStatus = submissionStatus; // nullable
         schedule.startedAt = requireNonNull(startedAt);
-        schedule.endedAt = finishedAt;
+        schedule.endedAt = endedAt;
         return schedule;
     }
 
