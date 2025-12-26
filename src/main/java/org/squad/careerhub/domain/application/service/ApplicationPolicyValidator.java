@@ -13,7 +13,7 @@ public class ApplicationPolicyValidator {
     // 지원서 생성 시 전형에 따른 입력 규칙 검증
     public void validateNewStage(NewStage newStage) {
         // 기타 전형 일정은 기타 전형 단계 일 때만 입력 가능
-        if (newStage.newEtcSchedule() != null && !newStage.stageType().isEtc()) {
+        if (!newStage.newEtcSchedules().isEmpty() && !newStage.stageType().isEtc()) {
             throw new CareerHubException(ErrorStatus.INVALID_ETC_STAGE_RULE);
         }
 

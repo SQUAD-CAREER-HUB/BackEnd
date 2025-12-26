@@ -1,8 +1,9 @@
 package org.squad.careerhub.domain.application.service;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
@@ -28,7 +29,7 @@ import org.squad.careerhub.domain.member.service.MemberReader;
 class ApplicationManagerUnitTest extends TestDoubleSupport {
 
     @Mock
-    ApplicationStageManager applicationStageManager;
+    ApplicationFileManager applicationFileManager;
 
     @Mock
     ApplicationJpaRepository applicationJpaRepository;
@@ -47,30 +48,7 @@ class ApplicationManagerUnitTest extends TestDoubleSupport {
     }
 
     @Test
-    void 지원_종료_단계_지원서가_생성될_경우_전형단계가_생성되지_않고_지원서만_생성된다() {
-        // given
-         var newJobPosting = createNewJobPosting();
-        var newApplicationInfo = createNewApplicationInfo();
-        var newStage = NewStage.builder()
-                .stageType(StageType.APPLICATION_CLOSE)
-                .finalApplicationStatus(ApplicationStatus.FINAL_PASS)
-                .newInterviewSchedules(List.of())
-                .build();
-
-        var application = createApplication(newJobPosting, newStage, newApplicationInfo);
-
-        given(memberReader.find(any())).willReturn(author);
-        given(applicationJpaRepository.save(any())).willReturn(application);
-
-        // when
-        applicationManager.createWithStage(newJobPosting, newApplicationInfo, newStage, 1L);
-
-        // then
-        verify(applicationStageManager, never()).create(any(), any());
-    }
-
-    @Test
-    void 진행중인_지원서가_생성될_경우_전형단계도_함께_생성한다() {
+    void 지원서가_생성될때_첨부파일_생성메서드가_호출된다() {
         // given
         var newJobPosting = createNewJobPosting();
         var newApplicationInfo = createNewApplicationInfo();
@@ -82,12 +60,38 @@ class ApplicationManagerUnitTest extends TestDoubleSupport {
 
         given(memberReader.find(any())).willReturn(author);
         given(applicationJpaRepository.save(any())).willReturn(application);
+        doNothing().when(applicationFileManager).addApplicationFile(any(), any());
 
         // when
-        applicationManager.createWithStage(newJobPosting, newApplicationInfo, newStage, 1L);
+        var savedApplication = applicationManager.create(newJobPosting, newApplicationInfo, newStage, List.of(), 1L);
+
+        assertThat(savedApplication).isNotNull()
+                .extracting(
+                        Application::getAuthor,
+                        Application::getJobPostingUrl,
+                        Application::getCompany,
+                        Application::getPosition,
+                        Application::getJobLocation,
+                        Application::getCurrentStageType,
+                        Application::getApplicationStatus,
+                        Application::getApplicationMethod,
+                        Application::getDeadline,
+                        Application::getMemo
+                ).containsExactly(
+                        author,
+                        newJobPosting.jobPostingUrl(),
+                        newJobPosting.company(),
+                        newJobPosting.position(),
+                        newJobPosting.jobLocation(),
+                        newStage.stageType(),
+                        ApplicationStatus.IN_PROGRESS,
+                        newApplicationInfo.applicationMethod(),
+                        newApplicationInfo.deadline(),
+                        null
+                );
 
         // then
-        verify(applicationStageManager, times(1)).create(any(), any());
+        verify(applicationFileManager, times(1)).addApplicationFile(any(), any());
     }
 
     private NewApplicationInfo createNewApplicationInfo() {

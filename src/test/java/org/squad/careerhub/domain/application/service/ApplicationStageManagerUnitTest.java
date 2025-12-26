@@ -8,31 +8,33 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.EnumSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.squad.careerhub.TestDoubleSupport;
 import org.squad.careerhub.domain.application.entity.Application;
 import org.squad.careerhub.domain.application.entity.ApplicationStage;
-import org.squad.careerhub.domain.application.entity.StageStatus;
 import org.squad.careerhub.domain.application.entity.StageType;
 import org.squad.careerhub.domain.application.entity.SubmissionStatus;
 import org.squad.careerhub.domain.application.repository.ApplicationStageJpaRepository;
 import org.squad.careerhub.domain.application.service.dto.NewEtcSchedule;
 import org.squad.careerhub.domain.application.service.dto.NewStage;
+import org.squad.careerhub.domain.schedule.service.ScheduleManager;
 
 class ApplicationStageManagerUnitTest extends TestDoubleSupport {
 
     @Mock
-    private ApplicationStageJpaRepository applicationStageJpaRepository;
+    ApplicationStageJpaRepository applicationStageJpaRepository;
+
+    @Mock
+    ScheduleManager scheduleManager;
 
     @InjectMocks
-    private ApplicationStageManager applicationStageManager;
+    ApplicationStageManager applicationStageManager;
 
-    private Application testApplication;
+    Application testApplication;
 
     @BeforeEach
     void setUp() {
@@ -40,131 +42,63 @@ class ApplicationStageManagerUnitTest extends TestDoubleSupport {
     }
 
     @Test
-    void 서류_전형만_생성하면_1번만_저장된다() {
+    void 서류_전형만_생성하면_1번만_저장되고_서류_일정_메서드를_호출한다() {
         // given
         var documentNewStage = NewStage.builder()
                 .stageType(StageType.DOCUMENT)
                 .submissionStatus(SubmissionStatus.NOT_SUBMITTED)
                 .build();
-        var documentStage = ApplicationStage.create(
-                testApplication,
-                StageType.DOCUMENT,
-                StageType.DOCUMENT.getDescription(),
-                SubmissionStatus.NOT_SUBMITTED
-        );
+        var documentStage = ApplicationStage.create(testApplication, StageType.DOCUMENT);
         given(applicationStageJpaRepository.save(any())).willReturn(documentStage);
 
         // when
-        var result = applicationStageManager.create(testApplication, documentNewStage);
+        var result = applicationStageManager.createWithSchedule(testApplication, documentNewStage);
 
         // then
-        assertThat(result).extracting(
-                ApplicationStage::getStageStatus,
-                ApplicationStage::getStageType,
-                ApplicationStage::getStageName,
-                ApplicationStage::getSubmissionStatus
-
-        ).containsExactly(
-                StageStatus.WAITING,
-                documentStage.getStageType(),
-                StageType.DOCUMENT.getDescription(),
-                documentStage.getSubmissionStatus()
-        );
+        assertThat(result.getStageType()).isEqualTo(StageType.DOCUMENT);
         verify(applicationStageJpaRepository, times(1)).save(any());
+        verify(scheduleManager, times(1)).createDocumentSchedule();
     }
 
     @Test
-    void 면접_전형_생성_시_2번_저장된다_서류_PASS_면접() {
+    void 면접_전형_생성_시_서류_전형도_함꼐_저장되고_면접_일정_메서드를_호출한다() {
         // given
         var interviewNewStage = NewStage.builder()
                 .stageType(StageType.INTERVIEW)
                 .build();
 
-        var interviewStage = ApplicationStage.create(
-                testApplication,
-                StageType.INTERVIEW,
-                StageType.INTERVIEW.getDescription(),
-                null
-        );
+        var interviewStage = ApplicationStage.create(testApplication, StageType.INTERVIEW);
         given(applicationStageJpaRepository.save(any())).willReturn(interviewStage);
 
         // when
-        var applicationStage = applicationStageManager.create(testApplication, interviewNewStage);
+        var applicationStage = applicationStageManager.createWithSchedule(testApplication, interviewNewStage);
 
         // then
-        assertThat(applicationStage).extracting(
-                ApplicationStage::getStageStatus,
-                ApplicationStage::getStageType,
-                ApplicationStage::getStageName,
-                ApplicationStage::getSubmissionStatus
-        ).containsExactly(
-                StageStatus.WAITING,
-                interviewStage.getStageType(),
-                StageType.INTERVIEW.getDescription(),
-                null
-        );
-
+        assertThat(applicationStage.getStageType()).isEqualTo(StageType.INTERVIEW);
         verify(applicationStageJpaRepository, times(2)).save(any());
+        verify(scheduleManager, times(1)).createInterviewSchedules();
     }
 
     @Test
-    void 기타_전형도_2번_저장된다_서류_PASS_기타() {
+    void 기타_전형_생성_시_서류_전형도_함꼐_저장되고_기타_일정_메서드를_호출한다() {
         // given
         var customStageName = "코딩테스트";
-        var etcSchedule = new NewEtcSchedule(customStageName, LocalDateTime.now(), LocalDateTime.now().plusDays(2));
+        var etcSchedules = List.of(new NewEtcSchedule(customStageName, LocalDateTime.now(), LocalDateTime.now().plusDays(2)));
         var etcNewStage = NewStage.builder()
                 .stageType(StageType.ETC)
-                .newEtcSchedule(etcSchedule)
+                .newEtcSchedules(etcSchedules)
                 .build();
 
-        var etcStage = ApplicationStage.create(
-                testApplication,
-                StageType.ETC,
-                customStageName,
-                null
-        );
+        var etcStage = ApplicationStage.create(testApplication, StageType.ETC);
         given(applicationStageJpaRepository.save(any())).willReturn(etcStage);
 
         // when
-        var applicationStage = applicationStageManager.create(testApplication, etcNewStage);
+        var applicationStage = applicationStageManager.createWithSchedule(testApplication, etcNewStage);
 
         // then
-        assertThat(applicationStage).extracting(
-                ApplicationStage::getStageStatus,
-                ApplicationStage::getStageType,
-                ApplicationStage::getStageName,
-                ApplicationStage::getSubmissionStatus
-
-        ).containsExactly(
-                StageStatus.WAITING,
-                etcStage.getStageType(),
-                customStageName,
-                null
-        );
-
+        assertThat(applicationStage.getStageType()).isEqualTo(StageType.ETC);
         verify(applicationStageJpaRepository, times(2)).save(any());
-    }
-
-
-    @ParameterizedTest
-    @EnumSource(value = StageType.class, names = {"INTERVIEW", "ETC"})
-    void 서류_외_모든_전형은_서류_PASS_를_자동_생성한다(StageType stageType) {
-        // given
-        NewStage.NewStageBuilder builder = NewStage.builder()
-                .stageType(stageType)
-                .submissionStatus(SubmissionStatus.SUBMITTED);
-
-        if (stageType == StageType.ETC) {
-            builder.newEtcSchedule(new NewEtcSchedule("커스텀", LocalDateTime.now(), LocalDateTime.now().plusDays(2)));
-        }
-
-        var stage = builder.build();
-
-        // when
-        applicationStageManager.create(testApplication, stage);
-
-        // then
-        verify(applicationStageJpaRepository, times(2)).save(any());
+        verify(scheduleManager, times(1)).createEtcSchedules();
     }
 
 }
