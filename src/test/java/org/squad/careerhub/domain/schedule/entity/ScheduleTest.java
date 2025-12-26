@@ -11,7 +11,7 @@ import org.squad.careerhub.domain.application.entity.Application;
 import org.squad.careerhub.domain.application.entity.ApplicationMethod;
 import org.squad.careerhub.domain.application.entity.ApplicationStage;
 import org.squad.careerhub.domain.application.entity.ApplicationStatus;
-import org.squad.careerhub.domain.application.entity.StageStatus;
+import org.squad.careerhub.domain.application.entity.ScheduleResult;
 import org.squad.careerhub.domain.application.entity.StageType;
 import org.squad.careerhub.domain.application.entity.SubmissionStatus;
 import org.squad.careerhub.domain.member.entity.Member;
@@ -47,8 +47,7 @@ class ScheduleTest {
             StageType.DOCUMENT,
             ApplicationStatus.IN_PROGRESS,
             ApplicationMethod.EMAIL,
-            LocalDate.of(2024, 12, 31),
-            LocalDate.of(2024, 10, 1)
+            LocalDateTime.of(2024, 12, 31, 23, 59, 59)
         );
 
         etcStage = createStage(application, StageType.ETC);
@@ -57,25 +56,25 @@ class ScheduleTest {
     }
 
     private ApplicationStage createStage(Application application, StageType stageType) {
-        String stageName = stageType.getDescription();
-        SubmissionStatus submissionStatus =
-            (stageType == StageType.DOCUMENT) ? SubmissionStatus.NOT_SUBMITTED : null;
-
-        return ApplicationStage.create(application, stageType, stageName, submissionStatus);
+        return ApplicationStage.create(application, stageType);
     }
 
     @Test
     void 기타일정을_생성한다_ETC() {
         // when
-        Schedule schedule = Schedule.createEtc(
+        Schedule schedule = Schedule.register(
+            author,
             etcStage,
-            "  코딩테스트  ",
+            "코딩테스트",
+            null,
+            ScheduleResult.WAITING,
+            null,
             LocalDateTime.of(2025, 12, 5, 23, 59),
             LocalDateTime.of(2025, 12, 6, 1, 0)
         );
 
         // then
-        assertThat(schedule.getStage()).isEqualTo(etcStage);
+        assertThat(schedule.getApplicationStage()).isEqualTo(etcStage);
         assertThat(schedule.getAuthor()).isEqualTo(author);
 
         assertThat(schedule.getScheduleName()).isEqualTo("코딩테스트"); // trim
@@ -84,7 +83,7 @@ class ScheduleTest {
 
         // ETC 규칙
         assertThat(schedule.getLocation()).isNull();
-        assertThat(schedule.getScheduleResult()).isEqualTo(StageStatus.WAITING);
+        assertThat(schedule.getScheduleResult()).isEqualTo(ScheduleResult.WAITING);
     }
 
     @Test
@@ -93,9 +92,13 @@ class ScheduleTest {
         LocalDateTime t = LocalDateTime.of(2025, 12, 5, 23, 59);
 
         // when & then
-        assertThatThrownBy(() -> Schedule.createEtc(
+        assertThatThrownBy(() -> Schedule.register(
+            author,
             interviewStage, // INTERVIEW stage
             "코딩테스트",
+            null,
+            ScheduleResult.WAITING,
+            null,
             t,
             t.plusHours(1)
         ))
@@ -107,15 +110,19 @@ class ScheduleTest {
     @Test
     void 면접일정을_생성한다_INTERVIEW() {
         // when
-        Schedule schedule = Schedule.createInterview(
+        Schedule schedule = Schedule.register(
+            author,
             interviewStage,
-            "  1차 면접  ",
+            "1차 면접",
+            "강남구 테헤란로",
+            ScheduleResult.WAITING,
+            null,
             LocalDateTime.of(2025, 12, 10, 19, 0),
-            "  서울  "
+            null
         );
 
         // then
-        assertThat(schedule.getStage()).isEqualTo(interviewStage);
+        assertThat(schedule.getApplicationStage()).isEqualTo(interviewStage);
         assertThat(schedule.getAuthor()).isEqualTo(author);
 
         assertThat(schedule.getScheduleName()).isEqualTo("1차 면접");
@@ -124,7 +131,7 @@ class ScheduleTest {
 
         // INTERVIEW 규칙
         assertThat(schedule.getEndedAt()).isNull();
-        assertThat(schedule.getScheduleResult()).isEqualTo(StageStatus.WAITING);
+        assertThat(schedule.getScheduleResult()).isEqualTo(ScheduleResult.WAITING);
     }
 
     @Test
@@ -133,11 +140,15 @@ class ScheduleTest {
         LocalDateTime t = LocalDateTime.of(2025, 12, 10, 19, 0);
 
         // when & then
-        assertThatThrownBy(() -> Schedule.createInterview(
+        assertThatThrownBy(() -> Schedule.register(
+            author,
             etcStage, // ETC stage
             "1차 면접",
+            "강남구 테헤란로",
+            ScheduleResult.WAITING,
+            null,
             t,
-            "서울"
+            null
         ))
             .isInstanceOf(CareerHubException.class)
             .extracting("errorStatus")
@@ -146,11 +157,16 @@ class ScheduleTest {
 
     @Test
     void createInterview는_startedAt이_null이면_NPE() {
-        assertThatThrownBy(() -> Schedule.createInterview(
-            interviewStage,
+        LocalDateTime t = LocalDateTime.of(2025, 12, 10, 19, 0);
+        assertThatThrownBy(() -> Schedule.register(
+            author,
+            etcStage, // ETC stage
             "1차 면접",
+            "강남구 테헤란로",
+            ScheduleResult.WAITING,
             null,
-            "서울"
+            t,
+            null
         )).isInstanceOf(NullPointerException.class);
     }
 }

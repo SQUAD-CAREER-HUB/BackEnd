@@ -41,7 +41,7 @@ public class ApplicationQueryDslRepository {
                         application.company,
                         application.position,
                         application.currentStageType,
-                        applicationStage.stageStatus.as("currentStageStatus"),
+                        applicationStage.stageType.as("currentStageStatus"),
                         application.applicationStatus,
                         application.deadline,
                         application.applicationMethod,
@@ -88,7 +88,6 @@ public class ApplicationQueryDslRepository {
                                 application.id.as("applicationId"),
                                 application.company,
                                 application.position,
-                                application.submittedAt,
                                 application.deadline,
                                 application.applicationMethod,
                                 schedule.submissionStatus

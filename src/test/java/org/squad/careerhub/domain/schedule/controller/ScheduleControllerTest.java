@@ -12,7 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.squad.careerhub.ControllerTestSupport;
 import org.squad.careerhub.domain.application.entity.ApplicationStatus;
-import org.squad.careerhub.domain.application.entity.StageStatus;
+import org.squad.careerhub.domain.application.entity.ScheduleResult;
 import org.squad.careerhub.domain.application.entity.StageType;
 import org.squad.careerhub.domain.schedule.controller.dto.EtcScheduleCreateRequest;
 import org.squad.careerhub.domain.schedule.controller.dto.InterviewScheduleCreateRequest;
@@ -44,7 +44,7 @@ class ScheduleControllerTest extends ControllerTestSupport {
                 .startedAt(LocalDateTime.of(2025, 12, 10, 19, 0))
                 .endedAt(null)
                 .location("서울")
-                .stageStatus(StageStatus.WAITING)
+                .scheduleResult(ScheduleResult.WAITING)
                 .submissionStatus(null)
                 .applicationStatus(ApplicationStatus.IN_PROGRESS)
                 .createdAt(LocalDateTime.of(2025, 12, 1, 10, 0))
@@ -88,7 +88,7 @@ class ScheduleControllerTest extends ControllerTestSupport {
                 .startedAt(LocalDateTime.of(2025, 12, 5, 23, 59))
                 .endedAt(null)
                 .location(null)
-                .stageStatus(StageStatus.WAITING)
+                .scheduleResult(ScheduleResult.WAITING)
                 .submissionStatus(null)
                 .applicationStatus(ApplicationStatus.IN_PROGRESS)
                 .createdAt(LocalDateTime.of(2025, 12, 1, 10, 0))

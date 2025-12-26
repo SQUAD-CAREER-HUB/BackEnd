@@ -16,7 +16,6 @@ import org.mockito.Mockito;
 import org.squad.careerhub.TestDoubleSupport;
 import org.squad.careerhub.domain.application.entity.Application;
 import org.squad.careerhub.domain.application.entity.ApplicationStage;
-import org.squad.careerhub.domain.application.entity.StageStatus;
 import org.squad.careerhub.domain.application.entity.StageType;
 import org.squad.careerhub.domain.application.service.ApplicationReader;
 import org.squad.careerhub.domain.schedule.controller.dto.EtcScheduleCreateRequest;
