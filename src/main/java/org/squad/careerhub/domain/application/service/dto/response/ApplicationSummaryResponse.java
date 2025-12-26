@@ -43,7 +43,7 @@ public record ApplicationSummaryResponse(
             String position,
             StageType currentStageType,
             ApplicationStatus applicationStatus,
-            LocalDate deadline,
+            LocalDateTime deadline,
             ApplicationMethod applicationMethod,
             ScheduleResult currentScheduleResult,
             String stageName,

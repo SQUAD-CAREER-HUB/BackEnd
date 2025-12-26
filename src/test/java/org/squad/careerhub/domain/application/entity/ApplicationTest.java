@@ -3,6 +3,7 @@ package org.squad.careerhub.domain.application.entity;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.squad.careerhub.domain.member.entity.Member;
@@ -20,6 +21,7 @@ class ApplicationTest {
     @Test
     void 지원서를_생성한다() {
         // when
+        LocalDateTime now = LocalDateTime.now();
         var application = Application.create(
                 author,
                 "http://jobposting.url",
@@ -29,7 +31,7 @@ class ApplicationTest {
                 StageType.DOCUMENT,
                 ApplicationStatus.FINAL_FAIL,
                 ApplicationMethod.EMAIL,
-                LocalDate.of(2024, 12, 31)
+                now
         );
         // then
         assertThat(application).extracting(
@@ -52,7 +54,7 @@ class ApplicationTest {
                 StageType.DOCUMENT,
                 ApplicationStatus.IN_PROGRESS,
                 ApplicationMethod.EMAIL,
-                LocalDate.of(2024, 12, 31),
+                now,
                 null
         );
     }
@@ -60,6 +62,7 @@ class ApplicationTest {
     @Test
     void 지원종료인_지원서를_생성한다() {
         // when
+        LocalDateTime deadline = LocalDateTime.of(2024, 12, 31, 0, 0);
         var application = Application.create(
                 author,
                 "http://jobposting.url",
@@ -69,7 +72,7 @@ class ApplicationTest {
                 StageType.APPLICATION_CLOSE,
                 ApplicationStatus.FINAL_PASS,
                 ApplicationMethod.EMAIL,
-                LocalDate.of(2024, 12, 31)
+                deadline
         );
         // then
         assertThat(application).extracting(
@@ -92,7 +95,7 @@ class ApplicationTest {
                 StageType.APPLICATION_CLOSE,
                 ApplicationStatus.FINAL_PASS,
                 ApplicationMethod.EMAIL,
-                LocalDate.of(2024, 12, 31),
+                deadline,
                 null
         );
     }

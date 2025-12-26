@@ -9,6 +9,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
@@ -74,7 +75,7 @@ class ApplicationControllerTest extends ControllerTestSupport {
                                 "c",
                                 "p",
                                 LocalDate.now(),
-                                LocalDate.now().plusDays(2),
+                                ApplicationMethod.EMAIL,
                                 SubmissionStatus.SUBMITTED))
                         )
                         .hasNext(false)
@@ -102,7 +103,7 @@ class ApplicationControllerTest extends ControllerTestSupport {
                 .applicationInfo(
                         ApplicationInfoRequest.builder()
                                 .applicationMethod(ApplicationMethod.HOMEPAGE)
-                                .deadline(LocalDate.of(2025, 3, 25))
+                                .deadline(LocalDateTime.of(2025, 3, 25, 0, 0))
                                 .build()
                 )
                 .stage(

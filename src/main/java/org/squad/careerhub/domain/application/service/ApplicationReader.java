@@ -1,6 +1,7 @@
 package org.squad.careerhub.domain.application.service;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.function.Function;
 import lombok.RequiredArgsConstructor;
@@ -90,7 +91,7 @@ public class ApplicationReader {
         List<BeforeDeadlineApplicationResponse> responses = applicationQueryDslRepository.findBeforeDeadLineFromApplication(
                 authorId,
                 StageType.DOCUMENT,
-                LocalDate.now(),
+                LocalDateTime.now(),
                 cursor
         );
 

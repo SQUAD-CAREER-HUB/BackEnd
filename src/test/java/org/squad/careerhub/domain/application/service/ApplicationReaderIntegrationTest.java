@@ -969,26 +969,54 @@ class ApplicationReaderIntegrationTest extends IntegrationTestSupport {
     @Test
     void 마감_되지_않은_서류_전형_지원서를_조회한다() {
         // given
-        createApplication(NewStage.builder()
+        Application app1 = createApplication(NewStage.builder()
                         .stageType(StageType.DOCUMENT)
                         .submissionStatus(SubmissionStatus.SUBMITTED)
                         .newInterviewSchedules(List.of())
                         .build(),
-                LocalDate.now().minusDays(1)
+                LocalDateTime.now().minusDays(1)
         );
-        createApplication(NewStage.builder()
+        var app2 = createApplication(NewStage.builder()
                         .stageType(StageType.DOCUMENT)
                         .submissionStatus(SubmissionStatus.NOT_SUBMITTED)
                         .newInterviewSchedules(List.of())
                         .build(),
-                LocalDate.now().plusDays(1)
+                LocalDateTime.now().plusDays(1)
         );
-        createApplication(NewStage.builder()
+        var app3 = createApplication(NewStage.builder()
                         .stageType(StageType.DOCUMENT)
                         .submissionStatus(SubmissionStatus.SUBMITTED)
                         .newInterviewSchedules(List.of())
                         .build(),
-                LocalDate.now().plusDays(2)
+                LocalDateTime.now().plusDays(2)
+        );
+
+        createApplicationSchedule(
+                applicationStageJpaRepository.save(ApplicationStage.create(app1, StageType.DOCUMENT)),
+                StageType.DOCUMENT.getDescription(),
+                null,
+                ScheduleResult.WAITING,
+                SubmissionStatus.SUBMITTED,
+                now(),
+                app1.getDeadline()
+        );
+        createApplicationSchedule(
+                applicationStageJpaRepository.save(ApplicationStage.create(app2, StageType.DOCUMENT)),
+                StageType.DOCUMENT.getDescription(),
+                null,
+                ScheduleResult.WAITING,
+                SubmissionStatus.SUBMITTED,
+                now(),
+                now().plusDays(1)
+        );
+        createApplicationSchedule(
+                applicationStageJpaRepository.save(ApplicationStage.create(app3, StageType.DOCUMENT)),
+                StageType.DOCUMENT.getDescription(),
+                null,
+                ScheduleResult.WAITING,
+                SubmissionStatus.SUBMITTED,
+                now(),
+                now().plusDays(1)
         );
 
         // when
@@ -1049,7 +1077,7 @@ class ApplicationReaderIntegrationTest extends IntegrationTestSupport {
                     stageType,
                     applicationStatus,
                     ApplicationMethod.values()[i % ApplicationMethod.values().length],
-                    LocalDate.now().plusDays(30)
+                    LocalDateTime.now().plusDays(30)
             );
             applications.add(app);
         }
@@ -1077,18 +1105,18 @@ class ApplicationReaderIntegrationTest extends IntegrationTestSupport {
     }
 
     private Application createApplication(String position, NewStage newStage) {
-        return createApplication("company", position, newStage, LocalDate.now().plusDays(10));
+        return createApplication("company", position, newStage, LocalDateTime.now().plusDays(10));
     }
 
     private Application createApplication(String company, String position, NewStage newStage) {
-        return createApplication(company, position, newStage, LocalDate.now().plusDays(10));
+        return createApplication(company, position, newStage, LocalDateTime.now().plusDays(10));
     }
 
-    private Application createApplication(NewStage newStage, LocalDate deadline) {
+    private Application createApplication(NewStage newStage, LocalDateTime deadline) {
         return createApplication("company", "BE", newStage, deadline);
     }
 
-    private Application createApplication(String company, String position, NewStage newStage, LocalDate deadline) {
+    private Application createApplication(String company, String position, NewStage newStage, LocalDateTime deadline) {
         var newJobPosting = NewJobPosting.builder()
                 .jobPostingUrl("jobPostingUrl")
                 .company(company)

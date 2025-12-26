@@ -8,6 +8,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -97,7 +98,7 @@ class ApplicationManagerUnitTest extends TestDoubleSupport {
     private NewApplicationInfo createNewApplicationInfo() {
         return new NewApplicationInfo(
                 ApplicationMethod.EMAIL,
-                LocalDate.of(2020, 1, 1)
+                LocalDateTime.of(2020, 1, 1, 0, 0)
         );
     }
 
