@@ -210,7 +210,7 @@ class ApplicationReaderIntegrationTest extends IntegrationTestSupport {
                         DocsStage::applicationMethod
                 )
                 .containsExactly(
-                        docsApp.getDeadline(),
+                        docsApp.getDeadline().truncatedTo(ChronoUnit.MICROS),
                         docsApp.getApplicationMethod().getDescription()
                 );
 
@@ -610,7 +610,7 @@ class ApplicationReaderIntegrationTest extends IntegrationTestSupport {
                 ScheduleResult.WAITING,
                 SubmissionStatus.NOT_SUBMITTED,
                 now(),
-                now().plusDays(1)
+                now()
         );
         var docsApp2 = createApplication(
                 "네이버",
@@ -664,7 +664,7 @@ class ApplicationReaderIntegrationTest extends IntegrationTestSupport {
                 DocsStage::deadline,
                 DocsStage::applicationMethod
         ).containsExactly(
-                docsApp2.getDeadline(),
+                docsApp2.getDeadline().truncatedTo(ChronoUnit.MICROS),
                 docsApp2.getApplicationMethod().getDescription()
         );
     }
