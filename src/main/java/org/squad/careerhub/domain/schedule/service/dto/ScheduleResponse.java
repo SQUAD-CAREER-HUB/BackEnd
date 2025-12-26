@@ -6,7 +6,7 @@ import lombok.Builder;
 import org.squad.careerhub.domain.application.entity.Application;
 import org.squad.careerhub.domain.application.entity.ApplicationStage;
 import org.squad.careerhub.domain.application.entity.ApplicationStatus;
-import org.squad.careerhub.domain.application.entity.StageStatus;
+import org.squad.careerhub.domain.application.entity.ScheduleResult;
 import org.squad.careerhub.domain.application.entity.StageType;
 import org.squad.careerhub.domain.application.entity.SubmissionStatus;
 import org.squad.careerhub.domain.schedule.entity.Schedule;
@@ -51,7 +51,7 @@ public record ScheduleResponse(
         example = "WAITING",
         allowableValues = {"WAITING", "PASS", "FAIL"}
     )
-    StageStatus stageStatus,
+    ScheduleResult scheduleResult,
 
     @Schema(
         description = "서류 제출 상태 (stageType=DOCUMENT일 때만 사용)",
@@ -75,7 +75,7 @@ public record ScheduleResponse(
 ) {
 
     public static ScheduleResponse from(Schedule schedule) {
-        ApplicationStage stage = schedule.getStage();
+        ApplicationStage stage = schedule.getApplicationStage();
         Application app = stage.getApplication();
 
         return ScheduleResponse.builder()
@@ -85,16 +85,12 @@ public record ScheduleResponse(
             .position(app.getPosition())
 
             .stageType(stage.getStageType())
-            .stageName(stage.getStageName())
-
             .scheduleName(schedule.getScheduleName())
-
             .startedAt(schedule.getStartedAt())
             .endedAt(schedule.getEndedAt())
             .location(schedule.getLocation())
-
-            .stageStatus(stage.getStageStatus())
-            .submissionStatus(stage.getSubmissionStatus())
+            .submissionStatus(schedule.getSubmissionStatus())
+            .scheduleResult(schedule.getScheduleResult())
 
             // stageType=APPLICATION_CLOSE일 때는 Schedule이 아니라 Application이 들고 있는게 자연스러움
             .applicationStatus(app.getApplicationStatus())
