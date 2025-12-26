@@ -9,7 +9,7 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -47,9 +47,7 @@ public class Application extends BaseEntity {
     private ApplicationMethod applicationMethod;
 
     @Column(nullable = false)
-    private LocalDate deadline;
-
-    private LocalDate submittedAt;
+    private LocalDateTime deadline;
 
     @Column(length = 5000)
     private String memo;
@@ -63,8 +61,7 @@ public class Application extends BaseEntity {
             StageType currentStageType,
             ApplicationStatus applicationStatus,
             ApplicationMethod applicationMethod,
-            LocalDate deadline,
-            LocalDate submittedAt
+            LocalDateTime deadline
     ) {
         ApplicationStatus currentApplicationStatus = currentStageType == StageType.APPLICATION_CLOSE ?
                 applicationStatus : ApplicationStatus.IN_PROGRESS;
@@ -79,7 +76,6 @@ public class Application extends BaseEntity {
         application.applicationStatus = currentApplicationStatus;
         application.applicationMethod = requireNonNull(applicationMethod);
         application.deadline = requireNonNull(deadline);
-        application.submittedAt = submittedAt;
         application.memo = null;
 
         return application;
@@ -91,8 +87,7 @@ public class Application extends BaseEntity {
             String position,
             String jobLocation,
             ApplicationMethod applicationMethod,
-            LocalDate deadline,
-            LocalDate submittedAt,
+            LocalDateTime deadline,
             String memo
     ) {
         this.jobPostingUrl = jobPostingUrl;
@@ -101,12 +96,11 @@ public class Application extends BaseEntity {
         this.jobLocation = requireNonNull(jobLocation);
         this.applicationMethod = requireNonNull(applicationMethod);
         this.deadline = requireNonNull(deadline);
-        this.submittedAt = submittedAt;
         this.memo = memo;
     }
 
     public boolean isDeadlinePassed() {
-        return LocalDate.now().isAfter(this.deadline);
+        return LocalDateTime.now().isAfter(this.deadline);
     }
 
     // Test를 위한 업데이트 메서드

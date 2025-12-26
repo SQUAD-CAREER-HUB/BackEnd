@@ -1,6 +1,6 @@
 package org.squad.careerhub.domain.application.entity;
 
-public enum StageStatus {
+public enum ScheduleResult {
 
     WAITING, // 대기
     PASS,    // 합격

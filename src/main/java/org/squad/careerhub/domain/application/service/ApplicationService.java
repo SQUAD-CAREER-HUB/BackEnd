@@ -6,7 +6,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import org.squad.careerhub.domain.application.entity.Application;
-import org.squad.careerhub.domain.application.entity.StageType;
 import org.squad.careerhub.domain.application.repository.dto.BeforeDeadlineApplicationResponse;
 import org.squad.careerhub.domain.application.service.dto.NewApplicationInfo;
 import org.squad.careerhub.domain.application.service.dto.NewJobPosting;
@@ -14,7 +13,6 @@ import org.squad.careerhub.domain.application.service.dto.NewStage;
 import org.squad.careerhub.domain.application.service.dto.SearchCondition;
 import org.squad.careerhub.domain.application.service.dto.response.ApplicationStatisticsResponse;
 import org.squad.careerhub.domain.application.service.dto.response.ApplicationSummaryResponse;
-import org.squad.careerhub.domain.schedule.service.InterviewScheduleManager;
 import org.squad.careerhub.global.support.Cursor;
 import org.squad.careerhub.global.support.PageResponse;
 
@@ -25,8 +23,7 @@ public class ApplicationService {
     private final ApplicationManager applicationManager;
     private final ApplicationReader applicationReader;
     private final ApplicationPolicyValidator applicationPolicyValidator;
-    private final ApplicationFileManager applicationFileManager;
-    private final InterviewScheduleManager interviewScheduleManager;
+    private final ApplicationStageManager applicationStageManager;
 
     /**
      * 지원서를 생성합니다.
@@ -46,24 +43,15 @@ public class ApplicationService {
     ) {
         applicationPolicyValidator.validateNewStage(newStage);
 
-        Application application = applicationManager.createWithStage(
+        Application application = applicationManager.create(
                 newJobPosting,
                 newApplicationInfo,
                 newStage,
+                files,
                 authorId
         );
 
-        applicationFileManager.addApplicationFile(application, files);
-
-        // 면접 전형일 경우 면접 일정 생성
-        if (newStage.stageType() == StageType.INTERVIEW) {
-            interviewScheduleManager.createInterviewSchedules();
-        }
-
-        // 기타 전형일 경우 기타 유형 일정 생성
-        if (newStage.stageType() == StageType.ETC) {
-            interviewScheduleManager.createEtcSchedules();
-        }
+        applicationStageManager.createWithSchedule(application, newStage);
 
         return application.getId();
     }

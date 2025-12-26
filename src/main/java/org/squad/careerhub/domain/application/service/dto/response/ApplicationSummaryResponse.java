@@ -1,12 +1,11 @@
 package org.squad.careerhub.domain.application.service.dto.response;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import lombok.Builder;
 import org.squad.careerhub.domain.application.entity.ApplicationMethod;
 import org.squad.careerhub.domain.application.entity.ApplicationStatus;
-import org.squad.careerhub.domain.application.entity.StageStatus;
+import org.squad.careerhub.domain.application.entity.ScheduleResult;
 import org.squad.careerhub.domain.application.entity.StageType;
 
 @Schema(description = "지원서 요약 응답 DTO")
@@ -24,11 +23,11 @@ public record ApplicationSummaryResponse(
         @Schema(description = "지원서 현재 전형 단계", example = "서류 전형")
         String currentStageType,
 
-        @Schema(description = "지원서 현재 전형 상태", example = "제출 완료")
-        String currentStageStatus,
-
         @Schema(description = "지원서 상태", example = "IN_PROGRESS ㅣ FINAL_PASS ㅣ FINAL_FAIL")
         String applicationStatus,
+
+        @Schema(description = "현재 전형 단계 일정 결과 상태", example = "PASS ㅣ FAIL ㅣ WAITING")
+        String currentScheduleResult,
 
         @Schema(description = "서류 전형 응답")
         DocsStage docsStage,
@@ -42,11 +41,10 @@ public record ApplicationSummaryResponse(
             String company,
             String position,
             StageType currentStageType,
-            StageStatus currentStageStatus,
             ApplicationStatus applicationStatus,
-            // 평탄화된 필드들
-            LocalDate deadline,
+            LocalDateTime deadline,
             ApplicationMethod applicationMethod,
+            ScheduleResult currentScheduleResult,
             String stageName,
             String location,
             LocalDateTime startedAt
@@ -56,8 +54,8 @@ public record ApplicationSummaryResponse(
                 company,
                 position,
                 currentStageType != null ? currentStageType.getDescription() : null,
-                currentStageStatus != null ? currentStageStatus.name() : null,
                 applicationStatus != null ? applicationStatus.name() : null,
+                currentScheduleResult != null ? currentScheduleResult.name() : null,
                 // 서류 전형일 때만 DocsStage 생성
                 (currentStageType == StageType.DOCUMENT)
                         ? new DocsStage(deadline, applicationMethod.getDescription())

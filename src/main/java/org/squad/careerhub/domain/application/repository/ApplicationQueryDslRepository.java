@@ -9,14 +9,14 @@ import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.StringUtils;
 import org.squad.careerhub.domain.application.entity.ApplicationStatus;
+import org.squad.careerhub.domain.application.entity.ScheduleResult;
 import org.squad.careerhub.domain.application.entity.StageResult;
-import org.squad.careerhub.domain.application.entity.StageStatus;
 import org.squad.careerhub.domain.application.entity.StageType;
 import org.squad.careerhub.domain.application.entity.SubmissionStatus;
 import org.squad.careerhub.domain.application.repository.dto.BeforeDeadlineApplicationResponse;
@@ -41,27 +41,28 @@ public class ApplicationQueryDslRepository {
                         application.company,
                         application.position,
                         application.currentStageType,
-                        applicationStage.stageStatus.as("currentStageStatus"),
                         application.applicationStatus,
                         application.deadline,
                         application.applicationMethod,
-                        schedule.stageName,
+                        schedule.scheduleResult,
+                        schedule.scheduleName,
                         schedule.location,
                         schedule.startedAt
                 ))
                 .from(application)
                 .leftJoin(applicationStage).on(applicationStage.application.id.eq(application.id)
                         .and(applicationStage.stageType.eq(application.currentStageType))
-                ).leftJoin(schedule).on(schedule.application.id.eq(application.id)
-                        .and(schedule.stageType.eq(application.currentStageType))
-                        // 가장 빠른 일정만
-                        .and(schedule.startedAt.eq(
-                                JPAExpressions
-                                        .select(schedule.startedAt.min())
+                )
+                .leftJoin(schedule).on(schedule.applicationStage.id.eq(applicationStage.id)
+                        .and(schedule.status.eq(EntityStatus.ACTIVE))
+                        .and(schedule.id.eq(
+                                JPAExpressions.select(schedule.id.max())
                                         .from(schedule)
-                                        .where(schedule.application.id.eq(application.id)
-                                                .and(schedule.stageType.eq(application.currentStageType)))
-                        )))
+                                        .where(schedule.applicationStage.id.eq(applicationStage.id)
+                                                .and(schedule.status.eq(EntityStatus.ACTIVE))
+                                        )
+                        ))
+                )
                 .where(
                         memberEq(memberId),
                         searchByKeyword(searchCondition.query()),
@@ -79,20 +80,23 @@ public class ApplicationQueryDslRepository {
     public List<BeforeDeadlineApplicationResponse> findBeforeDeadLineFromApplication(
             Long authorId,
             StageType stageType,
-            LocalDate today,
+            LocalDateTime today,
             Cursor cursor
     ) {
         return jpaQueryFactory.select(Projections.constructor(BeforeDeadlineApplicationResponse.class,
                                 application.id.as("applicationId"),
                                 application.company,
                                 application.position,
-                                application.submittedAt,
                                 application.deadline,
-                                applicationStage.submissionStatus
+                                application.applicationMethod,
+                                schedule.submissionStatus
                         )
                 ).from(application)
                 .join(applicationStage).on(applicationStage.application.id.eq(application.id)
                         .and(applicationStage.stageType.eq(application.currentStageType))
+                )
+                .leftJoin(schedule).on(schedule.applicationStage.id.eq(applicationStage.id)
+                        .and(schedule.status.eq(EntityStatus.ACTIVE))
                 )
                 .where(
                         cursorCondition(cursor.lastCursorId()),
@@ -113,8 +117,8 @@ public class ApplicationQueryDslRepository {
         return application.id.lt(lastCursorId);
     }
 
-    private BooleanExpression deadlineGoe(LocalDate today) {
-        today = today == null ? LocalDate.now() : today;
+    private BooleanExpression deadlineGoe(LocalDateTime today) {
+        today = today == null ? LocalDateTime.now() : today;
 
         return application.deadline.goe(today);
     }
@@ -159,7 +163,7 @@ public class ApplicationQueryDslRepository {
             return null;
         }
 
-        return applicationStage.submissionStatus.in(submissionStatus);
+        return schedule.submissionStatus.in(submissionStatus);
     }
 
     private BooleanExpression searchByStageResult(List<StageResult> stageResults) {
@@ -169,7 +173,7 @@ public class ApplicationQueryDslRepository {
 
         return stageResults.stream()
                 .map(stageResult -> switch (stageResult) {
-                    case STAGE_PASS -> applicationStage.stageStatus.eq(StageStatus.PASS);
+                    case STAGE_PASS -> schedule.scheduleResult.eq(ScheduleResult.PASS);
                     case FINAL_PASS -> application.applicationStatus.eq(ApplicationStatus.FINAL_PASS);
                     case FINAL_FAIL -> application.applicationStatus.eq(ApplicationStatus.FINAL_FAIL);
                 })
