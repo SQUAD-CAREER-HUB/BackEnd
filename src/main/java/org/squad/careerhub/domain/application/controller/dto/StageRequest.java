@@ -27,7 +27,7 @@ public record StageRequest(
 
         @Schema(description = "기타 전형 일정 (기타 전형일 때만 입력)")
         @Valid
-        EtcScheduleCreateRequest etcSchedule,
+        List<@NotNull EtcScheduleCreateRequest> etcSchedules,
 
         @Schema(description = "면접 일정 리스트 (면접 전형일 때만 입력)")
         @Valid
@@ -39,17 +39,18 @@ public record StageRequest(
                 .stageType(stageType)
                 .submissionStatus(submissionStatus)
                 .finalApplicationStatus(finalApplicationStatus)
-                .newEtcSchedule(toNewEtcSchedule())
+                .newEtcSchedules(toNewEtcSchedules())
                 .newInterviewSchedules(toNewInterviewSchedules())
                 .build();
     }
 
-    private NewEtcSchedule toNewEtcSchedule() {
-        if (etcSchedule == null) {
-            return null;
+    private List<NewEtcSchedule> toNewEtcSchedules() {
+        if (etcSchedules == null) {
+            return List.of();
         }
-
-        return etcSchedule.toNewEtcSchedule();
+        return etcSchedules.stream()
+                .map(EtcScheduleCreateRequest:: toNewEtcSchedule)
+                .toList();
     }
 
     private List<NewInterviewSchedule> toNewInterviewSchedules() {

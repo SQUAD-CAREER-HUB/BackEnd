@@ -13,7 +13,7 @@ public record NewStage(
         StageType stageType,
         SubmissionStatus submissionStatus,
         ApplicationStatus finalApplicationStatus,
-        NewEtcSchedule newEtcSchedule,
+        List<NewEtcSchedule> newEtcSchedules,
         List<NewInterviewSchedule> newInterviewSchedules
 ) {
 

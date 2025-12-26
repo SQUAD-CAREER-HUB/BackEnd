@@ -3,11 +3,9 @@ package org.squad.careerhub.domain.schedule.controller.dto;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
 import java.time.LocalDateTime;
 import lombok.Builder;
 import org.squad.careerhub.domain.application.entity.StageType;
-import org.squad.careerhub.domain.schedule.enums.InterviewType;
 import org.squad.careerhub.domain.schedule.service.dto.ApplicationInfo;
 import org.squad.careerhub.domain.schedule.service.dto.NewInterviewSchedule;
 
@@ -37,7 +35,6 @@ public record InterviewScheduleCreateRequest(
     @Schema(description = "면접 장소 (온라인일 경우 '온라인 면접 링크 입력')", example = "서울 강남구 OO 빌딩 3층 회의실 | https://zoom.us/j/123456789")
     @NotBlank(message = "면접 장소는 필수 값입니다.")
     String location
-
     ) {
 
     public NewInterviewSchedule toNewInterviewSchedule() {

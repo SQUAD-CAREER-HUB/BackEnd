@@ -3,6 +3,7 @@ package org.squad.careerhub.domain.application.repository;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.squad.careerhub.domain.application.entity.Application;
 import org.squad.careerhub.domain.application.entity.ApplicationStage;
 import org.squad.careerhub.domain.application.entity.StageType;
 
@@ -10,4 +11,5 @@ public interface ApplicationStageJpaRepository extends JpaRepository<Application
 
     List<ApplicationStage> findByApplicationId(Long applicationId);
     Optional<ApplicationStage> findByApplicationIdAndStageType(Long applicationId, StageType stageType);
+    boolean existsByApplicationAndStageType(Application application, StageType stageType);
 }

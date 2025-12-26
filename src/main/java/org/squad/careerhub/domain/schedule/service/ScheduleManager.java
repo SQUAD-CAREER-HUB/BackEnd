@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.squad.careerhub.domain.application.entity.Application;
 import org.squad.careerhub.domain.application.entity.ApplicationStage;
+import org.squad.careerhub.domain.application.entity.ScheduleResult;
 import org.squad.careerhub.domain.application.entity.StageType;
 import org.squad.careerhub.domain.application.repository.ApplicationStageJpaRepository;
 import org.squad.careerhub.domain.schedule.entity.Schedule;
@@ -31,27 +32,34 @@ public class ScheduleManager {
 
         app.updateCurrentStageType(StageType.INTERVIEW);
 
-        Schedule schedule = Schedule.createInterview(
+        Schedule schedule = Schedule.register(
+            app.getAuthor(),
             stage,
             requireNonNull(cmd.scheduleName()),
+            cmd.location(),
+            ScheduleResult.WAITING,
+            null,
             requireNonNull(cmd.startedAt()),
-            cmd.location()
+            null
         );
-
         return scheduleJpaRepository.save(schedule);
     }
 
-    public void createInterviewSchedules(Application app, List<NewInterviewSchedule> cmds) {
+    public void createInterviewSchedules(Application app, List<NewInterviewSchedule> cmds){
         ApplicationStage stage = getOrCreateStage(app, StageType.INTERVIEW);
 
         app.updateCurrentStageType(StageType.INTERVIEW);
 
         List<Schedule> schedules = cmds.stream()
-            .map(cmd -> Schedule.createInterview(
+            .map(cmd -> Schedule.register(
+                app.getAuthor(),
                 stage,
                 requireNonNull(cmd.scheduleName()),
+                cmd.location(),
+                ScheduleResult.WAITING,
+                null,
                 requireNonNull(cmd.startedAt()),
-                cmd.location()
+                null
             ))
             .toList();
 
@@ -60,12 +68,15 @@ public class ScheduleManager {
 
     public Schedule createEtcSchedule(Application app, NewEtcSchedule cmd) {
         ApplicationStage stage = getOrCreateStage(app, StageType.ETC);
-
         app.updateCurrentStageType(StageType.ETC);
 
-        Schedule schedule = Schedule.createEtc(
+        Schedule schedule = Schedule.register(
+            app.getAuthor(),
             stage,
             requireNonNull(cmd.scheduleName()),
+            null,
+            ScheduleResult.WAITING,
+            null,
             requireNonNull(cmd.startedAt()),
             cmd.endedAt()
         );
@@ -82,9 +93,7 @@ public class ScheduleManager {
                 try {
                     ApplicationStage created = ApplicationStage.create(
                         app,
-                        stageType,
-                        stageType.getDescription(), // StageName은 삭제될 것으로 알고 있음. 추후 수정
-                        null
+                        stageType
                     );
                     return applicationStageJpaRepository.save(created);
                 } catch (DataIntegrityViolationException e) {
