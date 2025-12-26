@@ -3,7 +3,7 @@ package org.squad.careerhub.domain.schedule.service.dto;
 import java.time.LocalDateTime;
 import lombok.Builder;
 import org.squad.careerhub.domain.application.entity.ApplicationStatus;
-import org.squad.careerhub.domain.application.entity.StageStatus;
+import org.squad.careerhub.domain.application.entity.ScheduleResult;
 import org.squad.careerhub.domain.application.entity.StageType;
 import org.squad.careerhub.domain.application.entity.SubmissionStatus;
 import org.squad.careerhub.domain.schedule.enums.InterviewType;
@@ -25,7 +25,7 @@ public record ScheduleItemResponse(
     LocalDateTime datetime,
     String location,
     String link,
-    StageStatus result,
+    ScheduleResult scheduleResult,
     ApplicationStatus applicationStatus,
 
     /**
@@ -47,7 +47,7 @@ public record ScheduleItemResponse(
             .datetime(LocalDateTime.parse("2025-12-13T14:00:00"))
             .location(null)
             .link("https://example.com/coding-test")
-            .result(StageStatus.WAITING)
+            .scheduleResult(ScheduleResult.WAITING)
             .build();
     }
 
@@ -59,7 +59,7 @@ public record ScheduleItemResponse(
             .companyName("삼성전자")
             .datetime(LocalDateTime.parse("2025-12-05T09:00:00"))
             .link("https://example.com/job-posting/101")
-            .result(StageStatus.PASS)
+            .scheduleResult(ScheduleResult.PASS)
             .submissionStatus(SubmissionStatus.SUBMITTED) // DOCUMENT만 존재
             .build();
     }
@@ -75,7 +75,7 @@ public record ScheduleItemResponse(
             .datetime(LocalDateTime.parse("2025-12-06T14:00:00"))
             .location("온라인")
             .link("https://zoom.us/j/123456789")
-            .result(StageStatus.WAITING)
+            .scheduleResult(ScheduleResult.WAITING)
             .build();
     }
 
@@ -86,7 +86,7 @@ public record ScheduleItemResponse(
             .applicationId(104L)
             .companyName("크래프톤")
             .datetime(LocalDateTime.parse("2025-12-29T10:00:00"))
-            .result(StageStatus.PASS)
+            .scheduleResult(ScheduleResult.PASS)
             .applicationStatus(ApplicationStatus.FINAL_PASS)
             .build();
     }
