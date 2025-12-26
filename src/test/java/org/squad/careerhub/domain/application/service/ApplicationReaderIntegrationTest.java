@@ -670,7 +670,7 @@ class ApplicationReaderIntegrationTest extends IntegrationTestSupport {
     }
 
     @Test
-    void 다가올_면접_일정이_포함되어_조회된다() {
+    void 최신으로_등록된_면접_일정이_포함되어_조회된다() {
         // given
         var baseTime = now();
         var techInterview = new NewInterviewSchedule("기술 면접", InterviewType.TECH, baseTime.plusDays(1), "판교");
