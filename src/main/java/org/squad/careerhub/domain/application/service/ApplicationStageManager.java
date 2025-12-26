@@ -30,7 +30,7 @@ public class ApplicationStageManager {
         if (!stageType.isDocument() && !hasDocumentStage(application)) {
             applicationStageJpaRepository.save(ApplicationStage.create(
                     application,
-                    StageType.INTERVIEW
+                    StageType.DOCUMENT
             ));
         }
 
