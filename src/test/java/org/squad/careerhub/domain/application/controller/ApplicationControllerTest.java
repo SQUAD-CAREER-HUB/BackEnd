@@ -103,7 +103,6 @@ class ApplicationControllerTest extends ControllerTestSupport {
                         ApplicationInfoRequest.builder()
                                 .applicationMethod(ApplicationMethod.HOMEPAGE)
                                 .deadline(LocalDate.of(2025, 3, 25))
-                                .submittedAt(LocalDate.of(2025, 3, 20))
                                 .build()
                 )
                 .stage(
