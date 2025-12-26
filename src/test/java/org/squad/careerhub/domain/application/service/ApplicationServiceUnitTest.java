@@ -44,7 +44,7 @@ class ApplicationServiceUnitTest extends TestDoubleSupport {
     @InjectMocks
     ApplicationService applicationService;
 
-    @MockitoBean
+    @Mock
     ScheduleManager scheduleManager;
 
     @Test
