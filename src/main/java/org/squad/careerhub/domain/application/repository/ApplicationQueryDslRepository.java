@@ -10,6 +10,7 @@ import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
@@ -80,18 +81,23 @@ public class ApplicationQueryDslRepository {
     public List<BeforeDeadlineApplicationResponse> findBeforeDeadLineFromApplication(
             Long authorId,
             StageType stageType,
-            LocalDate today,
+            LocalDateTime today,
             Cursor cursor
     ) {
         return jpaQueryFactory.select(Projections.constructor(BeforeDeadlineApplicationResponse.class,
                                 application.id.as("applicationId"),
                                 application.company,
                                 application.position,
-                                application.deadline
+                                application.deadline,
+                                application.applicationMethod,
+                                schedule.submissionStatus
                         )
                 ).from(application)
                 .join(applicationStage).on(applicationStage.application.id.eq(application.id)
                         .and(applicationStage.stageType.eq(application.currentStageType))
+                )
+                .leftJoin(schedule).on(schedule.applicationStage.id.eq(applicationStage.id)
+                        .and(schedule.status.eq(EntityStatus.ACTIVE))
                 )
                 .where(
                         cursorCondition(cursor.lastCursorId()),
@@ -112,8 +118,8 @@ public class ApplicationQueryDslRepository {
         return application.id.lt(lastCursorId);
     }
 
-    private BooleanExpression deadlineGoe(LocalDate today) {
-        today = today == null ? LocalDate.now() : today;
+    private BooleanExpression deadlineGoe(LocalDateTime today) {
+        today = today == null ? LocalDateTime.now() : today;
 
         return application.deadline.goe(today);
     }

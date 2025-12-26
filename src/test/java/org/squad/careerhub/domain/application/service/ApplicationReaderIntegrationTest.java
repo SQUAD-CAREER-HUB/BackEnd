@@ -969,26 +969,26 @@ class ApplicationReaderIntegrationTest extends IntegrationTestSupport {
     @Test
     void 마감_되지_않은_서류_전형_지원서를_조회한다() {
         // given
-        Application app1 = createApplication(NewStage.builder()
+        var app1 = createApplication(NewStage.builder()
                         .stageType(StageType.DOCUMENT)
                         .submissionStatus(SubmissionStatus.SUBMITTED)
                         .newInterviewSchedules(List.of())
                         .build(),
-                LocalDateTime.now().minusDays(1)
+                now().minusDays(1)
         );
         var app2 = createApplication(NewStage.builder()
                         .stageType(StageType.DOCUMENT)
                         .submissionStatus(SubmissionStatus.NOT_SUBMITTED)
                         .newInterviewSchedules(List.of())
                         .build(),
-                LocalDateTime.now().plusDays(1)
+                now().plusDays(1)
         );
         var app3 = createApplication(NewStage.builder()
                         .stageType(StageType.DOCUMENT)
                         .submissionStatus(SubmissionStatus.SUBMITTED)
                         .newInterviewSchedules(List.of())
                         .build(),
-                LocalDateTime.now().plusDays(2)
+                now().plusDays(2)
         );
 
         createApplicationSchedule(
@@ -1014,7 +1014,7 @@ class ApplicationReaderIntegrationTest extends IntegrationTestSupport {
                 StageType.DOCUMENT.getDescription(),
                 null,
                 ScheduleResult.WAITING,
-                SubmissionStatus.SUBMITTED,
+                SubmissionStatus.NOT_SUBMITTED,
                 now(),
                 now().plusDays(1)
         );
@@ -1033,7 +1033,7 @@ class ApplicationReaderIntegrationTest extends IntegrationTestSupport {
 
         // 모든 지원서의 데드라인이 미래인지 검증
         assertThat(response.contents())
-                .allMatch(app -> !app.deadline().isBefore(LocalDate.now()));
+                .allMatch(app -> !app.deadline().isBefore(now()));
 
         // 제출 상태 검증
         assertThat(response.contents()).hasSize(2)

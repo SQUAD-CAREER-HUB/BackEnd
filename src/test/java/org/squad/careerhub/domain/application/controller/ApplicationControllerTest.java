@@ -8,7 +8,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import org.junit.jupiter.api.Test;
@@ -74,7 +73,7 @@ class ApplicationControllerTest extends ControllerTestSupport {
                                 1L,
                                 "c",
                                 "p",
-                                LocalDate.now(),
+                                LocalDateTime.now(),
                                 ApplicationMethod.EMAIL,
                                 SubmissionStatus.SUBMITTED))
                         )
