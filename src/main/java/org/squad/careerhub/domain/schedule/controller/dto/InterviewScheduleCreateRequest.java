@@ -39,7 +39,7 @@ public record InterviewScheduleCreateRequest(
 
     public NewInterviewSchedule toNewInterviewSchedule() {
         return NewInterviewSchedule.builder()
-                .name(name)
+                .stageName(name)
                 .type(type)
                 .scheduledAt(scheduledAt)
                 .location(location)
