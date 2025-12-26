@@ -16,10 +16,6 @@ public record ApplicationInfoRequest(
         @NotNull(message = "마감일은 필수 입력 항목입니다.")
         LocalDate deadline,
 
-        @Schema(description = "제출일", example = "2025.03.25", type = "string", pattern = "yyyy.MM.dd")
-        @JsonFormat(pattern = "yyyy.MM.dd")
-        LocalDate submittedAt,
-
         @Schema(description = "지원 방법", example = "HOMEPAGE")
         @NotNull(message = "지원 방법은 필수 입력 항목입니다.")
         ApplicationMethod applicationMethod
@@ -28,7 +24,6 @@ public record ApplicationInfoRequest(
     public NewApplicationInfo toNewApplicationInfo() {
         return NewApplicationInfo.builder()
                 .deadline(deadline)
-                .submittedAt(submittedAt)
                 .applicationMethod(applicationMethod)
                 .build();
     }

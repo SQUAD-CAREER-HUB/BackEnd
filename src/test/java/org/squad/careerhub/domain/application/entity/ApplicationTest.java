@@ -29,8 +29,7 @@ class ApplicationTest {
                 StageType.DOCUMENT,
                 ApplicationStatus.FINAL_FAIL,
                 ApplicationMethod.EMAIL,
-                LocalDate.of(2024, 12, 31),
-                LocalDate.of(2024, 10, 1)
+                LocalDate.of(2024, 12, 31)
         );
         // then
         assertThat(application).extracting(
@@ -43,7 +42,6 @@ class ApplicationTest {
                 Application::getApplicationStatus,
                 Application::getApplicationMethod,
                 Application::getDeadline,
-                Application::getSubmittedAt,
                 Application::getMemo
         ).containsExactly(
                 author,
@@ -55,7 +53,6 @@ class ApplicationTest {
                 ApplicationStatus.IN_PROGRESS,
                 ApplicationMethod.EMAIL,
                 LocalDate.of(2024, 12, 31),
-                LocalDate.of(2024, 10, 1),
                 null
         );
     }
@@ -72,8 +69,7 @@ class ApplicationTest {
                 StageType.APPLICATION_CLOSE,
                 ApplicationStatus.FINAL_PASS,
                 ApplicationMethod.EMAIL,
-                LocalDate.of(2024, 12, 31),
-                LocalDate.of(2024, 10, 1)
+                LocalDate.of(2024, 12, 31)
         );
         // then
         assertThat(application).extracting(
@@ -86,7 +82,6 @@ class ApplicationTest {
                 Application::getApplicationStatus,
                 Application::getApplicationMethod,
                 Application::getDeadline,
-                Application::getSubmittedAt,
                 Application::getMemo
         ).containsExactly(
                 author,
@@ -98,7 +93,6 @@ class ApplicationTest {
                 ApplicationStatus.FINAL_PASS,
                 ApplicationMethod.EMAIL,
                 LocalDate.of(2024, 12, 31),
-                LocalDate.of(2024, 10, 1),
                 null
         );
     }

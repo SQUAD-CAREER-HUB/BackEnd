@@ -40,8 +40,7 @@ public class ApplicationManager {
                 newStage.stageType(),
                 newStage.finalApplicationStatus(),
                 newApplicationInfo.applicationMethod(),
-                newApplicationInfo.deadline(),
-                newApplicationInfo.submittedAt()
+                newApplicationInfo.deadline()
         ));
 
         createStageIfNotClose(application, newStage);

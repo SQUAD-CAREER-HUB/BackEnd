@@ -93,8 +93,7 @@ class ApplicationManagerUnitTest extends TestDoubleSupport {
     private NewApplicationInfo createNewApplicationInfo() {
         return new NewApplicationInfo(
                 ApplicationMethod.EMAIL,
-                LocalDate.of(2020, 1, 1),
-                LocalDate.of(2020, 2, 1)
+                LocalDate.of(2020, 1, 1)
         );
     }
 
@@ -117,8 +116,7 @@ class ApplicationManagerUnitTest extends TestDoubleSupport {
                 newStage.stageType(),
                 newStage.finalApplicationStatus(),
                 newApplicationInfo.applicationMethod(),
-                newApplicationInfo.deadline(),
-                newApplicationInfo.submittedAt()
+                newApplicationInfo.deadline()
         );
     }
 

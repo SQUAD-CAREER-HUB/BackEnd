@@ -49,8 +49,6 @@ public class Application extends BaseEntity {
     @Column(nullable = false)
     private LocalDate deadline;
 
-    private LocalDate submittedAt;
-
     @Column(length = 5000)
     private String memo;
 
@@ -63,8 +61,7 @@ public class Application extends BaseEntity {
             StageType currentStageType,
             ApplicationStatus applicationStatus,
             ApplicationMethod applicationMethod,
-            LocalDate deadline,
-            LocalDate submittedAt
+            LocalDate deadline
     ) {
         ApplicationStatus currentApplicationStatus = currentStageType == StageType.APPLICATION_CLOSE ?
                 applicationStatus : ApplicationStatus.IN_PROGRESS;
@@ -79,7 +76,6 @@ public class Application extends BaseEntity {
         application.applicationStatus = currentApplicationStatus;
         application.applicationMethod = requireNonNull(applicationMethod);
         application.deadline = requireNonNull(deadline);
-        application.submittedAt = submittedAt;
         application.memo = null;
 
         return application;
@@ -92,7 +88,6 @@ public class Application extends BaseEntity {
             String jobLocation,
             ApplicationMethod applicationMethod,
             LocalDate deadline,
-            LocalDate submittedAt,
             String memo
     ) {
         this.jobPostingUrl = jobPostingUrl;
@@ -101,7 +96,6 @@ public class Application extends BaseEntity {
         this.jobLocation = requireNonNull(jobLocation);
         this.applicationMethod = requireNonNull(applicationMethod);
         this.deadline = requireNonNull(deadline);
-        this.submittedAt = submittedAt;
         this.memo = memo;
     }
 
