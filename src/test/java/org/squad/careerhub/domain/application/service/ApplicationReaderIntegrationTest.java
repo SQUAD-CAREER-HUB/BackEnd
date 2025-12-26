@@ -112,7 +112,7 @@ class ApplicationReaderIntegrationTest extends IntegrationTestSupport {
                 null,
                 ScheduleResult.WAITING,
                 null,
-                baseTime.plusDays(1),
+                baseTime,
                 baseTime.plusDays(3)
         );
         NewEtcSchedule codingTest = new NewEtcSchedule("코딩 테스트", baseTime, baseTime.plusHours(1));
@@ -1104,11 +1104,11 @@ class ApplicationReaderIntegrationTest extends IntegrationTestSupport {
     }
 
     private Application createApplication(String position, NewStage newStage) {
-        return createApplication("company", position, newStage, LocalDateTime.now().plusDays(10));
+        return createApplication("company", position, newStage, now().plusDays(10));
     }
 
     private Application createApplication(String company, String position, NewStage newStage) {
-        return createApplication(company, position, newStage, LocalDateTime.now().plusDays(10));
+        return createApplication(company, position, newStage, now().plusDays(10));
     }
 
     private Application createApplication(NewStage newStage, LocalDateTime deadline) {
