@@ -14,20 +14,11 @@ public record ScheduleItemResponse(
     StageType stageType,
     Long applicationId,
     String companyName,
-
-    /**
-     * ETC(기타 전형)일 때만 값이 존재
-     * DOCUMENT/INTERVIEW/APPLICATION_CLOSE 는 null
-     */
-    String stageName,
-    InterviewType interviewType,
-    String typeDetail,
-    LocalDateTime datetime,
+    String scheduleName,
     String location,
-    String link,
+    LocalDateTime startedAt,
     ScheduleResult scheduleResult,
     ApplicationStatus applicationStatus,
-
     /**
      * DOCUMENT(서류 전형)일 때만 값이 존재
      * 그 외는 null
@@ -41,13 +32,10 @@ public record ScheduleItemResponse(
             .stageType(StageType.ETC)
             .applicationId(103L)
             .companyName("네이버")
-            .stageName("온라인 코딩 테스트") // ETC만 존재
-            .interviewType(InterviewType.TEST)
-            .typeDetail(null)
-            .datetime(LocalDateTime.parse("2025-12-13T14:00:00"))
+            .scheduleName("온라인 코딩 테스트") // ETC만 존재
+            .startedAt(LocalDateTime.parse("2025-12-13T14:00:00"))
             .location(null)
-            .link("https://example.com/coding-test")
-            .scheduleResult(ScheduleResult.WAITING)
+            .scheduleResult(org.squad.careerhub.domain.application.entity.ScheduleResult.WAITING)
             .build();
     }
 
@@ -57,9 +45,8 @@ public record ScheduleItemResponse(
             .stageType(StageType.DOCUMENT)
             .applicationId(101L)
             .companyName("삼성전자")
-            .datetime(LocalDateTime.parse("2025-12-05T09:00:00"))
-            .link("https://example.com/job-posting/101")
-            .scheduleResult(ScheduleResult.PASS)
+            .startedAt(LocalDateTime.parse("2025-12-05T09:00:00"))
+            .scheduleResult(org.squad.careerhub.domain.application.entity.ScheduleResult.PASS)
             .submissionStatus(SubmissionStatus.SUBMITTED) // DOCUMENT만 존재
             .build();
     }
@@ -70,12 +57,10 @@ public record ScheduleItemResponse(
             .stageType(StageType.INTERVIEW)
             .applicationId(102L)
             .companyName("당근마켓")
-            .interviewType(InterviewType.TECH)
-            .typeDetail("1차 화상 면접")
-            .datetime(LocalDateTime.parse("2025-12-06T14:00:00"))
+            .scheduleName("1차 면접")
+            .startedAt(LocalDateTime.parse("2025-12-06T14:00:00"))
             .location("온라인")
-            .link("https://zoom.us/j/123456789")
-            .scheduleResult(ScheduleResult.WAITING)
+            .scheduleResult(org.squad.careerhub.domain.application.entity.ScheduleResult.WAITING)
             .build();
     }
 
@@ -85,8 +70,8 @@ public record ScheduleItemResponse(
             .stageType(StageType.APPLICATION_CLOSE)
             .applicationId(104L)
             .companyName("크래프톤")
-            .datetime(LocalDateTime.parse("2025-12-29T10:00:00"))
-            .scheduleResult(ScheduleResult.PASS)
+            .startedAt(LocalDateTime.parse("2025-12-29T10:00:00"))
+            .scheduleResult(org.squad.careerhub.domain.application.entity.ScheduleResult.PASS)
             .applicationStatus(ApplicationStatus.FINAL_PASS)
             .build();
     }
