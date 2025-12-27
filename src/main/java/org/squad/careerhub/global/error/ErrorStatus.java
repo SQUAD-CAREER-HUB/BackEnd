@@ -66,9 +66,6 @@ public enum ErrorStatus {
     NOT_FOUND_SCHEDULE                 (404, "일정을 찾을 수 없습니다."),
     INVALID_SCHEDULE_AUTHOR_MISMATCH   (403, "일정 작성자가 지원서 작성자와 일치하지 않습니다."),
     INVALID_SUBMISSION_STATUS_RULE     (400, "서류 전형(DOCUMENT)에서만 제출 상태를 설정할 수 있습니다."),
-    INVALID_APPLICATION_STATUS_RULE    (400, "지원 종료(APPLICATION_CLOSE)에서만 지원 상태를 설정할 수 있습니다."),
-    INVALID_INTERVIEW_TYPE_RULE        (400, "면접 전형(INTERVIEW)에서만 면접 유형을 설정할 수 있습니다."),
-    INVALID_INTERVIEW_TYPE_DETAIL_RULE (400, "면접 유형 상세는 면접 유형이 있을 때만 설정할 수 있습니다.")
 
     ;
 

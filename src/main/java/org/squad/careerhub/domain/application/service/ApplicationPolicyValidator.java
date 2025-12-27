@@ -22,6 +22,11 @@ public class ApplicationPolicyValidator {
         if (!newStage.newInterviewSchedules().isEmpty() && !newStage.stageType().isInterview()) {
             throw new CareerHubException(ErrorStatus.INVALID_SCHEDULE_TYPE_RULE);
         }
+
+        // 지원서 최종 상태는 지원 종료 단계에서만 입력 가능
+        if (newStage.finalApplicationStatus() != null && !newStage.stageType().isApplicationClose()) {
+            throw new CareerHubException(ErrorStatus.INVALID_FINAL_APPLICATION_STATUS_RULE);
+        }
     }
 
 }

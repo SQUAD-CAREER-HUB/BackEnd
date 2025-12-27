@@ -28,7 +28,7 @@ class ApplicationPolicyValidatorTest extends TestDoubleSupport {
         var etcNewStage = new NewStage(
             StageType.ETC,
             null,
-            ApplicationStatus.IN_PROGRESS,
+            null,
             Collections.singletonList(
                 new NewEtcSchedule(StageType.ETC, "코딩 테스트", LocalDateTime.now(), null)),
             List.of()
@@ -37,7 +37,7 @@ class ApplicationPolicyValidatorTest extends TestDoubleSupport {
         var documentStage = new NewStage(
             StageType.DOCUMENT,
             SubmissionStatus.SUBMITTED,
-            ApplicationStatus.IN_PROGRESS,
+            null,
             Collections.singletonList(new NewEtcSchedule(
                 StageType.ETC,
                 "코딩테스트",
@@ -50,18 +50,14 @@ class ApplicationPolicyValidatorTest extends TestDoubleSupport {
         var interviewStage = NewStage.builder()
                 .stageType(StageType.INTERVIEW)
                 .newEtcSchedules(List.of(new NewEtcSchedule(StageType.ETC, "코딩 테스트", LocalDateTime.now(), LocalDateTime.now().plusDays(2))))
-                .newInterviewSchedules(
-                    List.of(new NewInterviewSchedule(StageType.INTERVIEW, "1차 면접", LocalDateTime.now(), "서울 본사"))
-                )
+                .newInterviewSchedules(List.of())
                 .build();
 
         var finalStage = NewStage.builder()
                 .stageType(StageType.APPLICATION_CLOSE)
                 .finalApplicationStatus(ApplicationStatus.FINAL_PASS)
                 .newEtcSchedules(List.of(new NewEtcSchedule(StageType.ETC, "코딩 테스트", LocalDateTime.now(), LocalDateTime.now().plusDays(2))))
-                .newInterviewSchedules(
-                    List.of(new NewInterviewSchedule(StageType.INTERVIEW, "1차 면접", LocalDateTime.now(), "서울 본사"))
-                )
+                .newInterviewSchedules(List.of())
                 .build();
 
         // when & then
@@ -89,6 +85,7 @@ class ApplicationPolicyValidatorTest extends TestDoubleSupport {
                 .newInterviewSchedules(
                         List.of(new NewInterviewSchedule(StageType.INTERVIEW, "1차 면접", LocalDateTime.now(), "서울 본사"))
                 )
+                .newEtcSchedules(List.of())
                 .build();
 
         var documentStage = NewStage.builder()
@@ -97,6 +94,7 @@ class ApplicationPolicyValidatorTest extends TestDoubleSupport {
                 .newInterviewSchedules(
                         List.of(new NewInterviewSchedule(StageType.INTERVIEW, "1차 면접", LocalDateTime.now(), "서울 본사"))
                 )
+                .newEtcSchedules(List.of())
                 .build();
 
         var interviewStage = NewStage.builder()
@@ -104,6 +102,7 @@ class ApplicationPolicyValidatorTest extends TestDoubleSupport {
                 .newInterviewSchedules(
                         List.of(new NewInterviewSchedule(StageType.INTERVIEW, "1차 면접", LocalDateTime.now(), "서울 본사"))
                 )
+                .newEtcSchedules(List.of())
                 .build();
 
         var finalStage = NewStage.builder()

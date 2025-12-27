@@ -41,7 +41,6 @@ public class ApplicationQueryDslRepository {
                         application.company,
                         application.position,
                         application.currentStageType,
-                        applicationStage.stageType.as("currentStageStatus"),
                         application.applicationStatus,
                         application.deadline,
                         application.applicationMethod,
