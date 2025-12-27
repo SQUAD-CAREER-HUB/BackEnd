@@ -1,6 +1,7 @@
 package org.squad.careerhub.domain.archive.controller;
 
 import jakarta.validation.Valid;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.squad.careerhub.domain.archive.controller.dto.PersonalQuestionCreateRequest;
 import org.squad.careerhub.domain.archive.controller.dto.PersonalQuestionUpdateRequest;
 import org.squad.careerhub.domain.archive.service.QuestionArchiveService;
+import org.squad.careerhub.domain.archive.service.dto.ApplicationQuestionArchiveResponse;
 import org.squad.careerhub.domain.archive.service.dto.PersonalQuestionPageResponse;
 import org.squad.careerhub.domain.archive.service.dto.PersonalQuestionResponse;
 import org.squad.careerhub.global.annotation.LoginMember;
@@ -46,6 +48,20 @@ public class QuestionArchiveController extends QuestionArchiveDocsController {
     ) {
         return ResponseEntity.ok(PersonalQuestionPageResponse.archiveMock());
     }
+
+    @GetMapping("/applications/{applicationId}/archived-questions")
+    public ResponseEntity<List<ApplicationQuestionArchiveResponse>> getArchivedQuestionsFromApplication(
+            @PathVariable Long applicationId,
+            @LoginMember Long memberId
+    ) {
+        List<ApplicationQuestionArchiveResponse> responses = questionArchiveService.findArchivedQuestionsByApplication(
+                applicationId,
+                memberId
+        );
+
+        return ResponseEntity.ok(responses);
+    }
+
 
     @Override
     @DeleteMapping("/archive/questions/{questionId}")

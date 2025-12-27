@@ -136,6 +136,10 @@ public class ApplicationReader {
         return new PageResponse<>(finalResponses, hasNext, nextCursorId);
     }
 
+    public boolean existByIdAndAuthorId(Long applicationId, Long memberId) {
+        return applicationJpaRepository.existsByIdAndAuthorId(applicationId, memberId);
+    }
+
     private <T> boolean hasNextPage(List<T> applications, int limit) {
         return applications.size() > limit;
     }
