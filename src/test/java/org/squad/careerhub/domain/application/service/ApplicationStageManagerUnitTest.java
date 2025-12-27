@@ -20,6 +20,7 @@ import org.squad.careerhub.domain.application.entity.StageType;
 import org.squad.careerhub.domain.application.entity.SubmissionStatus;
 import org.squad.careerhub.domain.application.repository.ApplicationStageJpaRepository;
 import org.squad.careerhub.domain.schedule.service.ScheduleManager;
+import org.squad.careerhub.domain.schedule.service.dto.NewDocumentSchedule;
 import org.squad.careerhub.domain.schedule.service.dto.NewEtcSchedule;
 import org.squad.careerhub.domain.application.service.dto.NewStage;
 
@@ -57,7 +58,9 @@ class ApplicationStageManagerUnitTest extends TestDoubleSupport {
         // then
         assertThat(result.getStageType()).isEqualTo(StageType.DOCUMENT);
         verify(applicationStageJpaRepository, times(1)).save(any());
-        verify(scheduleManager, times(1)).createDocumentSchedule(testApplication, any());
+        verify(scheduleManager, times(1)).createDocumentSchedule(testApplication,
+            new NewDocumentSchedule(documentNewStage.stageType(), testApplication.getDeadline(),
+                documentNewStage.submissionStatus()));
     }
 
     @Test
@@ -76,7 +79,7 @@ class ApplicationStageManagerUnitTest extends TestDoubleSupport {
         // then
         assertThat(applicationStage.getStageType()).isEqualTo(StageType.INTERVIEW);
         verify(applicationStageJpaRepository, times(2)).save(any());
-        verify(scheduleManager, times(1)).createInterviewSchedules(testApplication, any());
+        verify(scheduleManager, times(1)).createInterviewSchedules(testApplication, interviewNewStage.newInterviewSchedules());
     }
 
     @Test
