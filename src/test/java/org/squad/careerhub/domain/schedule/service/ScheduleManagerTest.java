@@ -4,9 +4,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -14,6 +14,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.squad.careerhub.TestDoubleSupport;
@@ -45,10 +46,7 @@ class ScheduleManagerTest extends TestDoubleSupport {
     }
 
     private ApplicationStage mockStage(Application app, StageType stageType) {
-        ApplicationStage stage = mock(ApplicationStage.class);
-        when(stage.getStageType()).thenReturn(stageType);
-        when(stage.getApplication()).thenReturn(app);
-        return stage;
+        return mock(ApplicationStage.class);
     }
 
 
@@ -58,11 +56,11 @@ class ScheduleManagerTest extends TestDoubleSupport {
         Application app = mockApplicationWithId(10L);
 
         Member author = mock(Member.class);
-        when(app.getAuthor()).thenReturn(author); // Schedule.createInterview 내부에서 author 필요할 수 있음
+        when(app.getAuthor()).thenReturn(author);
 
         ApplicationStage stage = mockStage(app, StageType.INTERVIEW);
 
-        when(applicationStageJpaRepository.findByApplicationIdAndStageType(10L, StageType.INTERVIEW))
+        when(applicationStageJpaRepository.findByApplicationIdAndStageType(eq(10L), eq(StageType.INTERVIEW)))
             .thenReturn(Optional.of(stage));
 
         NewInterviewSchedule s1 = NewInterviewSchedule.builder()
@@ -82,12 +80,16 @@ class ScheduleManagerTest extends TestDoubleSupport {
         when(scheduleJpaRepository.saveAll(anyList()))
             .thenAnswer(inv -> inv.getArgument(0));
 
-        // when
         scheduleManager.createInterviewSchedules(app, List.of(s1, s2));
 
-        // then
-        verify(scheduleJpaRepository, times(1)).saveAll(anyList());
-        verify(scheduleJpaRepository, never()).save(any(Schedule.class));
+        ArgumentCaptor<List<Schedule>> captor = ArgumentCaptor.forClass(List.class);
+        verify(scheduleJpaRepository).saveAll(captor.capture());
+        verify(scheduleJpaRepository, never()).save(any());
+
+        List<Schedule> saved = captor.getValue();
+        assertThat(saved).hasSize(2);
+        assertThat(saved).extracting(Schedule::getScheduleName)
+            .containsExactlyInAnyOrder("1차", "임원");
     }
 
     @Test
@@ -127,7 +129,6 @@ class ScheduleManagerTest extends TestDoubleSupport {
 
         ApplicationStage stage = mock(ApplicationStage.class);
         when(stage.getStageType()).thenReturn(StageType.ETC);
-        when(stage.getApplication()).thenReturn(app);
 
         when(applicationStageJpaRepository.findByApplicationIdAndStageType(10L, StageType.ETC))
             .thenReturn(Optional.of(stage));
@@ -147,7 +148,7 @@ class ScheduleManagerTest extends TestDoubleSupport {
 
         // then
         verify(scheduleJpaRepository).save(any(Schedule.class));
-        assertThat(saved.getStage().getStageType()).isEqualTo(StageType.ETC);
+        assertThat(saved.getApplicationStage().getStageType()).isEqualTo(StageType.ETC);
         assertThat(saved.getScheduleName()).isEqualTo("과제");
         assertThat(saved.getStartedAt()).isEqualTo(LocalDateTime.of(2025, 12, 5, 23, 59));
     }
