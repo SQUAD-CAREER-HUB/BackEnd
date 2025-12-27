@@ -39,7 +39,6 @@ class ScheduleControllerTest extends ControllerTestSupport {
                 .company("Naver")
                 .position("Backend Developer")
                 .stageType(StageType.INTERVIEW)
-                .stageName("면접")
                 .scheduleName("1차 기술면접")
                 .startedAt(LocalDateTime.of(2025, 12, 10, 19, 0))
                 .endedAt(null)
