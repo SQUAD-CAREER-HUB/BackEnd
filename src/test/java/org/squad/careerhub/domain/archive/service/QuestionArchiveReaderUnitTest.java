@@ -51,7 +51,7 @@ class QuestionArchiveReaderUnitTest extends TestDoubleSupport {
         var questionArchive = QuestionArchive.create(application1, interviewQuestion);
 
         given(applicationReader.existByIdAndAuthorId(any(), any())).willReturn(true);
-        given(questionArchiveJpaRepository.findByApplicationId(any())).willReturn(List.of(questionArchive));
+        given(questionArchiveJpaRepository.findByApplicationIdAndStatus(any(), any())).willReturn(List.of(questionArchive));
 
         // when
         List<QuestionArchive> archivedQuestionsByApplication = questionArchiveReader.findArchivedQuestionsByApplication(1L, 1L);
