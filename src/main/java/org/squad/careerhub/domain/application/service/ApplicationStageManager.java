@@ -9,6 +9,7 @@ import org.squad.careerhub.domain.application.entity.StageType;
 import org.squad.careerhub.domain.application.repository.ApplicationStageJpaRepository;
 import org.squad.careerhub.domain.application.service.dto.NewStage;
 import org.squad.careerhub.domain.schedule.service.ScheduleManager;
+import org.squad.careerhub.domain.schedule.service.dto.NewDocumentSchedule;
 
 @RequiredArgsConstructor
 @Component
@@ -53,7 +54,7 @@ public class ApplicationStageManager {
                 application,
                 StageType.INTERVIEW
         ));
-//        scheduleManager.createInterviewSchedules();
+        scheduleManager.createInterviewSchedules(application, newStage.newInterviewSchedules());
 
         return interviewStage;
     }
@@ -63,7 +64,11 @@ public class ApplicationStageManager {
                 application,
                 StageType.DOCUMENT
         ));
-//        scheduleManager.createDocumentSchedule();
+        scheduleManager.createDocumentSchedule(application,
+            new NewDocumentSchedule(
+                newStage.stageType(),
+                application.getDeadline(),
+                newStage.submissionStatus()));
 
         return documentStage;
     }
@@ -73,7 +78,7 @@ public class ApplicationStageManager {
                 application,
                 newStage.stageType()
         ));
-//        scheduleManager.createEtcSchedule(application, );
+        scheduleManager.createEtcSchedule(application, newStage.newEtcSchedules().getFirst());
 
         return etcStage;
     }
