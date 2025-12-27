@@ -7,7 +7,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import java.time.LocalDateTime;
-import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
@@ -53,7 +52,7 @@ class ScheduleServiceTest extends TestDoubleSupport {
 
         Schedule saved = Mockito.mock(Schedule.class);
         when(saved.getId()).thenReturn(100L);
-        when(saved.getStage()).thenReturn(stage);
+        when(saved.getApplicationStage()).thenReturn(stage);
 
         when(scheduleManager.createInterviewSchedule(eq(app), any(NewInterviewSchedule.class)))
             .thenReturn(saved);
@@ -168,11 +167,10 @@ class ScheduleServiceTest extends TestDoubleSupport {
         ApplicationStage stage = Mockito.mock(ApplicationStage.class);
         when(stage.getApplication()).thenReturn(app);
         when(stage.getStageType()).thenReturn(StageType.ETC);
-        when(stage.getStageStatus()).thenReturn(StageStatus.WAITING);
 
         Schedule saved = Mockito.mock(Schedule.class);
         when(saved.getId()).thenReturn(200L);
-        when(saved.getStage()).thenReturn(stage);
+        when(saved.getApplicationStage()).thenReturn(stage);
 
         when(scheduleManager.createEtcSchedule(eq(app), any(NewEtcSchedule.class)))
             .thenReturn(saved);
