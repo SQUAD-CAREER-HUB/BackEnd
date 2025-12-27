@@ -27,8 +27,14 @@ import org.squad.careerhub.global.entity.BaseEntity;
 @Table(
     name = "schedule",
     uniqueConstraints = {
-        @UniqueConstraint(name = "uk_stage_id_schedule_name", columnNames = {"stage_id", "schedule_name"}),
-        @UniqueConstraint(name = "uk_stage_id_started_at", columnNames = {"stage_id", "started_at"})
+        @UniqueConstraint(
+            name = "uk_schedule_stage_started_at",
+            columnNames = {"application_stage_id", "started_at"}
+        ),
+        @UniqueConstraint(
+            name = "uk_schedule_stage_schedule_name",
+            columnNames = {"application_stage_id", "schedule_name"}
+        )
     }
 )
 public class Schedule extends BaseEntity {
@@ -48,7 +54,7 @@ public class Schedule extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private ScheduleResult scheduleResult;
+    private ScheduleResult scheduleResult = ScheduleResult.WAITING;
 
     @Enumerated(EnumType.STRING)
     private SubmissionStatus submissionStatus; // 서류 전형 일정일 경우에만 값이 할당 됩니다
@@ -71,8 +77,8 @@ public class Schedule extends BaseEntity {
         Schedule schedule = new Schedule();
         schedule.author = requireNonNull(author);
         schedule.applicationStage = requireNonNull(applicationStage);
-        schedule.scheduleName = requireNonNull(scheduleName);
-        schedule.scheduleResult = requireNonNull(scheduleResult);
+        schedule.scheduleName = scheduleName;
+        schedule.scheduleResult = scheduleResult;
         schedule.submissionStatus = submissionStatus;
         schedule.location = location;
         schedule.startedAt = requireNonNull(startedAt);
