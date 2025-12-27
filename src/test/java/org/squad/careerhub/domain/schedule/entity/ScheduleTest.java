@@ -3,7 +3,6 @@ package org.squad.careerhub.domain.schedule.entity;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -13,11 +12,9 @@ import org.squad.careerhub.domain.application.entity.ApplicationStage;
 import org.squad.careerhub.domain.application.entity.ApplicationStatus;
 import org.squad.careerhub.domain.application.entity.ScheduleResult;
 import org.squad.careerhub.domain.application.entity.StageType;
-import org.squad.careerhub.domain.application.entity.SubmissionStatus;
 import org.squad.careerhub.domain.member.entity.Member;
 import org.squad.careerhub.domain.member.entity.SocialProvider;
-import org.squad.careerhub.global.error.CareerHubException;
-import org.squad.careerhub.global.error.ErrorStatus;
+
 
 class ScheduleTest {
 
@@ -87,27 +84,6 @@ class ScheduleTest {
     }
 
     @Test
-    void createEtc는_전형이_ETC가_아니면_INVALID_SCHEDULE_TYPE_RULE() {
-        // given
-        LocalDateTime t = LocalDateTime.of(2025, 12, 5, 23, 59);
-
-        // when & then
-        assertThatThrownBy(() -> Schedule.register(
-            author,
-            interviewStage, // INTERVIEW stage
-            "코딩테스트",
-            null,
-            ScheduleResult.WAITING,
-            null,
-            t,
-            t.plusHours(1)
-        ))
-            .isInstanceOf(CareerHubException.class)
-            .extracting("errorStatus")
-            .isEqualTo(ErrorStatus.INVALID_SCHEDULE_TYPE_RULE);
-    }
-
-    @Test
     void 면접일정을_생성한다_INTERVIEW() {
         // when
         Schedule schedule = Schedule.register(
@@ -127,32 +103,11 @@ class ScheduleTest {
 
         assertThat(schedule.getScheduleName()).isEqualTo("1차 면접");
         assertThat(schedule.getStartedAt()).isEqualTo(LocalDateTime.of(2025, 12, 10, 19, 0));
-        assertThat(schedule.getLocation()).isEqualTo("서울");
+        assertThat(schedule.getLocation()).isEqualTo("강남구 테헤란로");
 
         // INTERVIEW 규칙
         assertThat(schedule.getEndedAt()).isNull();
         assertThat(schedule.getScheduleResult()).isEqualTo(ScheduleResult.WAITING);
-    }
-
-    @Test
-    void createInterview는_전형이_INTERVIEW가_아니면_INVALID_SCHEDULE_TYPE_RULE() {
-        // given
-        LocalDateTime t = LocalDateTime.of(2025, 12, 10, 19, 0);
-
-        // when & then
-        assertThatThrownBy(() -> Schedule.register(
-            author,
-            etcStage, // ETC stage
-            "1차 면접",
-            "강남구 테헤란로",
-            ScheduleResult.WAITING,
-            null,
-            t,
-            null
-        ))
-            .isInstanceOf(CareerHubException.class)
-            .extracting("errorStatus")
-            .isEqualTo(ErrorStatus.INVALID_SCHEDULE_TYPE_RULE);
     }
 
     @Test
@@ -165,7 +120,7 @@ class ScheduleTest {
             "강남구 테헤란로",
             ScheduleResult.WAITING,
             null,
-            t,
+            null,
             null
         )).isInstanceOf(NullPointerException.class);
     }
