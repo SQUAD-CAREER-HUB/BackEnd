@@ -11,6 +11,7 @@ import org.squad.careerhub.domain.application.service.dto.NewApplicationInfo;
 import org.squad.careerhub.domain.application.service.dto.NewJobPosting;
 import org.squad.careerhub.domain.application.service.dto.NewStage;
 import org.squad.careerhub.domain.application.service.dto.SearchCondition;
+import org.squad.careerhub.domain.application.service.dto.response.ApplicationDetailPageResponse;
 import org.squad.careerhub.domain.application.service.dto.response.ApplicationStatisticsResponse;
 import org.squad.careerhub.domain.application.service.dto.response.ApplicationSummaryResponse;
 import org.squad.careerhub.global.support.Cursor;
@@ -27,6 +28,7 @@ public class ApplicationService {
 
     /**
      * 지원서를 생성합니다.
+     *
      * @param newJobPosting      새로운 채용 공고 정보
      * @param newApplicationInfo 새로운 지원서 정보
      * @param newStage           새로운 전형 정보
@@ -61,11 +63,11 @@ public class ApplicationService {
             Cursor cursor,
             Long memberId
     ) {
-       return applicationReader.findApplications(searchCondition, cursor, memberId);
+        return applicationReader.findApplications(searchCondition, cursor, memberId);
     }
 
-    public void findApplication(Long applicationId, Long memberId) {
-        applicationReader.findApplication(applicationId, memberId);
+    public ApplicationDetailPageResponse findApplication(Long applicationId, Long memberId) {
+        return applicationReader.findApplication(applicationId, memberId);
     }
 
     public ApplicationStatisticsResponse getApplicationStatic(Long authorId) {

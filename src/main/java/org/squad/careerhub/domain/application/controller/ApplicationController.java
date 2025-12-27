@@ -22,7 +22,7 @@ import org.squad.careerhub.domain.application.entity.SubmissionStatus;
 import org.squad.careerhub.domain.application.repository.dto.BeforeDeadlineApplicationResponse;
 import org.squad.careerhub.domain.application.service.ApplicationService;
 import org.squad.careerhub.domain.application.service.dto.SearchCondition;
-import org.squad.careerhub.domain.application.service.dto.response.ApplicationDetailResponse;
+import org.squad.careerhub.domain.application.service.dto.response.ApplicationDetailPageResponse;
 import org.squad.careerhub.domain.application.service.dto.response.ApplicationStatisticsResponse;
 import org.squad.careerhub.domain.application.service.dto.response.ApplicationSummaryResponse;
 import org.squad.careerhub.global.annotation.LoginMember;
@@ -75,11 +75,13 @@ public class ApplicationController extends ApplicationDocsController {
 
     @Override
     @GetMapping("/v1/applications/{applicationId}")
-    public ResponseEntity<ApplicationDetailResponse> getApplication(
+    public ResponseEntity<ApplicationDetailPageResponse> findApplication(
             @PathVariable Long applicationId,
             @LoginMember Long memberId
     ) {
-        return ResponseEntity.ok(ApplicationDetailResponse.mock());
+        ApplicationDetailPageResponse response = applicationService.findApplication(applicationId, memberId);
+
+        return ResponseEntity.ok(response);
     }
 
     @Override
