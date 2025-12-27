@@ -23,6 +23,7 @@ public enum ErrorStatus {
     INVALID_SCHEDULE_TYPE_RULE            (400, "지원서 작성 시 전형 단계가 면접 유형일 경우에만 면접 일정 생성이 가능합니다."),
     INVALID_FINAL_APPLICATION_STATUS_RULE (400 , "지원서 작성 시 전형 단계가 지원 종료일 경우에만 지원서 최종 상태를 입력할 수 있습니다."),
     NOT_FOUND_APPLICATION                 (404, "지원서를 찾을 수 없습니다."),
+    NOT_FOUND_APPLICATION_BY_AUTHOR       (404, "해당 작성자의 지원서를 찾을 수 없습니다."),
 
     // REVIEW
     INTERVIEW_QUESTION_NOT_BELONG_TO_REVIEW (403, "해당 면접 후기에 속하지 않는 질문입니다."),
