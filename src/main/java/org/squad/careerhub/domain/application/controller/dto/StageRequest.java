@@ -8,10 +8,9 @@ import lombok.Builder;
 import org.squad.careerhub.domain.application.entity.ApplicationStatus;
 import org.squad.careerhub.domain.application.entity.StageType;
 import org.squad.careerhub.domain.application.entity.SubmissionStatus;
-import org.squad.careerhub.domain.application.service.dto.NewEtcSchedule;
-import org.squad.careerhub.domain.application.service.dto.NewStage;
-import org.squad.careerhub.domain.schedule.controller.dto.InterviewScheduleCreateRequest;
+import org.squad.careerhub.domain.schedule.service.dto.NewEtcSchedule;
 import org.squad.careerhub.domain.schedule.service.dto.NewInterviewSchedule;
+import org.squad.careerhub.domain.application.service.dto.NewStage;
 
 @Schema(description = "전형 단계 요청 DTO")
 @Builder

@@ -8,7 +8,7 @@ import lombok.Builder;
 @Builder
 public record ScheduleStage(
         @Schema(description = "전형 이름", example = "1차 면접 | 화상 면접 | 코딩 테스트 etc..")
-        String stageName,
+        String scheduleName,
 
         @Schema(description = "장소 (기타 전형일 경우엔 Null)", example = "서울 강남구 테헤란로 123")
         String location,

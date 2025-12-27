@@ -18,11 +18,11 @@ public enum ErrorStatus {
     NOT_FOUND_MEMBER (404, "회원을 찾을 수 없습니다."),
 
     // APPLICATION
-    INVALID_MEMO_RULE                     (400, "지원서 생성 시 기타 전형 진행 중인 경우에만 메모를 작성해야 합니다."),
-    INVALID_ETC_STAGE_RULE                (400, "지원서 생성 시 기타 전형 진행 중인 경우에만 기타 전형 정보를 입력해야 합니다."),
-    INVALID_SCHEDULE_TYPE_RULE            (400, "지원서 작성 시 전형 단계가 면접 유형일 경우에만 면접 일정 생성이 가능합니다."),
+    INVALID_MEMO_RULE          (400, "지원서 생성 시 기타 전형 진행 중인 경우에만 메모를 작성해야 합니다."),
+    INVALID_ETC_STAGE_RULE     (400, "지원서 생성 시 기타 전형 진행 중인 경우에만 기타 전형 정보를 입력해야 합니다."),
+    INVALID_SCHEDULE_TYPE_RULE (400, "지원서 작성 시 전형 단계가 면접 유형일 경우에만 면접 일정 생성이 가능합니다."),
     INVALID_FINAL_APPLICATION_STATUS_RULE (400 , "지원서 작성 시 전형 단계가 지원 종료일 경우에만 지원서 최종 상태를 입력할 수 있습니다."),
-    NOT_FOUND_APPLICATION                 (404, "지원서를 찾을 수 없습니다."),
+    NOT_FOUND_APPLICATION      (404, "지원서를 찾을 수 없습니다."),
 
     // REVIEW
     INTERVIEW_QUESTION_NOT_BELONG_TO_REVIEW (403, "해당 면접 후기에 속하지 않는 질문입니다."),
@@ -61,6 +61,11 @@ public enum ErrorStatus {
     JOB_POSTING_EXTRACTION_FAILED   (400, "채용공고 정보 추출에 실패했습니다."),
     JOB_POSTING_AI_FAILED           (500, "채용공고 AI 분석에 실패하였습니다."),
     JOB_POSTING_AI_QUOTA_EXCEEDED   (429, "채용공고 분석 AI 무료 사용량이 초과되었습니다. 잠시 후 다시 시도해주세요."),
+
+    // SCHEDULE (STAGE_SCHEDULE)
+    NOT_FOUND_SCHEDULE                 (404, "일정을 찾을 수 없습니다."),
+    INVALID_SCHEDULE_AUTHOR_MISMATCH   (403, "일정 작성자가 지원서 작성자와 일치하지 않습니다."),
+    INVALID_SUBMISSION_STATUS_RULE     (400, "서류 전형(DOCUMENT)에서만 제출 상태를 설정할 수 있습니다."),
 
     ;
 

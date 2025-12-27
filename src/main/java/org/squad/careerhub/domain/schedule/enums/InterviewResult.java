@@ -7,7 +7,7 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum InterviewResult {
 
-    PENDING ("대기중"),
+    WAITING ("대기"),
     PASS    ("합격"),
     FAIL    ("불합격");
 

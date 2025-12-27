@@ -21,24 +21,22 @@ import org.squad.careerhub.domain.application.entity.SubmissionStatus;
 import org.squad.careerhub.domain.member.entity.Member;
 import org.squad.careerhub.global.entity.BaseEntity;
 
-/**
- * 면접 일정 관리 Entity 자원서 생성 기능 구현을 위해 제가 면접 일정 엔티티를 추가했습니다. 변동 사항 있으시면 변경 부탁드립니다. from MunSu Kwak
- **/
-
-@Table(uniqueConstraints = {
-        @UniqueConstraint(
-                name = "uk_schedule_application_stage_started_at",
-                columnNames = {"application_stage_id", "startedAt"}
-
-        ),
-        @UniqueConstraint(
-                name = "uk_schedule_application_stage_schedule_name",
-                columnNames = {"application_stage_id", "scheduleName"}
-        )}
-)
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
+@Table(
+    name = "schedule",
+    uniqueConstraints = {
+        @UniqueConstraint(
+            name = "uk_schedule_stage_started_at",
+            columnNames = {"application_stage_id", "started_at"}
+        ),
+        @UniqueConstraint(
+            name = "uk_schedule_stage_schedule_name",
+            columnNames = {"application_stage_id", "schedule_name"}
+        )
+    }
+)
 public class Schedule extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -56,7 +54,7 @@ public class Schedule extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private ScheduleResult scheduleResult;
+    private ScheduleResult scheduleResult = ScheduleResult.WAITING;
 
     @Enumerated(EnumType.STRING)
     private SubmissionStatus submissionStatus; // 서류 전형 일정일 경우에만 값이 할당 됩니다
@@ -79,8 +77,8 @@ public class Schedule extends BaseEntity {
         Schedule schedule = new Schedule();
         schedule.author = requireNonNull(author);
         schedule.applicationStage = requireNonNull(applicationStage);
-        schedule.scheduleName = requireNonNull(scheduleName);
-        schedule.scheduleResult = requireNonNull(scheduleResult);
+        schedule.scheduleName = scheduleName;
+        schedule.scheduleResult = scheduleResult;
         schedule.submissionStatus = submissionStatus;
         schedule.location = location;
         schedule.startedAt = requireNonNull(startedAt);
@@ -88,4 +86,19 @@ public class Schedule extends BaseEntity {
         return schedule;
     }
 
+    public void update(
+        String scheduleName,
+        String location,
+        ScheduleResult scheduleResult,
+        SubmissionStatus submissionStatus,
+        LocalDateTime startedAt,
+        LocalDateTime endedAt
+    ) {
+        this.scheduleName = requireNonNull(scheduleName);
+        this.location = location;
+        this.scheduleResult = requireNonNull(scheduleResult);
+        this.submissionStatus = submissionStatus;
+        this.startedAt = requireNonNull(startedAt);
+        this.endedAt = endedAt;
+    }
 }

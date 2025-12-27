@@ -13,6 +13,8 @@ import org.squad.careerhub.domain.community.interviewreview.controller.Interview
 import org.squad.careerhub.domain.community.interviewreview.service.InterviewReviewService;
 import org.squad.careerhub.domain.jobposting.controller.JobPostingController;
 import org.squad.careerhub.domain.jobposting.service.JobPostingService;
+import org.squad.careerhub.domain.schedule.controller.ScheduleController;
+import org.squad.careerhub.domain.schedule.service.ScheduleService;
 import org.squad.careerhub.global.security.TestSecurityConfig;
 
 @ActiveProfiles("test")
@@ -21,7 +23,8 @@ import org.squad.careerhub.global.security.TestSecurityConfig;
         controllers = {
                 ApplicationController.class,
                 InterviewReviewController.class,
-                JobPostingController.class
+                JobPostingController.class,
+                ScheduleController.class
         })
 public abstract class ControllerTestSupport {
 
@@ -39,6 +42,9 @@ public abstract class ControllerTestSupport {
 
     @MockitoBean
     protected JobPostingService jobPostingService;
+
+    @MockitoBean
+    protected ScheduleService scheduleService;
 
 
 }

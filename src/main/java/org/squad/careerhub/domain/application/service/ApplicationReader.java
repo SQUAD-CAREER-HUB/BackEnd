@@ -38,6 +38,11 @@ public class ApplicationReader {
     private final ApplicationJpaRepository applicationJpaRepository;
     private final ApplicationQueryDslRepository applicationQueryDslRepository;
 
+    public Application findApplication(Long applicationId) {
+        return applicationJpaRepository.findById(applicationId)
+            .orElseThrow(() -> new CareerHubException(ErrorStatus.NOT_FOUND));
+    }
+
     public PageResponse<ApplicationSummaryResponse> findApplications(
             SearchCondition searchCondition,
             Cursor cursor,
@@ -133,8 +138,8 @@ public class ApplicationReader {
     private <T> boolean hasNextPage(List<T> applications, int limit) {
         return applications.size() > limit;
     }
-    // 현재 페이지 데이터만 추출 (limit 개수만큼)
 
+    // 현재 페이지 데이터만 추출 (limit 개수만큼)
     private <T> List<T> getCurrentPageData(List<T> applications, int limit) {
         return applications.size() > limit ? applications.subList(0, limit) : applications;
     }

@@ -10,7 +10,7 @@ public enum TargetType {
     TASK("지원서 기타 항목"),
     INTERVIEW("면접"),
     REVIEW("커뮤니티 리뷰"),
-    OTHER("기타");
+    ETC("기타");
 
     private final String description;
 }

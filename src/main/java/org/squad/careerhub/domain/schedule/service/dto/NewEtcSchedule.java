@@ -5,10 +5,9 @@ import lombok.Builder;
 import org.squad.careerhub.domain.application.entity.StageType;
 
 @Builder
-public record NewInterviewSchedule(
+public record NewEtcSchedule(
     StageType stageType,
     String scheduleName,
     LocalDateTime startedAt,
-    String location
-) {
-}
+    LocalDateTime endedAt
+) { }
