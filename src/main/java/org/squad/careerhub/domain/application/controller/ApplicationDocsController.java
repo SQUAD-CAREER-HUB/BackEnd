@@ -22,7 +22,7 @@ import org.squad.careerhub.domain.application.entity.StageResult;
 import org.squad.careerhub.domain.application.entity.StageType;
 import org.squad.careerhub.domain.application.entity.SubmissionStatus;
 import org.squad.careerhub.domain.application.repository.dto.BeforeDeadlineApplicationResponse;
-import org.squad.careerhub.domain.application.service.dto.response.ApplicationDetailResponse;
+import org.squad.careerhub.domain.application.service.dto.response.ApplicationDetailPageResponse;
 import org.squad.careerhub.domain.application.service.dto.response.ApplicationStatisticsResponse;
 import org.squad.careerhub.domain.application.service.dto.response.ApplicationSummaryResponse;
 import org.squad.careerhub.global.support.PageResponse;
@@ -139,6 +139,8 @@ public abstract class ApplicationDocsController {
             summary = "지원 카드 상세 조회 - JWT O",
             description = """
                     ## 본인이 등록한 지원 카드의 상세 정보를 조회합니다.
+                    - 지원서 기본 정보, 전형 단계별 타임라인, 첨부 파일 정보 등을 포함합니다.
+                    - 내 면접 질문은 따로 API가 존재합니다.
                     """
     )
     @ApiResponse(
@@ -146,7 +148,7 @@ public abstract class ApplicationDocsController {
             description = "지원 카드 상세 조회 성공",
             content = @Content(
                     mediaType = MediaType.APPLICATION_JSON_VALUE,
-                    schema = @Schema(implementation = ApplicationDetailResponse.class)
+                    schema = @Schema(implementation = ApplicationDetailPageResponse.class)
             )
     )
     @ApiExceptions(values = {
@@ -155,7 +157,7 @@ public abstract class ApplicationDocsController {
             BAD_REQUEST,
             INTERNAL_SERVER_ERROR
     })
-    public abstract ResponseEntity<ApplicationDetailResponse> getApplication(
+    public abstract ResponseEntity<ApplicationDetailPageResponse> findApplication(
             @Parameter(
                     description = "지원 카드 ID",
                     example = "1",
