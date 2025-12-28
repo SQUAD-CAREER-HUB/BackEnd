@@ -10,6 +10,7 @@ import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
@@ -118,7 +119,7 @@ public class ApplicationQueryDslRepository {
     }
 
     private BooleanExpression deadlineGoe(LocalDateTime today) {
-        today = today == null ? LocalDateTime.now() : today;
+        today = today == null ? now() : today;
 
         return application.deadline.goe(today);
     }
@@ -192,4 +193,7 @@ public class ApplicationQueryDslRepository {
         return application.status.eq(EntityStatus.ACTIVE);
     }
 
+    private LocalDateTime now() {
+        return LocalDateTime.now().truncatedTo(ChronoUnit.MICROS);
+    }
 }

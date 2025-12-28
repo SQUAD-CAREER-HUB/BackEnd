@@ -9,6 +9,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
@@ -214,7 +215,7 @@ class InterviewReviewControllerTest extends ControllerTestSupport {
                 .position("position")
                 .interviewType("interviewType")
                 .content("content")
-                .createdAt(LocalDateTime.now())
+                .createdAt(now())
                 .author("author")
                 .isAuthor(true)
                 .interviewQuestions(List.of(
@@ -225,4 +226,7 @@ class InterviewReviewControllerTest extends ControllerTestSupport {
                 .build();
     }
 
+    private LocalDateTime now() {
+        return LocalDateTime.now().truncatedTo(ChronoUnit.MICROS);
+    }
 }

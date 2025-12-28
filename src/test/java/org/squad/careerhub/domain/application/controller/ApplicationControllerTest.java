@@ -9,6 +9,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
@@ -78,7 +79,7 @@ class ApplicationControllerTest extends ControllerTestSupport {
                                 1L,
                                 "c",
                                 "p",
-                                LocalDateTime.now(),
+                                now(),
                                 ApplicationMethod.EMAIL,
                                 SubmissionStatus.SUBMITTED))
                         )
@@ -169,7 +170,7 @@ class ApplicationControllerTest extends ControllerTestSupport {
                 .jobPostingUrl("https://example.com")
                 .currentStageType("면접 전형")
                 .applicationStatus("IN_PROGRESS")
-                .deadline(LocalDateTime.now().plusDays(30))
+                .deadline(now().plusDays(30))
                 .applicationMethod("온라인")
                 .memo("메모")
                 .attachedFiles(List.of())
@@ -190,6 +191,10 @@ class ApplicationControllerTest extends ControllerTestSupport {
                 .applicationInfo(applicationInfo)
                 .applicationStageTimeLine(timeline)
                 .build();
+    }
+
+    private LocalDateTime now() {
+        return LocalDateTime.now().truncatedTo(ChronoUnit.MICROS);
     }
 
 }

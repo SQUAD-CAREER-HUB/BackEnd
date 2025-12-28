@@ -3,6 +3,7 @@ package org.squad.careerhub.domain.application.service;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.Collections;
 import java.util.List;
 import org.junit.jupiter.api.Test;
@@ -30,7 +31,7 @@ class ApplicationPolicyValidatorTest extends TestDoubleSupport {
             null,
             null,
             Collections.singletonList(
-                new NewEtcSchedule(StageType.ETC, "코딩 테스트", LocalDateTime.now(), null)),
+                new NewEtcSchedule(StageType.ETC, "코딩 테스트", now(), null)),
             List.of()
         );
 
@@ -41,7 +42,7 @@ class ApplicationPolicyValidatorTest extends TestDoubleSupport {
             Collections.singletonList(new NewEtcSchedule(
                 StageType.ETC,
                 "코딩테스트",
-                LocalDateTime.now().plusDays(3),
+                now().plusDays(3),
                 null
             )),
             List.of()
@@ -49,14 +50,14 @@ class ApplicationPolicyValidatorTest extends TestDoubleSupport {
 
         var interviewStage = NewStage.builder()
                 .stageType(StageType.INTERVIEW)
-                .newEtcSchedules(List.of(new NewEtcSchedule(StageType.ETC, "코딩 테스트", LocalDateTime.now(), LocalDateTime.now().plusDays(2))))
+                .newEtcSchedules(List.of(new NewEtcSchedule(StageType.ETC, "코딩 테스트", now(), now().plusDays(2))))
                 .newInterviewSchedules(List.of())
                 .build();
 
         var finalStage = NewStage.builder()
                 .stageType(StageType.APPLICATION_CLOSE)
                 .finalApplicationStatus(ApplicationStatus.FINAL_PASS)
-                .newEtcSchedules(List.of(new NewEtcSchedule(StageType.ETC, "코딩 테스트", LocalDateTime.now(), LocalDateTime.now().plusDays(2))))
+                .newEtcSchedules(List.of(new NewEtcSchedule(StageType.ETC, "코딩 테스트", now(), now().plusDays(2))))
                 .newInterviewSchedules(List.of())
                 .build();
 
@@ -83,7 +84,7 @@ class ApplicationPolicyValidatorTest extends TestDoubleSupport {
         var etcNewStage = NewStage.builder()
                 .stageType(StageType.ETC)
                 .newInterviewSchedules(
-                        List.of(new NewInterviewSchedule(StageType.INTERVIEW, "1차 면접", LocalDateTime.now(), "서울 본사"))
+                        List.of(new NewInterviewSchedule(StageType.INTERVIEW, "1차 면접", now(), "서울 본사"))
                 )
                 .newEtcSchedules(List.of())
                 .build();
@@ -92,7 +93,7 @@ class ApplicationPolicyValidatorTest extends TestDoubleSupport {
                 .stageType(StageType.DOCUMENT)
                 .submissionStatus(SubmissionStatus.SUBMITTED)
                 .newInterviewSchedules(
-                        List.of(new NewInterviewSchedule(StageType.INTERVIEW, "1차 면접", LocalDateTime.now(), "서울 본사"))
+                        List.of(new NewInterviewSchedule(StageType.INTERVIEW, "1차 면접", now(), "서울 본사"))
                 )
                 .newEtcSchedules(List.of())
                 .build();
@@ -100,7 +101,7 @@ class ApplicationPolicyValidatorTest extends TestDoubleSupport {
         var interviewStage = NewStage.builder()
                 .stageType(StageType.INTERVIEW)
                 .newInterviewSchedules(
-                        List.of(new NewInterviewSchedule(StageType.INTERVIEW, "1차 면접", LocalDateTime.now(), "서울 본사"))
+                        List.of(new NewInterviewSchedule(StageType.INTERVIEW, "1차 면접", now(), "서울 본사"))
                 )
                 .newEtcSchedules(List.of())
                 .build();
@@ -110,7 +111,7 @@ class ApplicationPolicyValidatorTest extends TestDoubleSupport {
                 .finalApplicationStatus(ApplicationStatus.FINAL_PASS)
                 .newEtcSchedules(List.of())
                 .newInterviewSchedules(
-                        List.of(new NewInterviewSchedule(StageType.INTERVIEW, "1차 면접", LocalDateTime.now(), "서울 본사"))
+                        List.of(new NewInterviewSchedule(StageType.INTERVIEW, "1차 면접", now(), "서울 본사"))
                 )
                 .build();
         // when & then
@@ -176,6 +177,10 @@ class ApplicationPolicyValidatorTest extends TestDoubleSupport {
         assertThatThrownBy(() -> applicationPolicyValidator.validateNewStage(interviewStage))
                 .isInstanceOf(CareerHubException.class)
                 .hasMessage(ErrorStatus.INVALID_FINAL_APPLICATION_STATUS_RULE.getMessage());
+    }
+
+    private LocalDateTime now() {
+        return LocalDateTime.now().truncatedTo(ChronoUnit.MICROS);
     }
 
 }

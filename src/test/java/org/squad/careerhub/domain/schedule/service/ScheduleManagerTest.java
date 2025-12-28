@@ -11,6 +11,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
@@ -108,7 +109,7 @@ class ScheduleManagerTest extends TestDoubleSupport {
         NewInterviewSchedule s1 = NewInterviewSchedule.builder()
             .stageType(StageType.INTERVIEW)
             .scheduleName("1차 면접")
-            .startedAt(LocalDateTime.now())
+            .startedAt(now())
             .build();
 
         assertThatThrownBy(() -> scheduleManager.createInterviewSchedules(null, List.of(s1)))
@@ -158,7 +159,7 @@ class ScheduleManagerTest extends TestDoubleSupport {
         NewEtcSchedule cmd = NewEtcSchedule.builder()
             .stageType(StageType.ETC)
             .scheduleName("과제 제출")
-            .startedAt(LocalDateTime.now())
+            .startedAt(now())
             .endedAt(null)
             .build();
 
@@ -166,6 +167,10 @@ class ScheduleManagerTest extends TestDoubleSupport {
             .isInstanceOf(NullPointerException.class);
 
         verify(scheduleJpaRepository, never()).save(any());
+    }
+
+    private LocalDateTime now() {
+        return LocalDateTime.now().truncatedTo(ChronoUnit.MICROS);
     }
 }
 

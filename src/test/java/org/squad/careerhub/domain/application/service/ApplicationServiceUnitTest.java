@@ -11,6 +11,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.Test;
@@ -59,7 +60,7 @@ class ApplicationServiceUnitTest extends TestDoubleSupport {
                 StageType.DOCUMENT,
                 null,
                 ApplicationMethod.EMAIL,
-                LocalDateTime.now().plusDays(14)
+                now().plusDays(14)
         );
         ReflectionTestUtils.setField(application, "id", 1L);
 
@@ -100,7 +101,7 @@ class ApplicationServiceUnitTest extends TestDoubleSupport {
     private NewApplicationInfo createApplicationInfo() {
         return NewApplicationInfo.builder()
                 .applicationMethod(ApplicationMethod.EMAIL)
-                .deadline(LocalDateTime.now().plusDays(14))
+                .deadline(now().plusDays(14))
                 .build();
     }
 
@@ -119,4 +120,7 @@ class ApplicationServiceUnitTest extends TestDoubleSupport {
                 .build();
     }
 
+    private LocalDateTime now() {
+        return LocalDateTime.now().truncatedTo(ChronoUnit.MICROS);
+    }
 }

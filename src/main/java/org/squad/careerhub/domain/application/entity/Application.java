@@ -10,6 +10,7 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -102,7 +103,7 @@ public class Application extends BaseEntity {
     }
 
     public boolean isDeadlinePassed() {
-        return LocalDateTime.now().isAfter(this.deadline);
+        return now().isAfter(this.deadline);
     }
 
     // Test를 위한 업데이트 메서드
@@ -121,6 +122,10 @@ public class Application extends BaseEntity {
         if (!this.author.getId().equals(memberId)) {
             throw new CareerHubException(ErrorStatus.FORBIDDEN_ERROR);
         }
+    }
+
+    private LocalDateTime now() {
+        return LocalDateTime.now().truncatedTo(ChronoUnit.MICROS);
     }
 
 }

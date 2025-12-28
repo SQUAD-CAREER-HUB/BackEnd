@@ -8,6 +8,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -86,7 +87,7 @@ class ApplicationStageManagerUnitTest extends TestDoubleSupport {
     void 기타_전형_생성_시_서류_전형도_함꼐_저장되고_기타_일정_메서드를_호출한다() {
         // given
         var customStageName = "코딩테스트";
-        var etcSchedules = List.of(new NewEtcSchedule(StageType.ETC, customStageName, LocalDateTime.now(), LocalDateTime.now().plusDays(2)));
+        var etcSchedules = List.of(new NewEtcSchedule(StageType.ETC, customStageName, now(), now().plusDays(2)));
         var etcNewStage = NewStage.builder()
                 .stageType(StageType.ETC)
                 .newEtcSchedules(etcSchedules)
@@ -102,5 +103,9 @@ class ApplicationStageManagerUnitTest extends TestDoubleSupport {
         assertThat(applicationStage.getStageType()).isEqualTo(StageType.ETC);
         verify(applicationStageJpaRepository, times(2)).save(any());
         verify(scheduleManager, times(1)).createEtcSchedule(testApplication, etcSchedules.getFirst());
+    }
+
+    private LocalDateTime now() {
+        return LocalDateTime.now().truncatedTo(ChronoUnit.MICROS);
     }
 }

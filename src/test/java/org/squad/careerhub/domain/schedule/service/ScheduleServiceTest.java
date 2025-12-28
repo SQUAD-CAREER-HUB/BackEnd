@@ -7,6 +7,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
@@ -91,7 +92,7 @@ class ScheduleServiceTest extends TestDoubleSupport {
         ApplicationInfo info = new ApplicationInfo(null);
         NewInterviewSchedule cmd = NewInterviewSchedule.builder()
             .scheduleName("1차 면접")
-            .startedAt(LocalDateTime.now())
+            .startedAt(now())
             .location("서울")
             .build();
 
@@ -116,7 +117,7 @@ class ScheduleServiceTest extends TestDoubleSupport {
         ApplicationInfo info = new ApplicationInfo(applicationId);
         NewInterviewSchedule cmd = NewInterviewSchedule.builder()
             .scheduleName("면접")
-            .startedAt(LocalDateTime.now())
+            .startedAt(now())
             .location("서울")
             .build();
 
@@ -142,7 +143,7 @@ class ScheduleServiceTest extends TestDoubleSupport {
         ApplicationInfo info = new ApplicationInfo(applicationId);
         NewInterviewSchedule cmd = NewInterviewSchedule.builder()
             .scheduleName("면접")
-            .startedAt(LocalDateTime.now())
+            .startedAt(now())
             .location("서울")
             .build();
 
@@ -201,5 +202,9 @@ class ScheduleServiceTest extends TestDoubleSupport {
         assertThat(captured.scheduleName()).isEqualTo("과제 제출");
         assertThat(captured.startedAt()).isEqualTo(LocalDateTime.of(2025, 12, 5, 23, 59));
         assertThat(captured.endedAt()).isNull();
+    }
+
+    private LocalDateTime now() {
+        return LocalDateTime.now().truncatedTo(ChronoUnit.MICROS);
     }
 }

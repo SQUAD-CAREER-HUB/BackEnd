@@ -2,6 +2,7 @@ package org.squad.careerhub.domain.application.service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.time.temporal.ChronoUnit;
 import java.util.function.Function;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -124,7 +125,7 @@ public class ApplicationReader {
         List<BeforeDeadlineApplicationResponse> responses = applicationQueryDslRepository.findBeforeDeadLineFromApplication(
                 authorId,
                 StageType.DOCUMENT,
-                LocalDateTime.now(),
+                now(),
                 cursor
         );
 
@@ -155,4 +156,7 @@ public class ApplicationReader {
         return idExtractor.apply(items.getLast());
     }
 
+    private LocalDateTime now() {
+        return LocalDateTime.now().truncatedTo(ChronoUnit.MICROS);
+    }
 }

@@ -107,7 +107,7 @@ class ApplicationReaderIntegrationTest extends IntegrationTestSupport {
                         .newInterviewSchedules(List.of())
                         .build()
         );
-        var baseTime = LocalDateTime.now();
+        var baseTime = now();
 
         var newEtcSchedule = new NewEtcSchedule(StageType.INTERVIEW, "임원 면접", baseTime.plusDays(1), baseTime.plusDays(1));
         var etcApp = createApplication(
@@ -898,7 +898,7 @@ class ApplicationReaderIntegrationTest extends IntegrationTestSupport {
                     stageType,
                     applicationStatus,
                     ApplicationMethod.values()[i % ApplicationMethod.values().length],
-                    LocalDateTime.now().plusDays(30)
+                    now().plusDays(30)
             );
             applications.add(app);
         }
