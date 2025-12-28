@@ -1,10 +1,10 @@
 package org.squad.careerhub.domain.archive.service;
 
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.squad.careerhub.domain.archive.entity.QuestionArchive;
 import org.squad.careerhub.domain.archive.service.dto.ApplicationQuestionArchiveResponse;
+import org.squad.careerhub.global.support.Cursor;
+import org.squad.careerhub.global.support.PageResponse;
 
 @RequiredArgsConstructor
 @Service
@@ -12,13 +12,16 @@ public class QuestionArchiveService {
 
     private final QuestionArchiveReader questionArchiveReader;
 
-    public List<ApplicationQuestionArchiveResponse> findArchivedQuestionsByApplication(Long applicationId, Long memberId) {
-        List<QuestionArchive> archivedQuestionsByApplication = questionArchiveReader.findArchivedQuestionsByApplication(
+    public PageResponse<ApplicationQuestionArchiveResponse> findArchivedQuestionsByApplication(
+            Long applicationId,
+            Long memberId,
+            Cursor cursor
+    ) {
+        return questionArchiveReader.findArchivedQuestionsByApplication(
                 applicationId,
-                memberId
+                memberId,
+                cursor
         );
-
-        return ApplicationQuestionArchiveResponse.from(archivedQuestionsByApplication);
     }
 
 }

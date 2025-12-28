@@ -2,6 +2,7 @@ package org.squad.careerhub.domain.archive.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.tuple;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
@@ -11,17 +12,21 @@ import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.springframework.test.util.ReflectionTestUtils;
 import org.squad.careerhub.TestDoubleSupport;
 import org.squad.careerhub.domain.application.entity.Application;
 import org.squad.careerhub.domain.application.service.ApplicationReader;
 import org.squad.careerhub.domain.archive.entity.QuestionArchive;
-import org.squad.careerhub.domain.archive.repositroy.QuestionArchiveJpaRepository;
+import org.squad.careerhub.domain.archive.repositroy.QuestionArchiveQueryDslRepository;
+import org.squad.careerhub.domain.archive.service.dto.ApplicationQuestionArchiveResponse;
 import org.squad.careerhub.domain.community.interviewquestion.entity.InterviewQuestion;
 import org.squad.careerhub.domain.community.interviewreview.entity.InterviewReview;
 import org.squad.careerhub.domain.member.entity.Member;
 import org.squad.careerhub.domain.schedule.enums.InterviewType;
 import org.squad.careerhub.global.error.CareerHubException;
 import org.squad.careerhub.global.error.ErrorStatus;
+import org.squad.careerhub.global.support.Cursor;
+import org.squad.careerhub.global.support.PageResponse;
 
 @RequiredArgsConstructor
 class QuestionArchiveReaderUnitTest extends TestDoubleSupport {
@@ -30,7 +35,7 @@ class QuestionArchiveReaderUnitTest extends TestDoubleSupport {
     ApplicationReader applicationReader;
 
     @Mock
-    QuestionArchiveJpaRepository questionArchiveJpaRepository;
+    QuestionArchiveQueryDslRepository questionArchiveQueryDslRepository;
 
     @InjectMocks
     QuestionArchiveReader questionArchiveReader;
@@ -49,18 +54,33 @@ class QuestionArchiveReaderUnitTest extends TestDoubleSupport {
         );
         var interviewQuestion = InterviewQuestion.create(interviewReview, "questionContent");
         var questionArchive = QuestionArchive.create(application1, interviewQuestion);
-
+        ReflectionTestUtils.setField(questionArchive, "id", 1L);
+        var cursor = Cursor.of(null, 10);
         given(applicationReader.existByIdAndAuthorId(any(), any())).willReturn(true);
-        given(questionArchiveJpaRepository.findByApplicationIdAndStatus(any(), any())).willReturn(List.of(questionArchive));
+        given(questionArchiveQueryDslRepository.findByApplicationId(any(), any(), any())).willReturn(List.of(questionArchive));
 
         // when
-        List<QuestionArchive> archivedQuestionsByApplication = questionArchiveReader.findArchivedQuestionsByApplication(1L, 1L);
+        PageResponse<ApplicationQuestionArchiveResponse> response = questionArchiveReader.findArchivedQuestionsByApplication(
+                1L,
+                1L,
+                cursor
+        );
 
         // then
-        assertThat(archivedQuestionsByApplication).hasSize(1);
-        assertThat(archivedQuestionsByApplication.getFirst().getApplication()).isNotNull();
-        assertThat(archivedQuestionsByApplication.getFirst().getInterviewQuestion()).isNotNull();
-        assertThat(archivedQuestionsByApplication.getFirst().getContent()).isNull();
+        assertThat(response).isNotNull().extracting(
+                PageResponse::hasNext,
+                PageResponse::nextCursorId
+        ).containsExactly(
+                false,
+                null
+        );
+        assertThat(response.contents()).hasSize(1).extracting(
+                ApplicationQuestionArchiveResponse::questionArchiveId,
+                ApplicationQuestionArchiveResponse::question,
+                ApplicationQuestionArchiveResponse::interviewType
+        ).containsExactly(
+                tuple(1L, "questionContent", InterviewType.TECH.getDescription())
+        );
     }
 
     @Test
@@ -69,7 +89,7 @@ class QuestionArchiveReaderUnitTest extends TestDoubleSupport {
         given(applicationReader.existByIdAndAuthorId(any(), any())).willReturn(false);
 
         // when & then
-        assertThatThrownBy(() -> questionArchiveReader.findArchivedQuestionsByApplication(1L, 1L))
+        assertThatThrownBy(() -> questionArchiveReader.findArchivedQuestionsByApplication(1L, 1L, Cursor.of(null, 10)))
                 .isInstanceOf(CareerHubException.class)
                 .hasMessage(ErrorStatus.NOT_FOUND_APPLICATION_BY_AUTHOR.getMessage());
     }

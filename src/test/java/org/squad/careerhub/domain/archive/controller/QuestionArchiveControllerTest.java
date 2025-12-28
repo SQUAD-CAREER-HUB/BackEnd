@@ -9,6 +9,8 @@ import org.junit.jupiter.api.Test;
 import org.squad.careerhub.ControllerTestSupport;
 import org.squad.careerhub.domain.archive.service.dto.ApplicationQuestionArchiveResponse;
 import org.squad.careerhub.global.annotation.TestMember;
+import org.squad.careerhub.global.support.Cursor;
+import org.squad.careerhub.global.support.PageResponse;
 
 class QuestionArchiveControllerTest extends ControllerTestSupport {
 
@@ -16,22 +18,27 @@ class QuestionArchiveControllerTest extends ControllerTestSupport {
     @Test
     void 지원서의_면접_질문_모음_조회를_요청한다() {
         // given
-        var responses = List.of(ApplicationQuestionArchiveResponse.builder()
-                .questionArchiveId(1L)
-                .interviewType("기술면접")
-                .question("질문")
-                .build()
+        PageResponse<ApplicationQuestionArchiveResponse> response = new PageResponse<>(
+                List.of(ApplicationQuestionArchiveResponse.builder()
+                        .questionArchiveId(1L)
+                        .interviewType("기술면접")
+                        .question("질문")
+                        .build()),
+                false,
+                null
         );
-        given(questionArchiveService.findArchivedQuestionsByApplication(1L, 1L))
-                .willReturn(responses);
+        given(questionArchiveService.findArchivedQuestionsByApplication(1L, 1L, Cursor.of(1L, 10)))
+                .willReturn(response);
         // when
-        assertThat(mvcTester.get().uri("/v1/applications/{applicationId}/archived-questions", 1L))
+        assertThat(mvcTester.get().uri("/v1/applications/{applicationId}/archived-questions", 1L)
+                .param("lastCursorId", "1")
+                .param("size", "10"))
                 .apply(print())
                 .hasStatusOk()
                 .bodyJson()
-                .hasPathSatisfying("$[0].questionArchiveId", v ->  v.assertThat().isEqualTo(1))
-                .hasPathSatisfying("$[0].interviewType", v -> v.assertThat().isEqualTo("기술면접"))
-                .hasPathSatisfying("$[0].question", v -> v.assertThat().isEqualTo("질문"));
+                .hasPathSatisfying("$.contents", v -> v.assertThat().isNotEmpty())
+                .hasPathSatisfying("$.hasNext", v -> v.assertThat().isEqualTo(false))
+                .hasPathSatisfying("$.nextCursorId", v -> v.assertThat().isNull());
     }
 
 }
