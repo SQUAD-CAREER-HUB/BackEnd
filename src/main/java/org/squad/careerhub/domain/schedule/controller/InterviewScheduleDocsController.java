@@ -27,7 +27,7 @@ public abstract class InterviewScheduleDocsController {
         description = """
                     ### 특정 지원 카드에 연동되는 면접 일정을 생성합니다.
                     - 지원 카드 ID(applicationId)로 연동됩니다.
-                    - 면접 유형(type)은 TECH/FIT/EXECUTIVE/DESIGN/TEST/OTHER 등을 사용할 수 있습니다.
+                    - 면접 유형(type)은 TECH/FIT/EXECUTIVE/DESIGN/TEST/ETC 등을 사용할 수 있습니다.
                     - datetime은 ISO8601(LocalDateTime) 포맷을 사용합니다.
                     """,
         security = {@SecurityRequirement(name = "Bearer")}

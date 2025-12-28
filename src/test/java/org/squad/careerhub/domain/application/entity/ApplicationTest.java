@@ -1,6 +1,7 @@
 package org.squad.careerhub.domain.application.entity;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.squad.careerhub.global.utils.DateTimeUtils.now;
 
 import java.time.LocalDateTime;
 import org.junit.jupiter.api.BeforeEach;
@@ -20,7 +21,7 @@ class ApplicationTest {
     @Test
     void 지원서를_생성한다() {
         // when
-        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime now = now();
         var application = Application.create(
                 author,
                 "http://jobposting.url",
@@ -98,5 +99,4 @@ class ApplicationTest {
                 null
         );
     }
-
 }

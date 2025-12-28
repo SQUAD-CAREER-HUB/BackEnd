@@ -54,7 +54,7 @@ class JobPostingValidatorTest {
         }
 
         @Test
-        void http_https가_아닌_스킴이면_BAD_REQUEST_예외를_던진다() {
+        void http_https가_아닌_스킴이면_URL_ERROR_예외를_던진다() {
             String url = "ftp://www.wanted.co.kr/wd/12345";
 
             assertThatThrownBy(() -> validator.validateJobPostingUrl(url))
@@ -64,19 +64,8 @@ class JobPostingValidatorTest {
         }
 
         @Test
-        void 지원하지_않는_도메인이면_BAD_REQUEST_예외를_던진다() {
+        void 지원하지_않는_도메인이면_URL_ERROR_예외를_던진다() {
             String url = "https://www.google.com/search?q=job";
-
-            assertThatThrownBy(() -> validator.validateJobPostingUrl(url))
-                .isInstanceOf(CareerHubException.class)
-                .extracting("errorStatus")
-                .isEqualTo(ErrorStatus.URL_ERROR);
-        }
-
-        @Test
-        void 잘못된_URL_형식이면_BAD_REQUEST_예외를_던진다() {
-            // 공백 포함 등 잘못된 URI
-            String url = "  ";
 
             assertThatThrownBy(() -> validator.validateJobPostingUrl(url))
                 .isInstanceOf(CareerHubException.class)

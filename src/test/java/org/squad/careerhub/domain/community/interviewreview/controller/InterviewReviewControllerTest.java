@@ -6,9 +6,9 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.willDoNothing;
 import static org.mockito.BDDMockito.willThrow;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.squad.careerhub.global.utils.DateTimeUtils.now;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import java.time.LocalDateTime;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
@@ -214,7 +214,7 @@ class InterviewReviewControllerTest extends ControllerTestSupport {
                 .position("position")
                 .interviewType("interviewType")
                 .content("content")
-                .createdAt(LocalDateTime.now())
+                .createdAt(now())
                 .author("author")
                 .isAuthor(true)
                 .interviewQuestions(List.of(
@@ -224,5 +224,4 @@ class InterviewReviewControllerTest extends ControllerTestSupport {
                 )
                 .build();
     }
-
 }

@@ -1,11 +1,13 @@
 package org.squad.careerhub.domain.application.controller;
 
 import static org.assertj.core.api.Assertions.assertThat;
+
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.squad.careerhub.global.utils.DateTimeUtils.now;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import java.time.LocalDateTime;
@@ -78,7 +80,7 @@ class ApplicationControllerTest extends ControllerTestSupport {
                                 1L,
                                 "c",
                                 "p",
-                                LocalDateTime.now(),
+                                now(),
                                 ApplicationMethod.EMAIL,
                                 SubmissionStatus.SUBMITTED))
                         )
@@ -169,7 +171,7 @@ class ApplicationControllerTest extends ControllerTestSupport {
                 .jobPostingUrl("https://example.com")
                 .currentStageType("면접 전형")
                 .applicationStatus("IN_PROGRESS")
-                .deadline(LocalDateTime.now().plusDays(30))
+                .deadline(now().plusDays(30))
                 .applicationMethod("온라인")
                 .memo("메모")
                 .attachedFiles(List.of())
@@ -191,5 +193,4 @@ class ApplicationControllerTest extends ControllerTestSupport {
                 .applicationStageTimeLine(timeline)
                 .build();
     }
-
 }

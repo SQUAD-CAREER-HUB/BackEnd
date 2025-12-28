@@ -1,7 +1,8 @@
 package org.squad.careerhub.domain.application.service;
 
-import java.time.LocalDateTime;
 import java.util.List;
+import static org.squad.careerhub.global.utils.DateTimeUtils.now;
+
 import java.util.function.Function;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -37,6 +38,11 @@ public class ApplicationReader {
     private final ScheduleReader scheduleReader;
     private final ApplicationJpaRepository applicationJpaRepository;
     private final ApplicationQueryDslRepository applicationQueryDslRepository;
+
+    public Application findApplication(Long applicationId) {
+        return applicationJpaRepository.findById(applicationId)
+            .orElseThrow(() -> new CareerHubException(ErrorStatus.NOT_FOUND));
+    }
 
     public PageResponse<ApplicationSummaryResponse> findApplications(
             SearchCondition searchCondition,
@@ -119,7 +125,7 @@ public class ApplicationReader {
         List<BeforeDeadlineApplicationResponse> responses = applicationQueryDslRepository.findBeforeDeadLineFromApplication(
                 authorId,
                 StageType.DOCUMENT,
-                LocalDateTime.now(),
+                now(),
                 cursor
         );
 
@@ -133,8 +139,8 @@ public class ApplicationReader {
     private <T> boolean hasNextPage(List<T> applications, int limit) {
         return applications.size() > limit;
     }
-    // 현재 페이지 데이터만 추출 (limit 개수만큼)
 
+    // 현재 페이지 데이터만 추출 (limit 개수만큼)
     private <T> List<T> getCurrentPageData(List<T> applications, int limit) {
         return applications.size() > limit ? applications.subList(0, limit) : applications;
     }
@@ -149,5 +155,4 @@ public class ApplicationReader {
         }
         return idExtractor.apply(items.getLast());
     }
-
 }

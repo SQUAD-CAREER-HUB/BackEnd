@@ -1,7 +1,7 @@
 package org.squad.careerhub.domain.application.entity;
 
 import static java.util.Objects.requireNonNull;
-
+import static org.squad.careerhub.global.utils.DateTimeUtils.now;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -15,6 +15,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.squad.careerhub.domain.member.entity.Member;
 import org.squad.careerhub.global.entity.BaseEntity;
+import org.squad.careerhub.global.error.CareerHubException;
+import org.squad.careerhub.global.error.ErrorStatus;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -100,7 +102,7 @@ public class Application extends BaseEntity {
     }
 
     public boolean isDeadlinePassed() {
-        return LocalDateTime.now().isAfter(this.deadline);
+        return now().isAfter(this.deadline);
     }
 
     // Test를 위한 업데이트 메서드
@@ -108,4 +110,16 @@ public class Application extends BaseEntity {
         this.applicationStatus = applicationStatus;
     }
 
+    public void updateCurrentStageType(StageType currentStageType) {
+        this.currentStageType = currentStageType;
+    }
+
+    public void validateOwnedBy(Long memberId) {
+        if (this.author == null || this.author.getId() == null) {
+            throw new CareerHubException(ErrorStatus.BAD_REQUEST);
+        }
+        if (!this.author.getId().equals(memberId)) {
+            throw new CareerHubException(ErrorStatus.FORBIDDEN_ERROR);
+        }
+    }
 }

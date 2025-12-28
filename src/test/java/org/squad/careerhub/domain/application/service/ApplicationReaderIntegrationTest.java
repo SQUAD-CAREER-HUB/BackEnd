@@ -1,12 +1,14 @@
 package org.squad.careerhub.domain.application.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
-
+import static org.squad.careerhub.global.utils.DateTimeUtils.now;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,14 +18,13 @@ import org.squad.careerhub.domain.application.entity.ApplicationMethod;
 import org.squad.careerhub.domain.application.entity.ApplicationStage;
 import org.squad.careerhub.domain.application.entity.ApplicationStatus;
 import org.squad.careerhub.domain.application.entity.ScheduleResult;
-import org.squad.careerhub.domain.application.entity.StageResult;
 import org.squad.careerhub.domain.application.entity.StageType;
 import org.squad.careerhub.domain.application.entity.SubmissionStatus;
 import org.squad.careerhub.domain.application.repository.ApplicationJpaRepository;
 import org.squad.careerhub.domain.application.repository.ApplicationStageJpaRepository;
 import org.squad.careerhub.domain.application.repository.dto.BeforeDeadlineApplicationResponse;
 import org.squad.careerhub.domain.application.service.dto.NewApplicationInfo;
-import org.squad.careerhub.domain.application.service.dto.NewEtcSchedule;
+import org.squad.careerhub.domain.schedule.service.dto.NewEtcSchedule;
 import org.squad.careerhub.domain.application.service.dto.NewJobPosting;
 import org.squad.careerhub.domain.application.service.dto.NewStage;
 import org.squad.careerhub.domain.application.service.dto.SearchCondition;
@@ -35,12 +36,12 @@ import org.squad.careerhub.domain.member.entity.Member;
 import org.squad.careerhub.domain.member.entity.SocialProvider;
 import org.squad.careerhub.domain.member.repository.MemberJpaRepository;
 import org.squad.careerhub.domain.schedule.entity.Schedule;
-import org.squad.careerhub.domain.schedule.enums.InterviewType;
 import org.squad.careerhub.domain.schedule.repository.ScheduleJpaRepository;
 import org.squad.careerhub.domain.schedule.service.dto.NewInterviewSchedule;
 import org.squad.careerhub.global.support.Cursor;
 import org.squad.careerhub.global.support.PageResponse;
 
+@Slf4j
 @RequiredArgsConstructor
 @Transactional
 class ApplicationReaderIntegrationTest extends IntegrationTestSupport {
@@ -52,7 +53,8 @@ class ApplicationReaderIntegrationTest extends IntegrationTestSupport {
     final ApplicationManager applicationManager;
     final MemberJpaRepository memberRepository;
     final ApplicationJpaRepository applicationRepository;
-    final ScheduleJpaRepository interviewScheduleRepository;
+    final ScheduleJpaRepository scheduleJpaRepository;
+    final ApplicationStageManager applicationStageManager;
 
     Member member;
 
@@ -65,10 +67,6 @@ class ApplicationReaderIntegrationTest extends IntegrationTestSupport {
                 "TestUser",
                 "profile.png"
         ));
-    }
-
-    private LocalDateTime now() {
-        return LocalDateTime.now().truncatedTo(ChronoUnit.MICROS);
     }
 
     @Test
@@ -106,53 +104,24 @@ class ApplicationReaderIntegrationTest extends IntegrationTestSupport {
                         .build()
         );
         var baseTime = now();
-        createApplicationSchedule(
-                applicationStageJpaRepository.save(ApplicationStage.create(docsApp, StageType.DOCUMENT)),
-                StageType.DOCUMENT.getDescription(),
-                null,
-                ScheduleResult.WAITING,
-                null,
-                baseTime,
-                baseTime.plusDays(3)
-        );
-        NewEtcSchedule codingTest = new NewEtcSchedule("코딩 테스트", baseTime, baseTime.plusHours(1));
+
+        var newEtcSchedule = new NewEtcSchedule(StageType.INTERVIEW, "임원 면접", baseTime.plusDays(1), baseTime.plusDays(1));
         var etcApp = createApplication(
                 "BE",
                 NewStage.builder()
                         .stageType(StageType.ETC)
-                        .newEtcSchedules(List.of(codingTest))
+                        .newEtcSchedules(List.of(newEtcSchedule))
                         .newInterviewSchedules(List.of())
                         .build()
         );
-        var etcStage = applicationStageJpaRepository.save(ApplicationStage.create(etcApp, StageType.ETC));
 
-        createApplicationSchedule(
-                etcStage,
-                codingTest.stageName(),
-                null,
-                ScheduleResult.WAITING,
-                null,
-                codingTest.startedAt(),
-                codingTest.endedAt()
-        );
-
-        var newInterviewSchedule = new NewInterviewSchedule("임원 면접", InterviewType.EXECUTIVE, baseTime.plusDays(1), "판교");
+        var newInterviewSchedule = new NewInterviewSchedule(StageType.INTERVIEW, "임원 면접", baseTime.plusDays(1), "판교");
         var interviewApp = createApplication(
                 "DevOps",
                 NewStage.builder()
                         .stageType(StageType.INTERVIEW)
                         .newInterviewSchedules(List.of(newInterviewSchedule))
                         .build()
-        );
-        var interviewStage = applicationStageJpaRepository.save(ApplicationStage.create(interviewApp, StageType.INTERVIEW));
-        createApplicationSchedule(
-                interviewStage,
-                newInterviewSchedule.stageName(),
-                newInterviewSchedule.location(),
-                ScheduleResult.WAITING,
-                null,
-                newInterviewSchedule.scheduledAt(),
-                null
         );
 
         var closeApp = createApplication(
@@ -241,14 +210,14 @@ class ApplicationReaderIntegrationTest extends IntegrationTestSupport {
         assertThat(beEtcResponse.docsStage()).isNull();
         assertThat(beEtcResponse.scheduleStage()).isNotNull()
                 .extracting(
-                        ScheduleStage::stageName,
+                        ScheduleStage::scheduleName,
                         ScheduleStage::location,
                         ScheduleStage::nextScheduleAt
                 )
                 .containsExactly(
-                        codingTest.stageName(),
+                        "임원 면접",
                         null,
-                        codingTest.startedAt()
+                        newEtcSchedule.startedAt()
                 );
 
         // 3. 면접 전형 검증 (DevOps)
@@ -278,14 +247,14 @@ class ApplicationReaderIntegrationTest extends IntegrationTestSupport {
         assertThat(devOpsResponse.docsStage()).isNull();
         assertThat(devOpsResponse.scheduleStage()).isNotNull()
                 .extracting(
-                        ScheduleStage::stageName,
+                        ScheduleStage::scheduleName,
                         ScheduleStage::location,
                         ScheduleStage::nextScheduleAt
                 )
                 .containsExactly(
-                        newInterviewSchedule.stageName(),
+                        newInterviewSchedule.scheduleName(),
                         newInterviewSchedule.location(),
-                        newInterviewSchedule.scheduledAt()
+                        newInterviewSchedule.startedAt()
                 );
 
         // 4. 지원 마감 검증
@@ -321,7 +290,7 @@ class ApplicationReaderIntegrationTest extends IntegrationTestSupport {
     @Test
     void 회사명으로_검색하여_지원서를_조회한다() {
         // given
-        createApplication("카카오", "백엔드 개발자",
+        var docsApp = createApplication("카카오", "백엔드 개발자",
                 NewStage.builder()
                         .stageType(StageType.DOCUMENT)
                         .submissionStatus(SubmissionStatus.SUBMITTED)
@@ -329,28 +298,20 @@ class ApplicationReaderIntegrationTest extends IntegrationTestSupport {
                         .build()
         );
         var baseTime = now();
-        var codingTest = new NewEtcSchedule("코딩 테스트", baseTime, baseTime.plusHours(1));
+        var newEtcSchedule = new NewEtcSchedule(StageType.ETC, "코딩 테스트", baseTime, baseTime.plusHours(1));
         var etcApp = createApplication("네이버", "백엔드 개발자",
                 NewStage.builder()
                         .stageType(StageType.ETC)
-                        .newEtcSchedules(List.of(codingTest))
+                        .newEtcSchedules(List.of(newEtcSchedule))
                         .newInterviewSchedules(List.of())
                         .build()
         );
-        createApplicationSchedule(
-                applicationStageJpaRepository.save(ApplicationStage.create(etcApp, StageType.ETC)),
-                codingTest.stageName(),
-                null,
-                ScheduleResult.WAITING,
-                null,
-                codingTest.startedAt(),
-                codingTest.endedAt()
-        );
+
         createApplication("라인", "백엔드 개발자",
                 NewStage.builder()
                         .stageType(StageType.INTERVIEW)
                         .newInterviewSchedules(
-                                List.of(new NewInterviewSchedule("기술 면접", InterviewType.TECH, baseTime.plusDays(1),
+                                List.of(new NewInterviewSchedule(StageType.INTERVIEW, "기술 면접", baseTime.plusDays(1),
                                         "판교")))
                         .build()
         );
@@ -381,22 +342,20 @@ class ApplicationReaderIntegrationTest extends IntegrationTestSupport {
         );
         assertThat(docsSummaryResponse.docsStage()).isNull();
         assertThat(docsSummaryResponse.scheduleStage()).extracting(
-                ScheduleStage::stageName,
+                ScheduleStage::scheduleName,
                 ScheduleStage::location,
                 ScheduleStage::nextScheduleAt
         ).containsExactly(
-                codingTest.stageName(),
+                newEtcSchedule.scheduleName(),
                 null,
-                codingTest.startedAt()
+                newEtcSchedule.startedAt()
         );
     }
 
     @Test
     void 직무명으로_검색하여_지원서를_조회한다() {
         // given
-        createApplication(
-                "카카오",
-                "FE 개발자",
+        createApplication("카카오", "FE 개발자",
                 NewStage.builder()
                         .stageType(StageType.DOCUMENT)
                         .submissionStatus(SubmissionStatus.SUBMITTED)
@@ -404,34 +363,21 @@ class ApplicationReaderIntegrationTest extends IntegrationTestSupport {
                         .build()
         );
         var baseTime = now();
-        var codingTest = new NewEtcSchedule("코딩 테스트", baseTime, baseTime.plusHours(1));
-        createApplication(
-                "네이버",
-                "QA",
+        var newEtcSchedule = new NewEtcSchedule(StageType.ETC, "코딩 테스트", baseTime, baseTime.plusHours(1));
+        createApplication("네이버", "QA",
                 NewStage.builder()
                         .stageType(StageType.ETC)
-                        .newEtcSchedules(List.of(codingTest))
+                        .newEtcSchedules(List.of(newEtcSchedule))
                         .newInterviewSchedules(List.of())
                         .build()
         );
-        var newInterviewSchedule = new NewInterviewSchedule("기술 면접", InterviewType.TECH, baseTime.plusDays(1), "판교");
+        var newInterviewSchedule = new NewInterviewSchedule(StageType.INTERVIEW, "기술 면접", baseTime.plusDays(1), "판교");
         var interviewApp = createApplication("라인", "백엔드 개발자",
                 NewStage.builder()
                         .stageType(StageType.INTERVIEW)
                         .newInterviewSchedules(List.of(newInterviewSchedule))
                         .build()
         );
-        var interviewStage = applicationStageJpaRepository.save(ApplicationStage.create(interviewApp, StageType.INTERVIEW));
-        createApplicationSchedule(
-                interviewStage,
-                newInterviewSchedule.stageName(),
-                newInterviewSchedule.location(),
-                ScheduleResult.WAITING,
-                null,
-                newInterviewSchedule.scheduledAt(),
-                null
-        );
-
         var condition = SearchCondition.builder()
                 .query("백엔드")
                 .build();
@@ -458,22 +404,20 @@ class ApplicationReaderIntegrationTest extends IntegrationTestSupport {
         );
         assertThat(interviewSummaryResponse.docsStage()).isNull();
         assertThat(interviewSummaryResponse.scheduleStage()).extracting(
-                ScheduleStage::stageName,
+                ScheduleStage::scheduleName,
                 ScheduleStage::location,
                 ScheduleStage::nextScheduleAt
         ).containsExactly(
-                newInterviewSchedule.stageName(),
+                newInterviewSchedule.scheduleName(),
                 newInterviewSchedule.location(),
-                newInterviewSchedule.scheduledAt()
+                newInterviewSchedule.startedAt()
         );
     }
 
     @Test
     void 전형_타입으로_필터링하여_지원서를_조회한다() {
         // given
-        createApplication(
-                "카카오",
-                "FE 개발자",
+        createApplication("카카오", "FE 개발자",
                 NewStage.builder()
                         .stageType(StageType.DOCUMENT)
                         .submissionStatus(SubmissionStatus.SUBMITTED)
@@ -481,36 +425,20 @@ class ApplicationReaderIntegrationTest extends IntegrationTestSupport {
                         .build()
         );
         var baseTime = now();
-        var codingTest = new NewEtcSchedule("코딩 테스트", baseTime, baseTime.plusHours(1));
-        createApplication(
-                "네이버",
-                "QA",
+        var newEtcSchedule = new NewEtcSchedule(StageType.ETC, "코딩 테스트", baseTime, baseTime.plusHours(1));
+        createApplication("네이버", "QA",
                 NewStage.builder()
                         .stageType(StageType.ETC)
-                        .newEtcSchedules(List.of(codingTest))
+                        .newEtcSchedules(List.of(newEtcSchedule))
                         .newInterviewSchedules(List.of())
                         .build()
         );
-
-        var newInterviewSchedule = new NewInterviewSchedule("기술 면접", InterviewType.TECH, baseTime.plusDays(1), "판교");
-        var interviewApp = createApplication(
-                "라인",
-                "백엔드 개발자",
+        var newInterviewSchedule = new NewInterviewSchedule(StageType.INTERVIEW, "기술 면접", baseTime.plusDays(1), "판교");
+        var interviewApp = createApplication("라인", "백엔드 개발자",
                 NewStage.builder()
                         .stageType(StageType.INTERVIEW)
                         .newInterviewSchedules(List.of(newInterviewSchedule))
                         .build()
-        );
-        var interviewStage = applicationStageJpaRepository.save(ApplicationStage.create(interviewApp, StageType.INTERVIEW));
-
-        createApplicationSchedule(
-                interviewStage,
-                newInterviewSchedule.stageName(),
-                newInterviewSchedule.location(),
-                ScheduleResult.WAITING,
-                null,
-                newInterviewSchedule.scheduledAt(),
-                null
         );
 
         var condition = SearchCondition.builder()
@@ -539,13 +467,13 @@ class ApplicationReaderIntegrationTest extends IntegrationTestSupport {
         );
         assertThat(interviewSummaryResponse.docsStage()).isNull();
         assertThat(interviewSummaryResponse.scheduleStage()).extracting(
-                ScheduleStage::stageName,
+                ScheduleStage::scheduleName,
                 ScheduleStage::location,
                 ScheduleStage::nextScheduleAt
         ).containsExactly(
-                newInterviewSchedule.stageName(),
+                newInterviewSchedule.scheduleName(),
                 newInterviewSchedule.location(),
-                newInterviewSchedule.scheduledAt()
+                newInterviewSchedule.startedAt()
         );
     }
 
@@ -560,15 +488,15 @@ class ApplicationReaderIntegrationTest extends IntegrationTestSupport {
                         .build()
         );
         var baseTime = now();
-        var codingTest = new NewEtcSchedule("코딩 테스트", baseTime, baseTime.plusHours(1));
+        var newEtcSchedule = new NewEtcSchedule(StageType.ETC, "코딩 테스트", baseTime, baseTime.plusHours(1));
         createApplication("네이버", "QA",
                 NewStage.builder()
                         .stageType(StageType.ETC)
-                        .newEtcSchedules(List.of(codingTest))
+                        .newEtcSchedules(List.of(newEtcSchedule))
                         .newInterviewSchedules(List.of())
                         .build()
         );
-        var newInterviewSchedule = new NewInterviewSchedule("기술 면접", InterviewType.TECH, baseTime.plusDays(1), "판교");
+        var newInterviewSchedule = new NewInterviewSchedule(StageType.INTERVIEW, "기술 면접", baseTime.plusDays(1), "판교");
         var interviewApp = createApplication("라인", "백엔드 개발자",
                 NewStage.builder()
                         .stageType(StageType.INTERVIEW)
@@ -593,114 +521,70 @@ class ApplicationReaderIntegrationTest extends IntegrationTestSupport {
     @Test
     void 서류_제출_상태로_필터링하여_지원서를_조회한다() {
         // given
-        var docApp1 = createApplication(
-                "카카오",
-                "FE 개발자",
-                NewStage.builder()
-                        .stageType(StageType.DOCUMENT)
-                        .submissionStatus(SubmissionStatus.NOT_SUBMITTED)
-                        .newInterviewSchedules(List.of())
-                        .build()
+        var appSubmitted = createApplication("카카오", "FE 개발자",
+            NewStage.builder()
+                .stageType(StageType.DOCUMENT)
+                .submissionStatus(SubmissionStatus.SUBMITTED)
+                .newInterviewSchedules(List.of())
+                .build()
         );
 
-        createApplicationSchedule(
-                applicationStageJpaRepository.save(ApplicationStage.create(docApp1, StageType.DOCUMENT)),
-                StageType.DOCUMENT.getDescription(),
-                null,
-                ScheduleResult.WAITING,
-                SubmissionStatus.NOT_SUBMITTED,
-                now(),
-                now()
-        );
-        var docsApp2 = createApplication(
-                "네이버",
-                "FE 개발자",
-                NewStage.builder()
-                        .stageType(StageType.DOCUMENT)
-                        .submissionStatus(SubmissionStatus.SUBMITTED)
-                        .newInterviewSchedules(List.of())
-                        .build()
-        );
-
-        createApplicationSchedule(
-                applicationStageJpaRepository.save(ApplicationStage.create(docsApp2, StageType.DOCUMENT)),
-                StageType.DOCUMENT.getDescription(),
-                null,
-                ScheduleResult.WAITING,
-                SubmissionStatus.SUBMITTED,
-                now(),
-                now().plusDays(3)
+        createApplication("네이버", "FE 개발자",
+            NewStage.builder()
+                .stageType(StageType.INTERVIEW)
+                .newInterviewSchedules(List.of(new NewInterviewSchedule(StageType.INTERVIEW, "1차 면접" , now(), "강남")))
+                .build()
         );
 
         var condition = new SearchCondition(
-                null,
-                List.of(StageType.DOCUMENT),
-                List.of(SubmissionStatus.SUBMITTED),
-                null
+            null,
+            List.of(StageType.DOCUMENT),
+            List.of(SubmissionStatus.SUBMITTED),
+            null
         );
         var cursor = Cursor.of(null, 20);
 
         // when
-        PageResponse<ApplicationSummaryResponse> response = applicationReader.findApplications(condition, cursor, member.getId());
+        PageResponse<ApplicationSummaryResponse> response =
+            applicationReader.findApplications(condition, cursor, member.getId());
 
         // then
         assertThat(response.contents()).hasSize(1);
-        var interviewSummaryResponse = response.contents().getFirst();
-        assertThat(interviewSummaryResponse).extracting(
-                ApplicationSummaryResponse::applicationId,
-                ApplicationSummaryResponse::company,
-                ApplicationSummaryResponse::position,
-                ApplicationSummaryResponse::currentStageType,
-                ApplicationSummaryResponse::currentScheduleResult
+
+        var res = response.contents().getFirst();
+        assertThat(res).extracting(
+            ApplicationSummaryResponse::applicationId,
+            ApplicationSummaryResponse::company,
+            ApplicationSummaryResponse::position,
+            ApplicationSummaryResponse::currentStageType,
+            ApplicationSummaryResponse::currentScheduleResult
         ).containsExactly(
-                docsApp2.getId(),
-                docsApp2.getCompany(),
-                docsApp2.getPosition(),
-                docsApp2.getCurrentStageType().getDescription(),
-                ScheduleResult.WAITING.name()
+            appSubmitted.getId(),
+            appSubmitted.getCompany(),
+            appSubmitted.getPosition(),
+            appSubmitted.getCurrentStageType().getDescription(),
+            ScheduleResult.WAITING.name()
         );
-        assertThat(interviewSummaryResponse.scheduleStage()).isNull();
-        assertThat(interviewSummaryResponse.docsStage()).extracting(
-                DocsStage::deadline,
-                DocsStage::applicationMethod
-        ).containsExactly(
-                docsApp2.getDeadline().truncatedTo(ChronoUnit.MICROS),
-                docsApp2.getApplicationMethod().getDescription()
-        );
+
+        assertThat(res.scheduleStage()).isNull();
+        assertThat(res.docsStage()).isNotNull()
+            .extracting(DocsStage::deadline, DocsStage::applicationMethod)
+            .containsExactly(
+                appSubmitted.getDeadline(),
+                appSubmitted.getApplicationMethod().getDescription()
+            );
     }
 
     @Test
-    void 최신으로_등록된_면접_일정이_포함되어_조회된다() {
+    void 가장_가까운_면접_일정이_포함되어_조회된다() {
         // given
         var baseTime = now();
-        var techInterview = new NewInterviewSchedule("기술 면접", InterviewType.TECH, baseTime.plusDays(1), "판교");
-        var techInterview2 = new NewInterviewSchedule("2차 기술 면접", InterviewType.TECH, baseTime.plusDays(2), "판교");
-        var interviewApp = createApplication(
-                "카카오",
-                "백엔드 개발자",
+        var newInterviewSchedule = new NewInterviewSchedule(StageType.INTERVIEW, "기술 면접", baseTime.plusDays(1), "판교");
+        var interviewApp = createApplication("카카오", "백엔드 개발자",
                 NewStage.builder()
                         .stageType(StageType.INTERVIEW)
-                        .newInterviewSchedules(List.of(techInterview, techInterview2))
+                        .newInterviewSchedules(List.of(newInterviewSchedule))
                         .build()
-        );
-        var interviewStage = applicationStageJpaRepository.save(ApplicationStage.create(interviewApp, StageType.INTERVIEW));
-        createApplicationSchedule(
-                interviewStage,
-                techInterview.stageName(),
-                techInterview.location(),
-                ScheduleResult.WAITING,
-                null,
-                techInterview.scheduledAt(),
-                null
-        );
-        createApplicationSchedule(
-                interviewStage,
-                techInterview2.stageName(),
-                techInterview2.location(),
-                ScheduleResult.WAITING,
-                null,
-                techInterview2.scheduledAt(),
-                null
         );
 
         var condition = SearchCondition.builder().build();
@@ -729,14 +613,14 @@ class ApplicationReaderIntegrationTest extends IntegrationTestSupport {
         var responseScheduleStage = interviewSummaryResponse.scheduleStage();
         assertThat(responseScheduleStage).isNotNull()
                 .extracting(
-                        ScheduleStage::stageName,
+                        ScheduleStage::scheduleName,
                         ScheduleStage::location,
                         ScheduleStage::nextScheduleAt
                 )
                 .containsExactly(
-                        techInterview2.stageName(),
-                        techInterview2.location(),
-                        techInterview2.scheduledAt()
+                        newInterviewSchedule.scheduleName(),
+                        newInterviewSchedule.location(),
+                        newInterviewSchedule.startedAt()
                 );
     }
 
@@ -840,66 +724,28 @@ class ApplicationReaderIntegrationTest extends IntegrationTestSupport {
                         .build()
         );
         var baseTime = now();
-        var codingTest = new NewEtcSchedule("코딩 테스트", baseTime, baseTime.plusHours(1));
-        var etcApp = createApplication(
-                "네이버",
-                "QA 개발자",
+        var newEtcSchedule = new NewEtcSchedule(StageType.ETC, "코딩 테스트", baseTime, baseTime.plusHours(1));
+        createApplication("네이버", "QA 개발자",
                 NewStage.builder()
                         .stageType(StageType.ETC)
-                        .newEtcSchedules(List.of(codingTest))
+                        .newEtcSchedules(List.of(newEtcSchedule))
                         .newInterviewSchedules(List.of())
                         .build()
         );
-        createApplicationSchedule(
-                applicationStageJpaRepository.save(ApplicationStage.create(etcApp, StageType.ETC)),
-                codingTest.stageName(),
-                null,
-                ScheduleResult.PASS,
-                null,
-                codingTest.startedAt(),
-                codingTest.endedAt()
-        );
-        var study = new NewEtcSchedule("사전 과제", baseTime, baseTime.plusHours(1));
-        var etcApp2 = createApplication(
-                "삼성",
-                "BE 개발자",
-                NewStage.builder()
-                        .stageType(StageType.ETC)
-                        .newEtcSchedules(List.of(codingTest))
-                        .newInterviewSchedules(List.of())
-                        .build()
-        );
-        createApplicationSchedule(
-                applicationStageJpaRepository.save(ApplicationStage.create(etcApp2, StageType.ETC)),
-                study.stageName(),
-                null,
-                ScheduleResult.WAITING,
-                null,
-                study.startedAt(),
-                study.endedAt()
-        );
-        var newInterviewSchedule = new NewInterviewSchedule("기술 면접", InterviewType.TECH, baseTime.plusDays(1), "판교");
-        var interviewApp = createApplication("라인", "백엔드 개발자",
+
+        var newInterviewSchedule = new NewInterviewSchedule(StageType.INTERVIEW, "기술 면접", baseTime.plusDays(1), "판교");
+        createApplication("라인", "백엔드 개발자",
                 NewStage.builder()
                         .stageType(StageType.INTERVIEW)
                         .newInterviewSchedules(List.of(newInterviewSchedule))
                         .build()
-        );
-        createApplicationSchedule(
-                applicationStageJpaRepository.save(ApplicationStage.create(interviewApp, StageType.INTERVIEW)),
-                newInterviewSchedule.stageName(),
-                newInterviewSchedule.location(),
-                ScheduleResult.PASS,
-                null,
-                newInterviewSchedule.scheduledAt(),
-                null
         );
 
         var condition = new SearchCondition(
                 "개발자",
                 List.of(StageType.INTERVIEW, StageType.ETC),
                 List.of(),
-                List.of(StageResult.STAGE_PASS)
+                List.of()
         );
         var cursor = Cursor.of(null, 20);
 
@@ -990,34 +836,6 @@ class ApplicationReaderIntegrationTest extends IntegrationTestSupport {
                 now().plusDays(2)
         );
 
-        createApplicationSchedule(
-                applicationStageJpaRepository.save(ApplicationStage.create(app1, StageType.DOCUMENT)),
-                StageType.DOCUMENT.getDescription(),
-                null,
-                ScheduleResult.WAITING,
-                SubmissionStatus.SUBMITTED,
-                now(),
-                app1.getDeadline()
-        );
-        createApplicationSchedule(
-                applicationStageJpaRepository.save(ApplicationStage.create(app2, StageType.DOCUMENT)),
-                StageType.DOCUMENT.getDescription(),
-                null,
-                ScheduleResult.WAITING,
-                SubmissionStatus.SUBMITTED,
-                now(),
-                now().plusDays(1)
-        );
-        createApplicationSchedule(
-                applicationStageJpaRepository.save(ApplicationStage.create(app3, StageType.DOCUMENT)),
-                StageType.DOCUMENT.getDescription(),
-                null,
-                ScheduleResult.WAITING,
-                SubmissionStatus.NOT_SUBMITTED,
-                now(),
-                now().plusDays(1)
-        );
-
         // when
         var response = applicationReader.findBeforeDeadlineApplications(member.getId(), new Cursor(null, 20));
 
@@ -1059,7 +877,7 @@ class ApplicationReaderIntegrationTest extends IntegrationTestSupport {
                 startedAt,
                 endedAt
         );
-        interviewScheduleRepository.save(schedule);
+        scheduleJpaRepository.save(schedule);
     }
 
     private List<Application> createBulkApplications(Member member, StageType stageType, ApplicationStatus applicationStatus,
@@ -1076,7 +894,7 @@ class ApplicationReaderIntegrationTest extends IntegrationTestSupport {
                     stageType,
                     applicationStatus,
                     ApplicationMethod.values()[i % ApplicationMethod.values().length],
-                    LocalDateTime.now().plusDays(30)
+                    now().plusDays(30)
             );
             applications.add(app);
         }
@@ -1127,7 +945,13 @@ class ApplicationReaderIntegrationTest extends IntegrationTestSupport {
                 .deadline(deadline)
                 .build();
 
-        return applicationManager.create(newJobPosting, newApplicationInfo, newStage, List.of(), member.getId());
+        Application app = applicationManager.create(newJobPosting, newApplicationInfo, newStage, List.of(), member.getId());
+        applicationStageManager.createWithSchedule(app, newStage);
+        return app;
     }
-
+    private Optional<ApplicationStage> getStage(Application app, StageType type) {
+        return Optional.of(applicationStageJpaRepository
+            .findByApplicationIdAndStageType(app.getId(), type)
+            .orElseThrow());
+    }
 }

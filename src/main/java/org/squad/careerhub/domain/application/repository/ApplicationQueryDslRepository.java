@@ -4,7 +4,7 @@ import static com.querydsl.core.types.Projections.constructor;
 import static org.squad.careerhub.domain.application.entity.QApplication.application;
 import static org.squad.careerhub.domain.application.entity.QApplicationStage.applicationStage;
 import static org.squad.careerhub.domain.schedule.entity.QSchedule.schedule;
-
+import static org.squad.careerhub.global.utils.DateTimeUtils.now;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.JPAExpressions;
@@ -118,7 +118,7 @@ public class ApplicationQueryDslRepository {
     }
 
     private BooleanExpression deadlineGoe(LocalDateTime today) {
-        today = today == null ? LocalDateTime.now() : today;
+        today = today == null ? now() : today;
 
         return application.deadline.goe(today);
     }
@@ -191,5 +191,4 @@ public class ApplicationQueryDslRepository {
     private BooleanExpression isActive() {
         return application.status.eq(EntityStatus.ACTIVE);
     }
-
 }
