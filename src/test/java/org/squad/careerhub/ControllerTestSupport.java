@@ -9,6 +9,8 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.assertj.MockMvcTester;
 import org.squad.careerhub.domain.application.controller.ApplicationController;
 import org.squad.careerhub.domain.application.service.ApplicationService;
+import org.squad.careerhub.domain.archive.controller.QuestionArchiveController;
+import org.squad.careerhub.domain.archive.service.QuestionArchiveService;
 import org.squad.careerhub.domain.community.interviewreview.controller.InterviewReviewController;
 import org.squad.careerhub.domain.community.interviewreview.service.InterviewReviewService;
 import org.squad.careerhub.domain.jobposting.controller.JobPostingController;
@@ -23,6 +25,8 @@ import org.squad.careerhub.global.security.TestSecurityConfig;
         controllers = {
                 ApplicationController.class,
                 InterviewReviewController.class,
+                JobPostingController.class,
+                QuestionArchiveController.class,
                 JobPostingController.class,
                 ScheduleController.class
         })
@@ -44,7 +48,9 @@ public abstract class ControllerTestSupport {
     protected JobPostingService jobPostingService;
 
     @MockitoBean
-    protected ScheduleService scheduleService;
+    protected QuestionArchiveService questionArchiveService;
 
+    @MockitoBean
+    protected ScheduleService scheduleService;
 
 }
