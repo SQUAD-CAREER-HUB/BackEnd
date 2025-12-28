@@ -25,8 +25,7 @@ public class QuestionArchiveQueryDslRepository {
                 .join(questionArchive.interviewQuestion, interviewQuestion).fetchJoin()
                 .join(interviewQuestion.interviewReview, interviewReview).fetchJoin()
                 .where(
-                        applicationEq(applicationId),
-                        memberEq(authorId),
+                        applicationAndAuthorEq(applicationId, authorId),
                         isActive(),
                         cursorCondition(cursor.lastCursorId())
                 )
@@ -43,12 +42,9 @@ public class QuestionArchiveQueryDslRepository {
         return questionArchive.id.lt(lastCursorId);
     }
 
-    private BooleanExpression memberEq(Long authorId) {
-        return interviewReview.author.id.eq(authorId);
-    }
-
-    private BooleanExpression applicationEq(Long applicationId) {
-        return questionArchive.application.id.eq(applicationId);
+    private BooleanExpression applicationAndAuthorEq(Long applicationId, Long authorId) {
+        return questionArchive.application.id.eq(applicationId)
+                .and(questionArchive.application.author.id.eq(authorId));
     }
 
     private BooleanExpression isActive() {
