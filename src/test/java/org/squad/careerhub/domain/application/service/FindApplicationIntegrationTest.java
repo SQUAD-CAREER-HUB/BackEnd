@@ -2,10 +2,9 @@ package org.squad.careerhub.domain.application.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.tuple;
-
+import static org.squad.careerhub.global.utils.DateTimeUtils.now;
 import jakarta.transaction.Transactional;
 import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.BeforeEach;
@@ -468,10 +467,6 @@ class FindApplicationIntegrationTest extends IntegrationTestSupport {
 
         var interviewStageTimeLines = applicationDetailPageResponse.applicationStageTimeLine().interviewStageTimeLine();
         assertThat(interviewStageTimeLines).isEmpty();
-    }
-
-    private LocalDateTime now() {
-        return LocalDateTime.now().truncatedTo(ChronoUnit.MICROS);
     }
 
     private Schedule createApplicationSchedule(

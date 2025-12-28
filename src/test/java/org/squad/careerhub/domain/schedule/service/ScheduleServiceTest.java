@@ -7,7 +7,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
+import static org.squad.careerhub.global.utils.DateTimeUtils.now;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
@@ -202,9 +202,5 @@ class ScheduleServiceTest extends TestDoubleSupport {
         assertThat(captured.scheduleName()).isEqualTo("과제 제출");
         assertThat(captured.startedAt()).isEqualTo(LocalDateTime.of(2025, 12, 5, 23, 59));
         assertThat(captured.endedAt()).isNull();
-    }
-
-    private LocalDateTime now() {
-        return LocalDateTime.now().truncatedTo(ChronoUnit.MICROS);
     }
 }

@@ -1,8 +1,8 @@
 package org.squad.careerhub.domain.application.service;
 
-import java.time.LocalDateTime;
 import java.util.List;
-import java.time.temporal.ChronoUnit;
+import static org.squad.careerhub.global.utils.DateTimeUtils.now;
+
 import java.util.function.Function;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -154,9 +154,5 @@ public class ApplicationReader {
             return null;
         }
         return idExtractor.apply(items.getLast());
-    }
-
-    private LocalDateTime now() {
-        return LocalDateTime.now().truncatedTo(ChronoUnit.MICROS);
     }
 }

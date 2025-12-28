@@ -1,9 +1,9 @@
 package org.squad.careerhub.domain.application.entity;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.squad.careerhub.global.utils.DateTimeUtils.now;
 
 import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.squad.careerhub.domain.member.entity.Member;
@@ -98,8 +98,5 @@ class ApplicationTest {
                 deadline,
                 null
         );
-    }
-    private LocalDateTime now() {
-        return LocalDateTime.now().truncatedTo(ChronoUnit.MICROS);
     }
 }

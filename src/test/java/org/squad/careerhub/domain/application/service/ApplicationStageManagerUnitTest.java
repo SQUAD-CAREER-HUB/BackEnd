@@ -6,9 +6,8 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.squad.careerhub.global.utils.DateTimeUtils.now;
 
-import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -103,9 +102,5 @@ class ApplicationStageManagerUnitTest extends TestDoubleSupport {
         assertThat(applicationStage.getStageType()).isEqualTo(StageType.ETC);
         verify(applicationStageJpaRepository, times(2)).save(any());
         verify(scheduleManager, times(1)).createEtcSchedule(testApplication, etcSchedules.getFirst());
-    }
-
-    private LocalDateTime now() {
-        return LocalDateTime.now().truncatedTo(ChronoUnit.MICROS);
     }
 }

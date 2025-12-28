@@ -9,9 +9,8 @@ import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.squad.careerhub.global.utils.DateTimeUtils.now;
 
-import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.Test;
@@ -118,9 +117,5 @@ class ApplicationServiceUnitTest extends TestDoubleSupport {
                 .stageType(StageType.INTERVIEW)
                 .newInterviewSchedules(List.of())
                 .build();
-    }
-
-    private LocalDateTime now() {
-        return LocalDateTime.now().truncatedTo(ChronoUnit.MICROS);
     }
 }

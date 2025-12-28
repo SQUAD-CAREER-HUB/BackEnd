@@ -1,7 +1,7 @@
 package org.squad.careerhub.domain.application.entity;
 
 import static java.util.Objects.requireNonNull;
-
+import static org.squad.careerhub.global.utils.DateTimeUtils.now;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -10,7 +10,6 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -123,9 +122,4 @@ public class Application extends BaseEntity {
             throw new CareerHubException(ErrorStatus.FORBIDDEN_ERROR);
         }
     }
-
-    private LocalDateTime now() {
-        return LocalDateTime.now().truncatedTo(ChronoUnit.MICROS);
-    }
-
 }

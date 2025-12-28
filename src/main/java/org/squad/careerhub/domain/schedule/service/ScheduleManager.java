@@ -1,11 +1,9 @@
 package org.squad.careerhub.domain.schedule.service;
 
 import static java.util.Objects.requireNonNull;
-
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.security.oauth2.client.web.OAuth2AuthorizedClientRepository;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.squad.careerhub.domain.application.entity.Application;
@@ -28,7 +26,6 @@ public class ScheduleManager {
 
     private final ScheduleJpaRepository scheduleJpaRepository;
     private final ApplicationStageJpaRepository applicationStageJpaRepository;
-    private final OAuth2AuthorizedClientRepository authorizedClientRepository;
 
     public Schedule createInterviewSchedule(Application app, NewInterviewSchedule cmd) {
         ApplicationStage stage = getOrCreateStage(app, StageType.INTERVIEW);

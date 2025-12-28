@@ -1,9 +1,7 @@
 package org.squad.careerhub.domain.application.service;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-
-import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
+import static org.squad.careerhub.global.utils.DateTimeUtils.now;
 import java.util.Collections;
 import java.util.List;
 import org.junit.jupiter.api.Test;
@@ -177,10 +175,6 @@ class ApplicationPolicyValidatorTest extends TestDoubleSupport {
         assertThatThrownBy(() -> applicationPolicyValidator.validateNewStage(interviewStage))
                 .isInstanceOf(CareerHubException.class)
                 .hasMessage(ErrorStatus.INVALID_FINAL_APPLICATION_STATUS_RULE.getMessage());
-    }
-
-    private LocalDateTime now() {
-        return LocalDateTime.now().truncatedTo(ChronoUnit.MICROS);
     }
 
 }

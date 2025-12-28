@@ -9,9 +9,9 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.squad.careerhub.global.utils.DateTimeUtils.now;
 
 import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
@@ -167,10 +167,6 @@ class ScheduleManagerTest extends TestDoubleSupport {
             .isInstanceOf(NullPointerException.class);
 
         verify(scheduleJpaRepository, never()).save(any());
-    }
-
-    private LocalDateTime now() {
-        return LocalDateTime.now().truncatedTo(ChronoUnit.MICROS);
     }
 }
 
