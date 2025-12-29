@@ -73,9 +73,7 @@ public class ApplicationService {
         return applicationReader.findApplication(applicationId, memberId);
     }
 
-    public ApplicationStatisticsResponse getApplicationStatic(Long authorId) {
-        log.debug("[Application] 지원서 통계 조회 - memberId: {}", authorId);
-
+    public ApplicationStatisticsResponse getApplicationStatistics(Long authorId) {
         return applicationReader.getApplicationStatistics(authorId);
     }
 
