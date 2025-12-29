@@ -4,8 +4,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 import lombok.Builder;
-import org.squad.careerhub.domain.application.entity.StageType;
-import org.squad.careerhub.domain.schedule.service.dto.ApplicationInfo;
 import org.squad.careerhub.domain.schedule.service.dto.NewEtcSchedule;
 
 @Builder
@@ -51,18 +49,12 @@ public record EtcScheduleCreateRequest(
     )
     String link
 ) {
+
     public NewEtcSchedule toNewEtcSchedule() {
         return NewEtcSchedule.builder()
-            .stageType(StageType.ETC)
             .scheduleName(scheduleName)
             .startedAt(startedAt)
             .endedAt(endedAt)
-            .build();
-    }
-
-    public ApplicationInfo toApplicationInfo() {
-        return ApplicationInfo.builder()
-            .applicationId(applicationId)
             .build();
     }
 }
