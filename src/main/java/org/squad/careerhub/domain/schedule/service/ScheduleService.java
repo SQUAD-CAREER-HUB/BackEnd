@@ -23,7 +23,9 @@ public class ScheduleService {
     ) {
         Application app = applicationReader.findApplication(applicationId);
         app.validateOwnedBy(memberId);
+
         Schedule saved = scheduleManager.createInterviewSchedule(app, newInterviewSchedule);
+
         return ScheduleResponse.from(saved);
     }
 
@@ -34,7 +36,9 @@ public class ScheduleService {
     ) {
         Application app = applicationReader.findApplication(applicationId);
         app.validateOwnedBy(memberId);
+
         Schedule saved = scheduleManager.createEtcSchedule(app, newEtcSchedule);
+        
         return ScheduleResponse.from(saved);
     }
 
