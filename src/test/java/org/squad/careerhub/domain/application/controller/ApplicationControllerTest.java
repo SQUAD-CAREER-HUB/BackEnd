@@ -108,7 +108,7 @@ class ApplicationControllerTest extends ControllerTestSupport {
                 .etcStageCount(20)
                 .finalPassedCount(25)
                 .build();
-        given(applicationService.getApplicationStatic(any())).willReturn(response);
+        given(applicationService.getApplicationStatistics(any())).willReturn(response);
 
         // when & then
         assertThat(mvcTester.get().uri("/v1/applications/statistics"))
