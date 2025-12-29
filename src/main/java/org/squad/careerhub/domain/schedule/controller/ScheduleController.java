@@ -14,8 +14,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.squad.careerhub.domain.schedule.controller.dto.EtcScheduleCreateRequest;
 import org.squad.careerhub.domain.application.entity.StageType;
+import org.squad.careerhub.domain.schedule.controller.dto.EtcScheduleCreateRequest;
 import org.squad.careerhub.domain.schedule.controller.dto.InterviewScheduleCreateRequest;
 import org.squad.careerhub.domain.schedule.service.ScheduleService;
 import org.squad.careerhub.domain.schedule.service.dto.ScheduleListResponse;
@@ -36,7 +36,7 @@ public class ScheduleController extends ScheduleDocsController {
         @LoginMember Long memberId
     ) {
         ScheduleResponse response = scheduleService.createInterviewFromCalendar(
-            request.toApplicationInfo(),
+            request.applicationId(),
             request.toNewInterviewSchedule(),
             memberId
         );
@@ -50,7 +50,7 @@ public class ScheduleController extends ScheduleDocsController {
         @LoginMember Long memberId
     ) {
         ScheduleResponse response = scheduleService.createEtcFromCalendar(
-            request.toApplicationInfo(),
+            request.applicationId(),
             request.toNewEtcSchedule(),
             memberId);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);

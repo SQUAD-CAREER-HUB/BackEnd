@@ -1,13 +1,14 @@
 package org.squad.careerhub.domain.schedule.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import java.time.LocalDateTime;
 import static org.squad.careerhub.global.utils.DateTimeUtils.now;
+
+import java.time.LocalDateTime;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
@@ -21,7 +22,6 @@ import org.squad.careerhub.domain.application.service.ApplicationReader;
 import org.squad.careerhub.domain.schedule.controller.dto.EtcScheduleCreateRequest;
 import org.squad.careerhub.domain.schedule.controller.dto.InterviewScheduleCreateRequest;
 import org.squad.careerhub.domain.schedule.entity.Schedule;
-import org.squad.careerhub.domain.schedule.service.dto.ApplicationInfo;
 import org.squad.careerhub.domain.schedule.service.dto.NewEtcSchedule;
 import org.squad.careerhub.domain.schedule.service.dto.NewInterviewSchedule;
 import org.squad.careerhub.domain.schedule.service.dto.ScheduleResponse;
@@ -66,7 +66,7 @@ class ScheduleServiceTest extends TestDoubleSupport {
             .build();
 
         ScheduleResponse res = scheduleService.createInterviewFromCalendar(
-            req.toApplicationInfo(),
+            req.applicationId(),
             req.toNewInterviewSchedule(),
             memberId
         );
@@ -76,7 +76,8 @@ class ScheduleServiceTest extends TestDoubleSupport {
         verify(applicationReader).findApplication(applicationId);
         verify(app).validateOwnedBy(memberId);
 
-        ArgumentCaptor<NewInterviewSchedule> captor = ArgumentCaptor.forClass(NewInterviewSchedule.class);
+        ArgumentCaptor<NewInterviewSchedule> captor = ArgumentCaptor.forClass(
+            NewInterviewSchedule.class);
         verify(scheduleManager).createInterviewSchedule(eq(app), captor.capture());
 
         NewInterviewSchedule captured = captor.getValue();
@@ -89,7 +90,6 @@ class ScheduleServiceTest extends TestDoubleSupport {
     @Test
     void createInterviewFromCalendar_applicationId가_null이면_BAD_REQUEST() {
         // given
-        ApplicationInfo info = new ApplicationInfo(null);
         NewInterviewSchedule cmd = NewInterviewSchedule.builder()
             .scheduleName("1차 면접")
             .startedAt(now())
@@ -100,7 +100,7 @@ class ScheduleServiceTest extends TestDoubleSupport {
             .thenThrow(new CareerHubException(ErrorStatus.BAD_REQUEST));
 
         // when & then
-        assertThatThrownBy(() -> scheduleService.createInterviewFromCalendar(info, cmd, 1L))
+        assertThatThrownBy(() -> scheduleService.createInterviewFromCalendar(null, cmd, 1L))
             .isInstanceOf(CareerHubException.class)
             .extracting("errorStatus")
             .isEqualTo(ErrorStatus.BAD_REQUEST);
@@ -114,7 +114,6 @@ class ScheduleServiceTest extends TestDoubleSupport {
         when(applicationReader.findApplication(applicationId))
             .thenThrow(new CareerHubException(ErrorStatus.NOT_FOUND));
 
-        ApplicationInfo info = new ApplicationInfo(applicationId);
         NewInterviewSchedule cmd = NewInterviewSchedule.builder()
             .scheduleName("면접")
             .startedAt(now())
@@ -122,7 +121,8 @@ class ScheduleServiceTest extends TestDoubleSupport {
             .build();
 
         // when & then
-        assertThatThrownBy(() -> scheduleService.createInterviewFromCalendar(info, cmd, 1L))
+        assertThatThrownBy(
+            () -> scheduleService.createInterviewFromCalendar(applicationId, cmd, 1L))
             .isInstanceOf(CareerHubException.class)
             .extracting("errorStatus")
             .isEqualTo(ErrorStatus.NOT_FOUND);
@@ -140,7 +140,6 @@ class ScheduleServiceTest extends TestDoubleSupport {
         Mockito.doThrow(new CareerHubException(ErrorStatus.FORBIDDEN_ERROR))
             .when(app).validateOwnedBy(memberId);
 
-        ApplicationInfo info = new ApplicationInfo(applicationId);
         NewInterviewSchedule cmd = NewInterviewSchedule.builder()
             .scheduleName("면접")
             .startedAt(now())
@@ -148,7 +147,8 @@ class ScheduleServiceTest extends TestDoubleSupport {
             .build();
 
         // when & then
-        assertThatThrownBy(() -> scheduleService.createInterviewFromCalendar(info, cmd, memberId))
+        assertThatThrownBy(
+            () -> scheduleService.createInterviewFromCalendar(applicationId, cmd, memberId))
             .isInstanceOf(CareerHubException.class)
             .extracting("errorStatus")
             .isEqualTo(ErrorStatus.FORBIDDEN_ERROR);
@@ -183,11 +183,10 @@ class ScheduleServiceTest extends TestDoubleSupport {
             .endedAt(null)
             .build();
 
-        ApplicationInfo info = req.toApplicationInfo();
         NewEtcSchedule cmd = req.toNewEtcSchedule();
 
         // when
-        ScheduleResponse res = scheduleService.createEtcFromCalendar(info, cmd, memberId);
+        ScheduleResponse res = scheduleService.createEtcFromCalendar(applicationId, cmd, memberId);
 
         // then
         assertThat(res.id()).isEqualTo(200L);
