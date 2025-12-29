@@ -6,7 +6,6 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.time.LocalDate;
 import java.util.List;
@@ -16,7 +15,6 @@ import org.springframework.http.ResponseEntity;
 import org.squad.careerhub.domain.application.entity.StageType;
 import org.squad.careerhub.domain.schedule.controller.dto.EtcScheduleCreateRequest;
 import org.squad.careerhub.domain.schedule.controller.dto.InterviewScheduleCreateRequest;
-import org.squad.careerhub.domain.schedule.service.dto.InterviewScheduleResponse;
 import org.squad.careerhub.domain.schedule.service.dto.ScheduleListResponse;
 import org.squad.careerhub.domain.schedule.service.dto.ScheduleResponse;
 import org.squad.careerhub.global.error.ErrorStatus;
@@ -147,7 +145,6 @@ public abstract class ScheduleDocsController {
             example = "INTERVIEW,DOCUMENT"
         )
         List<StageType> stageTypes,
-
 
         Long memberId
     );

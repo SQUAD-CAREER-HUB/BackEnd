@@ -6,7 +6,6 @@ import org.squad.careerhub.domain.application.entity.ApplicationStatus;
 import org.squad.careerhub.domain.application.entity.ScheduleResult;
 import org.squad.careerhub.domain.application.entity.StageType;
 import org.squad.careerhub.domain.application.entity.SubmissionStatus;
-import org.squad.careerhub.domain.schedule.enums.InterviewType;
 
 @Builder
 public record ScheduleItemResponse(

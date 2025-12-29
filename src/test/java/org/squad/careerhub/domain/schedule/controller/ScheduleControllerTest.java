@@ -50,7 +50,6 @@ class ScheduleControllerTest extends ControllerTestSupport {
                 .updatedAt(LocalDateTime.of(2025, 12, 1, 10, 0))
                 .build());
 
-
         // when & then
         assertThat(
             mvcTester.post()
@@ -82,7 +81,6 @@ class ScheduleControllerTest extends ControllerTestSupport {
                 .company("Naver")
                 .position("Backend Developer")
                 .stageType(StageType.ETC)
-                .stageName("기타")
                 .scheduleName("과제 제출")
                 .startedAt(LocalDateTime.of(2025, 12, 5, 23, 59))
                 .endedAt(null)
