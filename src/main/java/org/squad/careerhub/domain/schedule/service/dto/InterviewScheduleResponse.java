@@ -3,8 +3,7 @@ package org.squad.careerhub.domain.schedule.service.dto;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalDateTime;
 import lombok.Builder;
-import org.squad.careerhub.domain.schedule.enums.InterviewResult;
-import org.squad.careerhub.domain.schedule.enums.InterviewType;
+import org.squad.careerhub.domain.application.entity.ScheduleResult;
 
 @Schema(description = "면접 일정 응답 DTO")
 @Builder
@@ -17,17 +16,10 @@ public record InterviewScheduleResponse(
     Long applicationId,
 
     @Schema(
-        description = "면접 유형",
-        example = "TECH",
-        allowableValues = {"TECH", "FIT", "EXECUTIVE", "DESIGN", "TEST", "ETC"}
-    )
-    InterviewType type,
-
-    @Schema(
-        description = "기타 면접 유형 상세 (type= ETC 일 때만 사용)",
+        description = "면접 일정 이름",
         example = "인성 + 기술 면접"
     )
-    String typeDetail,
+    String scheduleName,
 
     @Schema(
         description = "면접 일시 (ISO8601, LocalDateTime)",
@@ -48,7 +40,7 @@ public record InterviewScheduleResponse(
         description = "면접 결과 상태 (WAITING 대기/ PASS 합격/ FAIL 불합격)",
         example = "WAITING"
     )
-    InterviewResult result,
+    ScheduleResult result,
 
     @Schema(description = "생성 시각", example = "2025-11-30T21:10:00")
     LocalDateTime createdAt,
@@ -60,20 +52,18 @@ public record InterviewScheduleResponse(
     public static InterviewScheduleResponse of(
         Long id,
         Long applicationId,
-        InterviewType type,
-        String typeDetail,
+        String scheduleName,
         LocalDateTime datetime,
         String location,
         String onlineLink,
-        InterviewResult result,
+        ScheduleResult result,
         LocalDateTime createdAt,
         LocalDateTime updatedAt
     ) {
         return InterviewScheduleResponse.builder()
             .id(id)
             .applicationId(applicationId)
-            .type(type)
-            .typeDetail(typeDetail)
+            .scheduleName(scheduleName)
             .datetime(datetime)
             .location(location)
             .onlineLink(onlineLink)
@@ -87,11 +77,11 @@ public record InterviewScheduleResponse(
         return InterviewScheduleResponse.builder()
             .id(10L)
             .applicationId(1L)
-            .type(InterviewType.TECH)
+            .scheduleName("1차 면접")
             .datetime(LocalDateTime.parse("2025-12-10T19:00:00"))
             .location("서울 강남구 OO빌딩 3층 회의실")
             .onlineLink("https://zoom.us/j/123456789")
-            .result(InterviewResult.PASS)
+            .result(ScheduleResult.PASS)
             .createdAt(LocalDateTime.parse("2025-11-30T21:10:00"))
             .updatedAt(LocalDateTime.parse("2025-11-30T21:10:00"))
             .build();
