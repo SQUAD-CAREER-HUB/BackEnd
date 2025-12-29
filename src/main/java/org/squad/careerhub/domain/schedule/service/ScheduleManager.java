@@ -1,6 +1,7 @@
 package org.squad.careerhub.domain.schedule.service;
 
 import static java.util.Objects.requireNonNull;
+
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -27,38 +28,38 @@ public class ScheduleManager {
     private final ScheduleJpaRepository scheduleJpaRepository;
     private final ApplicationStageJpaRepository applicationStageJpaRepository;
 
-    public Schedule createInterviewSchedule(Application app, NewInterviewSchedule cmd) {
+    public Schedule createInterviewSchedule(Application app,
+        NewInterviewSchedule interviewSchedule) {
         ApplicationStage stage = getOrCreateStage(app, StageType.INTERVIEW);
-
         app.updateCurrentStageType(StageType.INTERVIEW);
 
         Schedule schedule = Schedule.register(
             app.getAuthor(),
             stage,
-            requireNonNull(cmd.scheduleName()),
-            cmd.location(),
+            interviewSchedule.scheduleName(),
+            interviewSchedule.location(),
             ScheduleResult.WAITING,
             null,
-            requireNonNull(cmd.startedAt()),
+            requireNonNull(interviewSchedule.startedAt()),
             null
         );
         return scheduleJpaRepository.save(schedule);
     }
 
-    public void createInterviewSchedules(Application app, List<NewInterviewSchedule> cmds){
+    public void createInterviewSchedules(Application app,
+        List<NewInterviewSchedule> interviewSchedules) {
         ApplicationStage stage = getOrCreateStage(app, StageType.INTERVIEW);
-
         app.updateCurrentStageType(StageType.INTERVIEW);
 
-        List<Schedule> schedules = cmds.stream()
-            .map(cmd -> Schedule.register(
+        List<Schedule> schedules = interviewSchedules.stream()
+            .map(schedule -> Schedule.register(
                 app.getAuthor(),
                 stage,
-                requireNonNull(cmd.scheduleName()),
-                cmd.location(),
+                schedule.scheduleName(),
+                schedule.location(),
                 ScheduleResult.WAITING,
                 null,
-                requireNonNull(cmd.startedAt()),
+                requireNonNull(schedule.startedAt()),
                 null
             ))
             .toList();
@@ -66,26 +67,28 @@ public class ScheduleManager {
         scheduleJpaRepository.saveAll(schedules);
     }
 
-    public Schedule createEtcSchedule(Application app, NewEtcSchedule cmd) {
+    public Schedule createEtcSchedule(Application app, NewEtcSchedule etcSchedule) {
         ApplicationStage stage = getOrCreateStage(app, StageType.ETC);
         app.updateCurrentStageType(StageType.ETC);
 
         Schedule schedule = Schedule.register(
             app.getAuthor(),
             stage,
-            requireNonNull(cmd.scheduleName()),
+            requireNonNull(etcSchedule.scheduleName()),
             null,
             ScheduleResult.WAITING,
             null,
-            requireNonNull(cmd.startedAt()),
-            cmd.endedAt()
+            requireNonNull(etcSchedule.startedAt()),
+            etcSchedule.endedAt()
         );
 
         return scheduleJpaRepository.save(schedule);
     }
 
     private ApplicationStage getOrCreateStage(Application app, StageType stageType) {
-        if (stageType == null) throw new CareerHubException(ErrorStatus.BAD_REQUEST);
+        if (stageType == null) {
+            throw new CareerHubException(ErrorStatus.BAD_REQUEST);
+        }
 
         return applicationStageJpaRepository
             .findByApplicationIdAndStageType(app.getId(), stageType)
@@ -104,9 +107,8 @@ public class ScheduleManager {
             });
     }
 
-    public Schedule createDocumentSchedule(Application app, NewDocumentSchedule cmd) {
+    public Schedule createDocumentSchedule(Application app, NewDocumentSchedule documentSchedule) {
         ApplicationStage stage = getOrCreateStage(app, StageType.DOCUMENT);
-
         app.updateCurrentStageType(StageType.DOCUMENT);
 
         Schedule schedule = Schedule.register(
@@ -115,9 +117,9 @@ public class ScheduleManager {
             StageType.DOCUMENT.getDescription(),
             null,
             ScheduleResult.WAITING,
-            cmd.submissionStatus(),
+            documentSchedule.submissionStatus(),
             app.getDeadline(),
-            cmd.endedAt()
+            documentSchedule.endedAt()
         );
 
         return scheduleJpaRepository.save(schedule);
