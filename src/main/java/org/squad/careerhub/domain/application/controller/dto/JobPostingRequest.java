@@ -5,7 +5,6 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 import lombok.Builder;
-import org.squad.careerhub.domain.application.service.dto.NewJobPosting;
 
 @Schema(description = "채용공고 정보 요청 DTO")
 @Builder

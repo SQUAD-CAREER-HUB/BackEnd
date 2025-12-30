@@ -864,28 +864,6 @@ class ApplicationReaderIntegrationTest extends IntegrationTestSupport {
                 .contains(SubmissionStatus.SUBMITTED, SubmissionStatus.NOT_SUBMITTED);
     }
 
-    private void createApplicationSchedule(
-            ApplicationStage applicationStage,
-            String scheduleName,
-            String location,
-            ScheduleResult scheduleResult,
-            SubmissionStatus submissionStatus,
-            LocalDateTime startedAt,
-            LocalDateTime endedAt
-    ) {
-        Schedule schedule = Schedule.register(
-                member,
-                applicationStage,
-                scheduleName,
-                location,
-                scheduleResult,
-                submissionStatus,
-                startedAt,
-                endedAt
-        );
-        scheduleJpaRepository.save(schedule);
-    }
-
     private List<Application> createBulkApplications(Member member, StageType stageType, ApplicationStatus applicationStatus,
             int count) {
         List<Application> applications = new ArrayList<>();
