@@ -9,8 +9,8 @@ import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.squad.careerhub.global.utils.DateTimeUtils.now;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.Test;
@@ -20,13 +20,14 @@ import org.springframework.test.util.ReflectionTestUtils;
 import org.squad.careerhub.TestDoubleSupport;
 import org.squad.careerhub.domain.application.entity.Application;
 import org.squad.careerhub.domain.application.entity.ApplicationMethod;
+import org.squad.careerhub.domain.application.entity.ApplicationStatus;
+import org.squad.careerhub.domain.application.entity.ScheduleResult;
 import org.squad.careerhub.domain.application.entity.StageType;
 import org.squad.careerhub.domain.application.entity.SubmissionStatus;
-import org.squad.careerhub.domain.application.service.dto.NewApplicationInfo;
-import org.squad.careerhub.domain.application.service.dto.NewJobPosting;
+import org.squad.careerhub.domain.application.service.dto.NewApplication;
 import org.squad.careerhub.domain.application.service.dto.NewStage;
 import org.squad.careerhub.domain.member.entity.Member;
-import org.squad.careerhub.domain.schedule.service.ScheduleManager;
+import org.squad.careerhub.domain.schedule.service.dto.NewDocsSchedule;
 
 @RequiredArgsConstructor
 class ApplicationServiceUnitTest extends TestDoubleSupport {
@@ -43,39 +44,20 @@ class ApplicationServiceUnitTest extends TestDoubleSupport {
     @InjectMocks
     ApplicationService applicationService;
 
-    @Mock
-    ScheduleManager scheduleManager;
-
     @Test
     void 지원서_생성_시_전형단계와_일정을_생성하는_메서드를_호출한다() {
         // given
         var mockMember = mock(Member.class);
-        var application = Application.create(
-                mockMember,
-                "http://jobposting.url",
-                "TestCompany",
-                "TestPosition",
-                "서울",
-                StageType.DOCUMENT,
-                null,
-                ApplicationMethod.EMAIL,
-                now().plusDays(14)
-        );
+        var newApplicationDto = createNewApplication();
+        var application = createApplication(mockMember, newApplicationDto);
         ReflectionTestUtils.setField(application, "id", 1L);
 
-        doNothing().when(applicationPolicyValidator).validateNewStage(any());
-        given(applicationManager.create(
-                any(NewJobPosting.class),
-                any(NewApplicationInfo.class),
-                any(NewStage.class),
-                anyList(),
-                anyLong()
-        )).willReturn(application);
+        doNothing().when(applicationPolicyValidator).validateNewStage(any(), any());
+        given(applicationManager.create(any(), anyList(), anyLong())).willReturn(application);
 
         // when
         Long applicationId = applicationService.createApplication(
-                createJobPosting("TestCompany", "TestPosition", "http://jobposting.url"),
-                createApplicationInfo(),
+                newApplicationDto,
                 createDocumentNewStage(),
                 List.of(),
                 1L
@@ -84,38 +66,42 @@ class ApplicationServiceUnitTest extends TestDoubleSupport {
         // then
         assertThat(applicationId).isEqualTo(1L);
         verify(applicationStageManager, times(1)).createWithSchedule(any(), any());
-
     }
 
 
-    private NewJobPosting createJobPosting(String company, String position, String jobPostingUrl) {
-        return NewJobPosting.builder()
-                .company(company)
-                .position(position)
-                .jobPostingUrl(jobPostingUrl)
-                .jobLocation("서울")
-                .build();
-    }
-
-    private NewApplicationInfo createApplicationInfo() {
-        return NewApplicationInfo.builder()
+    private NewApplication createNewApplication() {
+        return NewApplication.builder()
+                .jobPostingUrl("https://www.careerhub.com/job/12345")
+                .company("TechCorp")
+                .position("Software Engineer")
+                .jobLocation("New York, NY")
+                .deadline(LocalDateTime.of(2020, 1, 1, 0, 0))
+                .stageType(StageType.INTERVIEW)
                 .applicationMethod(ApplicationMethod.EMAIL)
-                .deadline(now().plusDays(14))
+                .finalApplicationStatus(ApplicationStatus.IN_PROGRESS)
                 .build();
     }
 
     private NewStage createDocumentNewStage() {
         return NewStage.builder()
                 .stageType(StageType.DOCUMENT)
-                .submissionStatus(SubmissionStatus.NOT_SUBMITTED)
+                .newDocsSchedule(new NewDocsSchedule(SubmissionStatus.NOT_SUBMITTED, ScheduleResult.WAITING))
                 .newInterviewSchedules(List.of())
                 .build();
     }
 
-    private NewStage createInterviewNewStage() {
-        return NewStage.builder()
-                .stageType(StageType.INTERVIEW)
-                .newInterviewSchedules(List.of())
-                .build();
+    private Application createApplication(Member mockMember, NewApplication newApplication) {
+        return Application.create(
+                mockMember,
+                newApplication.jobPostingUrl(),
+                newApplication.company(),
+                newApplication.position(),
+                newApplication.jobLocation(),
+                newApplication.stageType(),
+                newApplication.finalApplicationStatus(),
+                newApplication.applicationMethod(),
+                newApplication.deadline()
+        );
     }
+
 }

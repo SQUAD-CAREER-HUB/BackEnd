@@ -10,7 +10,9 @@ public enum ApplicationMethod {
     HOMEPAGE ("홈페이지 지원"),
     EMAIL    ("이메일"),
     PLATFORM ("채용 플랫폼"),
-    REFERRAL ("지인 추천");
+    REFERRAL ("지인 추천"),
+    EMPTY    ("미입력")
+    ;
 
     private final String description;
 

@@ -3,14 +3,13 @@ package org.squad.careerhub.domain.application.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.tuple;
 import static org.squad.careerhub.global.utils.DateTimeUtils.now;
+
 import jakarta.transaction.Transactional;
-import java.time.LocalDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.squad.careerhub.IntegrationTestSupport;
-import org.squad.careerhub.domain.application.entity.Application;
 import org.squad.careerhub.domain.application.entity.ApplicationAttachment;
 import org.squad.careerhub.domain.application.entity.ApplicationMethod;
 import org.squad.careerhub.domain.application.entity.ApplicationStage;
@@ -20,9 +19,7 @@ import org.squad.careerhub.domain.application.entity.StageType;
 import org.squad.careerhub.domain.application.entity.SubmissionStatus;
 import org.squad.careerhub.domain.application.repository.ApplicationAttachmentJpaRepository;
 import org.squad.careerhub.domain.application.repository.ApplicationStageJpaRepository;
-import org.squad.careerhub.domain.application.service.dto.NewApplicationInfo;
-import org.squad.careerhub.domain.application.service.dto.NewJobPosting;
-import org.squad.careerhub.domain.application.service.dto.NewStage;
+import org.squad.careerhub.domain.application.service.dto.NewApplication;
 import org.squad.careerhub.domain.application.service.dto.response.ApplicationInfoResponse;
 import org.squad.careerhub.domain.application.service.dto.response.ApplicationStageTimeLineListResponse.EtcStageTimeLine;
 import org.squad.careerhub.domain.application.service.dto.response.ApplicationStageTimeLineListResponse.InterviewStageTimeLine;
@@ -59,32 +56,34 @@ class FindApplicationIntegrationTest extends IntegrationTestSupport {
     @Test
     void 지원서_상세_페이지_조회를_위한_서류_전형만_존재하는_전형_타임_라인_정보와_지원서_정보를_조회한다() {
         // given
-        var app = createApplication(
-                "네이버",
-                "백엔드",
-                NewStage.builder()
-                        .stageType(StageType.DOCUMENT)
-                        .submissionStatus(SubmissionStatus.SUBMITTED)
-                        .newEtcSchedules(List.of())
-                        .newInterviewSchedules(List.of())
-                        .build()
-        );
-        var docsStage = applicationStageJpaRepository.save(ApplicationStage.create(app, StageType.DOCUMENT));
+        var stageType = StageType.DOCUMENT;
+        var newApplicationDto = NewApplication.builder()
+                .jobPostingUrl("https://www.careerhub.com/job/12345")
+                .company("네이버")
+                .position("백엔드")
+                .jobLocation("New York, NY")
+                .deadline(now())
+                .stageType(stageType)
+                .applicationMethod(ApplicationMethod.EMAIL)
+                .finalApplicationStatus(ApplicationStatus.IN_PROGRESS)
+                .build();
+        var app = applicationManager.create(newApplicationDto, List.of(), member.getId());
+        var docsStage = applicationStageJpaRepository.save(ApplicationStage.create(app, stageType));
         var attachment = applicationAttachmentJpaRepository.save(ApplicationAttachment.create(
                 app,
                 "fileUrl",
                 "originalFileName",
                 "pdf")
         );
-        createApplicationSchedule(
+        scheduleJpaRepository.save(Schedule.registerDocs(
+                member,
                 docsStage,
-                StageType.DOCUMENT.getDescription(),
-                null,
-                ScheduleResult.WAITING,
+                stageType.getDescription(),
                 SubmissionStatus.SUBMITTED,
+                ScheduleResult.WAITING,
                 now(),
                 app.getDeadline()
-        );
+        ));
 
         // when
         var applicationDetailPageResponse = applicationReader.findApplication(app.getId(), member.getId());
@@ -138,15 +137,17 @@ class FindApplicationIntegrationTest extends IntegrationTestSupport {
     @Test
     void 모든_전형이_존재하는_전형_타임_라인_정보와_지원서_정보를_조회한다() {
         // given
-        var app = createApplication(
-                "네이버",
-                "백엔드",
-                NewStage.builder()
-                        .stageType(StageType.INTERVIEW)
-                        .newEtcSchedules(List.of())
-                        .newInterviewSchedules(List.of())
-                        .build()
-        );
+        var newApplicationDto = NewApplication.builder()
+                .jobPostingUrl("https://www.careerhub.com/job/12345")
+                .company("네이버")
+                .position("백엔드")
+                .jobLocation("New York, NY")
+                .deadline(now())
+                .stageType(StageType.INTERVIEW)
+                .applicationMethod(ApplicationMethod.EMAIL)
+                .finalApplicationStatus(ApplicationStatus.IN_PROGRESS)
+                .build();
+        var app = applicationManager.create(newApplicationDto, List.of(), member.getId());
         var attachment = applicationAttachmentJpaRepository.save(ApplicationAttachment.create(
                 app,
                 "fileUrl",
@@ -157,51 +158,47 @@ class FindApplicationIntegrationTest extends IntegrationTestSupport {
         var etcStage = applicationStageJpaRepository.save(ApplicationStage.create(app, StageType.ETC));
         var interviewStage = applicationStageJpaRepository.save(ApplicationStage.create(app, StageType.INTERVIEW));
 
-        var docsSchedule = createApplicationSchedule(
+        var docsSchedule = scheduleJpaRepository.save(Schedule.registerDocs(
+                member,
                 docsStage,
                 StageType.DOCUMENT.getDescription(),
-                null,
-                ScheduleResult.PASS,
                 SubmissionStatus.SUBMITTED,
+                ScheduleResult.PASS,
                 now(),
                 app.getDeadline()
-        );
-        var codingTestSchedule = createApplicationSchedule(
+        ));
+        var codingTestSchedule = scheduleJpaRepository.save(Schedule.registerEtc(
+                member,
                 etcStage,
                 "코딩테스트",
-                null,
                 ScheduleResult.PASS,
-                null,
-                now().plusDays(1),
-                null
-        );
-        var studySchedule = createApplicationSchedule(
+                now(),
+                now().plusDays(1)
+        ));
+        var studySchedule = scheduleJpaRepository.save(Schedule.registerEtc(
+                member,
                 etcStage,
                 "과제전형",
-                null,
                 ScheduleResult.PASS,
-                null,
                 now().plusDays(2),
                 now().plusDays(3)
-        );
-        var firstInterview = createApplicationSchedule(
+        ));
+        var firstInterview = scheduleJpaRepository.save(Schedule.registerInterview(
+                member,
                 interviewStage,
                 "1차 면접",
                 "판교",
                 ScheduleResult.PASS,
-                null,
-                now().plusDays(3),
-                null
-        );
-        var secInterview = createApplicationSchedule(
+                now().plusDays(3)
+        ));
+        var secInterview = scheduleJpaRepository.save(Schedule.registerInterview(
+                member,
                 interviewStage,
                 "2차 면접",
                 "판교",
                 ScheduleResult.WAITING,
-                null,
-                now().plusDays(5),
-                null
-        );
+                now().plusDays(5)
+        ));
 
         // when
         var applicationDetailPageResponse = applicationReader.findApplication(app.getId(), member.getId());
@@ -259,7 +256,7 @@ class FindApplicationIntegrationTest extends IntegrationTestSupport {
                         codingTestSchedule.getScheduleName(),
                         codingTestSchedule.getScheduleResult(),
                         codingTestSchedule.getStartedAt(),
-                        null
+                        codingTestSchedule.getEndedAt()
                 ),
                 tuple(
                         etcStage.getId(),
@@ -297,15 +294,17 @@ class FindApplicationIntegrationTest extends IntegrationTestSupport {
     @Test
     void 전형은_존재하지만_일정이_없는_기타_전형인_상태의_타임_라인_정보와_지원서_정보를_조회한다() {
         // given
-        var app = createApplication(
-                "네이버",
-                "백엔드",
-                NewStage.builder()
-                        .stageType(StageType.ETC)
-                        .newEtcSchedules(List.of())
-                        .newInterviewSchedules(List.of())
-                        .build()
-        );
+        var newApplicationDto = NewApplication.builder()
+                .jobPostingUrl("https://www.careerhub.com/job/12345")
+                .company("네이버")
+                .position("백엔드")
+                .jobLocation("New York, NY")
+                .deadline(now())
+                .stageType(StageType.ETC)
+                .applicationMethod(ApplicationMethod.EMAIL)
+                .finalApplicationStatus(ApplicationStatus.IN_PROGRESS)
+                .build();
+        var app = applicationManager.create(newApplicationDto, List.of(), member.getId());
         var attachment = applicationAttachmentJpaRepository.save(ApplicationAttachment.create(
                 app,
                 "fileUrl",
@@ -315,15 +314,15 @@ class FindApplicationIntegrationTest extends IntegrationTestSupport {
         var docsStage = applicationStageJpaRepository.save(ApplicationStage.create(app, StageType.DOCUMENT));
         var etcStage = applicationStageJpaRepository.save(ApplicationStage.create(app, StageType.ETC));
 
-        var docsSchedule = createApplicationSchedule(
+        var docsSchedule = scheduleJpaRepository.save(Schedule.registerDocs(
+                member,
                 docsStage,
                 StageType.DOCUMENT.getDescription(),
-                null,
-                ScheduleResult.PASS,
                 SubmissionStatus.SUBMITTED,
+                ScheduleResult.PASS,
                 now(),
                 app.getDeadline()
-        );
+        ));
 
         // when
         var applicationDetailPageResponse = applicationReader.findApplication(app.getId(), member.getId());
@@ -392,16 +391,17 @@ class FindApplicationIntegrationTest extends IntegrationTestSupport {
     @Test
     void 최종합격_지원서를_조회한다() {
         // given
-        var app = createApplication(
-                "네이버",
-                "백엔드",
-                NewStage.builder()
-                        .stageType(StageType.APPLICATION_CLOSE)
-                        .finalApplicationStatus(ApplicationStatus.FINAL_PASS)
-                        .newEtcSchedules(List.of())
-                        .newInterviewSchedules(List.of())
-                        .build()
-        );
+        var newApplicationDto = NewApplication.builder()
+                .jobPostingUrl("https://www.careerhub.com/job/12345")
+                .company("네이버")
+                .position("백엔드")
+                .jobLocation("New York, NY")
+                .deadline(now())
+                .stageType(StageType.APPLICATION_CLOSE)
+                .applicationMethod(ApplicationMethod.EMAIL)
+                .finalApplicationStatus(ApplicationStatus.FINAL_PASS)
+                .build();
+        var app = applicationManager.create(newApplicationDto, List.of(), member.getId());
         var attachment = applicationAttachmentJpaRepository.save(ApplicationAttachment.create(
                 app,
                 "fileUrl",
@@ -410,15 +410,16 @@ class FindApplicationIntegrationTest extends IntegrationTestSupport {
         ));
         var docsStage = applicationStageJpaRepository.save(ApplicationStage.create(app, StageType.DOCUMENT));
 
-        var docsSchedule = createApplicationSchedule(
+
+        var docsSchedule = scheduleJpaRepository.save(Schedule.registerDocs(
+                member,
                 docsStage,
                 StageType.DOCUMENT.getDescription(),
-                null,
-                ScheduleResult.PASS,
                 SubmissionStatus.SUBMITTED,
+                ScheduleResult.PASS,
                 now(),
                 app.getDeadline()
-        );
+        ));
         // when
         var applicationDetailPageResponse = applicationReader.findApplication(app.getId(), member.getId());
 
@@ -467,43 +468,6 @@ class FindApplicationIntegrationTest extends IntegrationTestSupport {
 
         var interviewStageTimeLines = applicationDetailPageResponse.applicationStageTimeLine().interviewStageTimeLine();
         assertThat(interviewStageTimeLines).isEmpty();
-    }
-
-    private Schedule createApplicationSchedule(
-            ApplicationStage applicationStage,
-            String scheduleName,
-            String location,
-            ScheduleResult scheduleResult,
-            SubmissionStatus submissionStatus,
-            LocalDateTime startedAt,
-            LocalDateTime endedAt
-    ) {
-        Schedule schedule = Schedule.register(
-                member,
-                applicationStage,
-                scheduleName,
-                location,
-                scheduleResult,
-                submissionStatus,
-                startedAt,
-                endedAt
-        );
-        return scheduleJpaRepository.save(schedule);
-    }
-
-    private Application createApplication(String company, String position, NewStage newStage) {
-        var newJobPosting = NewJobPosting.builder()
-                .jobPostingUrl("jobPostingUrl")
-                .company(company)
-                .position(position)
-                .jobLocation("seoul")
-                .build();
-        var newApplicationInfo = NewApplicationInfo.builder()
-                .applicationMethod(ApplicationMethod.EMAIL)
-                .deadline(now().plusDays(10))
-                .build();
-
-        return applicationManager.create(newJobPosting, newApplicationInfo, newStage, List.of(), member.getId());
     }
 
 }

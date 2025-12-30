@@ -1,8 +1,8 @@
 package org.squad.careerhub.domain.application.service;
 
-import java.util.List;
 import static org.squad.careerhub.global.utils.DateTimeUtils.now;
 
+import java.util.List;
 import java.util.function.Function;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;

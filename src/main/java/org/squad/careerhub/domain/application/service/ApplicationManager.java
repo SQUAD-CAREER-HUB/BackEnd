@@ -7,9 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import org.squad.careerhub.domain.application.entity.Application;
 import org.squad.careerhub.domain.application.repository.ApplicationJpaRepository;
-import org.squad.careerhub.domain.application.service.dto.NewApplicationInfo;
-import org.squad.careerhub.domain.application.service.dto.NewJobPosting;
-import org.squad.careerhub.domain.application.service.dto.NewStage;
+import org.squad.careerhub.domain.application.service.dto.NewApplication;
 import org.squad.careerhub.domain.member.entity.Member;
 import org.squad.careerhub.domain.member.service.MemberReader;
 
@@ -26,23 +24,21 @@ public class ApplicationManager {
      **/
     @Transactional
     public Application create(
-            NewJobPosting newJobPosting,
-            NewApplicationInfo newApplicationInfo,
-            NewStage newStage,
+            NewApplication newApplication,
             List<MultipartFile> files,
-            Long memberId
+            Long authorId
     ) {
-        Member author = memberReader.find(memberId);
+        Member author = memberReader.find(authorId);
         Application application = applicationJpaRepository.save(Application.create(
                 author,
-                newJobPosting.jobPostingUrl(),
-                newJobPosting.company(),
-                newJobPosting.position(),
-                newJobPosting.jobLocation(),
-                newStage.stageType(),
-                newStage.finalApplicationStatus(),
-                newApplicationInfo.applicationMethod(),
-                newApplicationInfo.deadline()
+                newApplication.jobPostingUrl(),
+                newApplication.company(),
+                newApplication.position(),
+                newApplication.jobLocation(),
+                newApplication.stageType(),
+                newApplication.finalApplicationStatus(),
+                newApplication.applicationMethod(),
+                newApplication.deadline()
         ));
 
         applicationFileManager.addApplicationFile(application, files);

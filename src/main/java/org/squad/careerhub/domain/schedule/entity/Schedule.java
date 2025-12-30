@@ -13,6 +13,7 @@ import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 import java.time.LocalDateTime;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.squad.careerhub.domain.application.entity.ApplicationStage;
@@ -23,20 +24,20 @@ import org.squad.careerhub.global.entity.BaseEntity;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Entity
 @Table(
-    name = "schedule",
-    uniqueConstraints = {
-        @UniqueConstraint(
-            name = "uk_schedule_stage_started_at",
-            columnNames = {"application_stage_id", "started_at"}
-        ),
-        @UniqueConstraint(
-            name = "uk_schedule_stage_schedule_name",
-            columnNames = {"application_stage_id", "schedule_name"}
-        )
-    }
+        name = "schedule",
+        uniqueConstraints = {
+                @UniqueConstraint(
+                        name = "uk_schedule_stage_started_at",
+                        columnNames = {"application_stage_id", "started_at"}
+                ),
+                @UniqueConstraint(
+                        name = "uk_schedule_stage_schedule_name",
+                        columnNames = {"application_stage_id", "schedule_name"}
+                )
+        }
 )
+@Entity
 public class Schedule extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -64,7 +65,8 @@ public class Schedule extends BaseEntity {
 
     private LocalDateTime endedAt;
 
-    public static Schedule register(
+    @Builder(access = AccessLevel.PRIVATE)
+    private Schedule(
             Member author,
             ApplicationStage applicationStage,
             String scheduleName,
@@ -74,25 +76,83 @@ public class Schedule extends BaseEntity {
             LocalDateTime startedAt,
             LocalDateTime endedAt
     ) {
-        Schedule schedule = new Schedule();
-        schedule.author = requireNonNull(author);
-        schedule.applicationStage = requireNonNull(applicationStage);
-        schedule.scheduleName = scheduleName;
-        schedule.scheduleResult = scheduleResult;
-        schedule.submissionStatus = submissionStatus;
-        schedule.location = location;
-        schedule.startedAt = requireNonNull(startedAt);
-        schedule.endedAt = endedAt;
-        return schedule;
+        this.author = requireNonNull(author);
+        this.applicationStage = requireNonNull(applicationStage);
+        this.startedAt = requireNonNull(startedAt);
+        this.scheduleName = scheduleName;
+        this.location = location;
+        this.scheduleResult = scheduleResult;
+        this.submissionStatus = submissionStatus;
+        this.endedAt = endedAt;
+    }
+
+    // 정적 팩토리 메서드 - 의도를 명확히
+    public static Schedule registerInterview(
+            Member author,
+            ApplicationStage applicationStage,
+            String scheduleName,
+            String location,
+            ScheduleResult scheduleResult,
+            LocalDateTime startedAt
+    ) {
+        // submissionStatus, endedAt은 null
+        return Schedule.builder()
+                .author(author)
+                .applicationStage(applicationStage)
+                .scheduleName(scheduleName)
+                .location(location)
+                .scheduleResult(scheduleResult)
+                .startedAt(startedAt)
+                .build();
+    }
+
+    public static Schedule registerDocs(
+            Member author,
+            ApplicationStage applicationStage,
+            String scheduleName,
+            SubmissionStatus submissionStatus,
+            ScheduleResult scheduleResult,
+            LocalDateTime startedAt,
+            LocalDateTime endedAt
+    ) {
+        // location 은 null
+        return Schedule.builder()
+                .author(author)
+                .applicationStage(applicationStage)
+                .scheduleName(scheduleName)
+                .submissionStatus(submissionStatus)
+                .scheduleResult(scheduleResult)
+                .startedAt(startedAt)
+                .endedAt(endedAt)
+                .build();
+    }
+
+    public static Schedule registerEtc(
+            Member author,
+            ApplicationStage applicationStage,
+            String scheduleName,
+            ScheduleResult scheduleResult,
+            LocalDateTime startedAt,
+            LocalDateTime endedAt
+    ) {
+        // location, submissionStatus 은 null
+        return Schedule.builder()
+                .author(author)
+                .applicationStage(applicationStage)
+                .scheduleName(scheduleName)
+                .scheduleResult(scheduleResult)
+                .startedAt(startedAt)
+                .endedAt(endedAt)
+                .build();
     }
 
     public void update(
-        String scheduleName,
-        String location,
-        ScheduleResult scheduleResult,
-        SubmissionStatus submissionStatus,
-        LocalDateTime startedAt,
-        LocalDateTime endedAt
+            String scheduleName,
+            String location,
+            ScheduleResult scheduleResult,
+            SubmissionStatus submissionStatus,
+            LocalDateTime startedAt,
+            LocalDateTime endedAt
     ) {
         this.scheduleName = requireNonNull(scheduleName);
         this.location = location;
@@ -101,4 +161,5 @@ public class Schedule extends BaseEntity {
         this.startedAt = requireNonNull(startedAt);
         this.endedAt = endedAt;
     }
+
 }

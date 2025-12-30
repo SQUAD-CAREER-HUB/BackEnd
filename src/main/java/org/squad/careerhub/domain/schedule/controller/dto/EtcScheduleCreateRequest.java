@@ -1,6 +1,7 @@
 package org.squad.careerhub.domain.schedule.controller.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 import lombok.Builder;
@@ -10,37 +11,18 @@ import org.squad.careerhub.domain.schedule.service.dto.NewEtcSchedule;
 @Builder
 @Schema(description = "캘린더에서 기타(ETC) 일정 생성 요청")
 public record EtcScheduleCreateRequest(
-
-        @Schema(
-                description = "일정 제목",
-                example = "과제 전형 제출"
-        )
-        @NotNull
+        @Schema(description = "일정 제목", example = "과제 전형 제출")
+        @NotBlank(message = "일정 제목은 필수 입력 항목입니다.")
         String scheduleName,
 
-        @Schema(
-                description = "일정 시작 일시",
-                example = "2025-12-05T23:59:00"
-        )
+        @Schema(description = "일정 시작 일시")
         @NotNull
         LocalDateTime startedAt,
 
-        @Schema(
-                description = "일정 종료 일시",
-                example = "2025-12-05T23:59:00"
-        )
+        @Schema(description = "일정 종료 일시")
         LocalDateTime endedAt,
 
-        @Schema(
-                description = "장소",
-                example = "온라인"
-        )
-        String location,
-
-        @Schema(
-                description = "일정 결과",
-                example = "WAITING"
-        )
+        @Schema(description = "전형 결과(캘린더에서 생성 시 기본 WAITING 이므로 값 안넣으셔도 됩니다.)", example = "WAITING")
         ScheduleResult scheduleResult
 ) {
 
@@ -49,9 +31,8 @@ public record EtcScheduleCreateRequest(
                 .scheduleName(scheduleName)
                 .startedAt(startedAt)
                 .endedAt(endedAt)
-                .result(scheduleResult)
+                .scheduleResult(scheduleResult == null ? ScheduleResult.WAITING : scheduleResult)
                 .build();
     }
+
 }
-
-

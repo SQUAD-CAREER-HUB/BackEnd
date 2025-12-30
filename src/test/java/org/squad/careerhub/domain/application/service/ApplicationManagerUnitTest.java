@@ -19,9 +19,7 @@ import org.squad.careerhub.domain.application.entity.ApplicationMethod;
 import org.squad.careerhub.domain.application.entity.ApplicationStatus;
 import org.squad.careerhub.domain.application.entity.StageType;
 import org.squad.careerhub.domain.application.repository.ApplicationJpaRepository;
-import org.squad.careerhub.domain.application.service.dto.NewApplicationInfo;
-import org.squad.careerhub.domain.application.service.dto.NewJobPosting;
-import org.squad.careerhub.domain.application.service.dto.NewStage;
+import org.squad.careerhub.domain.application.service.dto.NewApplication;
 import org.squad.careerhub.domain.member.entity.Member;
 import org.squad.careerhub.domain.member.entity.SocialProvider;
 import org.squad.careerhub.domain.member.service.MemberReader;
@@ -50,20 +48,15 @@ class ApplicationManagerUnitTest extends TestDoubleSupport {
     @Test
     void 지원서가_생성될때_첨부파일_생성메서드가_호출된다() {
         // given
-        var newJobPosting = createNewJobPosting();
-        var newApplicationInfo = createNewApplicationInfo();
-        var newStage = NewStage.builder()
-                .stageType(StageType.INTERVIEW)
-                .newInterviewSchedules(List.of())
-                .build();
-        var application = createApplication(newJobPosting, newStage, newApplicationInfo);
+        var newApplicationDto = createNewApplication();
+        var application = createApplication(newApplicationDto);
 
         given(memberReader.find(any())).willReturn(author);
         given(applicationJpaRepository.save(any())).willReturn(application);
         doNothing().when(applicationFileManager).addApplicationFile(any(), any());
 
         // when
-        var savedApplication = applicationManager.create(newJobPosting, newApplicationInfo, newStage, List.of(), 1L);
+        var savedApplication = applicationManager.create(newApplicationDto, List.of(), 1L);
 
         assertThat(savedApplication).isNotNull()
                 .extracting(
@@ -79,14 +72,14 @@ class ApplicationManagerUnitTest extends TestDoubleSupport {
                         Application::getMemo
                 ).containsExactly(
                         author,
-                        newJobPosting.jobPostingUrl(),
-                        newJobPosting.company(),
-                        newJobPosting.position(),
-                        newJobPosting.jobLocation(),
-                        newStage.stageType(),
+                        newApplicationDto.jobPostingUrl(),
+                        newApplicationDto.company(),
+                        newApplicationDto.position(),
+                        newApplicationDto.jobLocation(),
+                        newApplicationDto.stageType(),
                         ApplicationStatus.IN_PROGRESS,
-                        newApplicationInfo.applicationMethod(),
-                        newApplicationInfo.deadline(),
+                        newApplicationDto.applicationMethod(),
+                        newApplicationDto.deadline(),
                         null
                 );
 
@@ -94,33 +87,30 @@ class ApplicationManagerUnitTest extends TestDoubleSupport {
         verify(applicationFileManager, times(1)).addApplicationFile(any(), any());
     }
 
-    private NewApplicationInfo createNewApplicationInfo() {
-        return new NewApplicationInfo(
-                ApplicationMethod.EMAIL,
-                LocalDateTime.of(2020, 1, 1, 0, 0)
-        );
+    private NewApplication createNewApplication() {
+        return NewApplication.builder()
+                .jobPostingUrl("https://www.careerhub.com/job/12345")
+                .company("TechCorp")
+                .position("Software Engineer")
+                .jobLocation("New York, NY")
+                .deadline(LocalDateTime.of(2020, 1, 1, 0, 0))
+                .stageType(StageType.INTERVIEW)
+                .applicationMethod(ApplicationMethod.EMAIL)
+                .finalApplicationStatus(ApplicationStatus.IN_PROGRESS)
+                .build();
     }
 
-    private NewJobPosting createNewJobPosting() {
-        return new NewJobPosting(
-                "https://www.careerhub.com/job/12345",
-                "TechCorp",
-                "Software Engineer",
-                "New York, NY"
-        );
-    }
-
-    private Application createApplication(NewJobPosting newJobPosting, NewStage newStage, NewApplicationInfo newApplicationInfo) {
+    private Application createApplication(NewApplication newApplication) {
         return Application.create(
                 author,
-                newJobPosting.jobPostingUrl(),
-                newJobPosting.company(),
-                newJobPosting.position(),
-                newJobPosting.jobLocation(),
-                newStage.stageType(),
-                newStage.finalApplicationStatus(),
-                newApplicationInfo.applicationMethod(),
-                newApplicationInfo.deadline()
+                newApplication.jobPostingUrl(),
+                newApplication.company(),
+                newApplication.position(),
+                newApplication.jobLocation(),
+                newApplication.stageType(),
+                newApplication.finalApplicationStatus(),
+                newApplication.applicationMethod(),
+                newApplication.deadline()
         );
     }
 

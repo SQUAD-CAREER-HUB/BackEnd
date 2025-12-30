@@ -2,6 +2,7 @@ package org.squad.careerhub.domain.application.entity;
 
 import static java.util.Objects.requireNonNull;
 import static org.squad.careerhub.global.utils.DateTimeUtils.now;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -67,6 +68,7 @@ public class Application extends BaseEntity {
     ) {
         ApplicationStatus currentApplicationStatus = currentStageType == StageType.APPLICATION_CLOSE ?
                 applicationStatus : ApplicationStatus.IN_PROGRESS;
+
         Application application = new Application();
 
         application.author = author;

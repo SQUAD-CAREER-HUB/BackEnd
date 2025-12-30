@@ -16,8 +16,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.squad.careerhub.domain.application.entity.StageType;
 import org.squad.careerhub.domain.schedule.controller.dto.EtcScheduleCreateRequest;
 import org.squad.careerhub.domain.schedule.controller.dto.InterviewScheduleCreateRequest;
-import org.squad.careerhub.domain.schedule.service.dto.ScheduleListResponse;
-import org.squad.careerhub.domain.schedule.service.dto.ScheduleResponse;
+import org.squad.careerhub.domain.schedule.service.dto.response.ScheduleListResponse;
+import org.squad.careerhub.domain.schedule.service.dto.response.ScheduleResponse;
 import org.squad.careerhub.global.error.ErrorStatus;
 import org.squad.careerhub.global.swagger.ApiExceptions;
 

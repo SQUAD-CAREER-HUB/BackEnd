@@ -11,18 +11,11 @@ import org.squad.careerhub.domain.schedule.service.dto.NewInterviewSchedule;
 @Schema(description = "면접 일정 생성 요청 DTO")
 @Builder
 public record InterviewScheduleCreateRequest(
-
-        @Schema(
-                description = "일정 이름",
-                example = "1차(기술+인성 면접)"
-        )
-        @NotNull(message = "일정 이름은 필수 값입니다.")
+        @Schema(description = "일정 이름", example = "1차(기술+인성 면접)")
+        @NotBlank(message = "일정 이름은 필수 값입니다.")
         String scheduleName,
 
-        @Schema(
-                description = "면접 일시 (ISO8601, LocalDateTime)",
-                example = "2025-12-10T19:00:00"
-        )
+        @Schema(description = "면접 일시 (ISO8601, LocalDateTime)", example = "2025-12-10T19:00:00")
         @NotNull(message = "면접 일시는 필수 값입니다.")
         LocalDateTime startedAt,
 
@@ -30,16 +23,17 @@ public record InterviewScheduleCreateRequest(
         @NotBlank(message = "면접 장소는 필수 값입니다.")
         String location,
 
-        @Schema(description = "일정 결과", example = "WAITING")
+        @Schema(description = "전형 결과(캘린더에서 생성 시 기본 WAITING 이므로 값 안넣으셔도 됩니다.)", example = "WAITING")
         ScheduleResult scheduleResult
 ) {
 
     public NewInterviewSchedule toNewInterviewSchedule() {
         return NewInterviewSchedule.builder()
+                .scheduleName(scheduleName)
                 .startedAt(startedAt)
                 .location(location)
-                .scheduleName(scheduleName)
-                .result(scheduleResult)
+                .scheduleResult(scheduleResult == null ? ScheduleResult.WAITING : scheduleResult)
                 .build();
     }
+
 }

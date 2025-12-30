@@ -5,18 +5,16 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.squad.careerhub.domain.application.entity.Application;
 import org.squad.careerhub.domain.application.entity.ApplicationStage;
-import org.squad.careerhub.domain.application.entity.ScheduleResult;
 import org.squad.careerhub.domain.application.entity.StageType;
 import org.squad.careerhub.domain.application.repository.ApplicationStageJpaRepository;
 import org.squad.careerhub.domain.application.service.dto.NewStage;
-import org.squad.careerhub.domain.schedule.service.ScheduleManager;
-import org.squad.careerhub.domain.schedule.service.dto.NewDocumentSchedule;
+import org.squad.careerhub.domain.schedule.service.ScheduleCreator;
 
 @RequiredArgsConstructor
 @Component
 public class ApplicationStageManager {
 
-    private final ScheduleManager scheduleManager;
+    private final ScheduleCreator scheduleCreator;
     private final ApplicationStageJpaRepository applicationStageJpaRepository;
 
     // NOTE: null 반환 하는 게 맘에 안듦 추후에 고민해봄
@@ -47,17 +45,15 @@ public class ApplicationStageManager {
     }
 
     private boolean hasDocumentStage(Application application) {
-        return applicationStageJpaRepository.existsByApplicationAndStageType(application,
-                StageType.DOCUMENT);
+        return applicationStageJpaRepository.existsByApplicationAndStageType(application, StageType.DOCUMENT);
     }
 
     private ApplicationStage createInterviewStage(Application application, NewStage newStage) {
-        ApplicationStage interviewStage = applicationStageJpaRepository.save(
-                ApplicationStage.create(
-                        application,
-                        StageType.INTERVIEW
-                ));
-        scheduleManager.createInterviewSchedules(application, newStage.newInterviewSchedules());
+        ApplicationStage interviewStage = applicationStageJpaRepository.save(ApplicationStage.create(
+                application,
+                StageType.INTERVIEW
+        ));
+        scheduleCreator.createInterviewSchedules(application, newStage.newInterviewSchedules());
 
         return interviewStage;
     }
@@ -67,13 +63,7 @@ public class ApplicationStageManager {
                 application,
                 StageType.DOCUMENT
         ));
-        scheduleManager.createDocumentSchedule(application,
-                new NewDocumentSchedule(
-                        application.getDeadline(),
-                        newStage.submissionStatus(),
-                        ScheduleResult.WAITING // 추가될거로 예상해서 미리 넣어둠 stage에서 값 가져오는 걸로 변경해야함
-                )
-        );
+        scheduleCreator.createDocumentSchedule(application, newStage.newDocsSchedule());
 
         return documentStage;
     }
@@ -83,7 +73,7 @@ public class ApplicationStageManager {
                 application,
                 newStage.stageType()
         ));
-        scheduleManager.createEtcSchedule(application, newStage.newEtcSchedules().getFirst());
+        scheduleCreator.createEtcSchedules(application, newStage.newEtcSchedules());
 
         return etcStage;
     }

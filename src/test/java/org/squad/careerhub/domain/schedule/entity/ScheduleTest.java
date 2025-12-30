@@ -59,13 +59,11 @@ class ScheduleTest {
     @Test
     void 기타일정을_생성한다_ETC() {
         // when
-        Schedule schedule = Schedule.register(
+        Schedule schedule = Schedule.registerEtc(
             author,
             etcStage,
             "코딩테스트",
-            null,
             ScheduleResult.WAITING,
-            null,
             LocalDateTime.of(2025, 12, 5, 23, 59),
             LocalDateTime.of(2025, 12, 6, 1, 0)
         );
@@ -86,15 +84,13 @@ class ScheduleTest {
     @Test
     void 면접일정을_생성한다_INTERVIEW() {
         // when
-        Schedule schedule = Schedule.register(
+        Schedule schedule = Schedule.registerInterview(
             author,
             interviewStage,
             "1차 면접",
             "강남구 테헤란로",
             ScheduleResult.WAITING,
-            null,
-            LocalDateTime.of(2025, 12, 10, 19, 0),
-            null
+            LocalDateTime.of(2025, 12, 10, 19, 0)
         );
 
         // then
@@ -113,14 +109,12 @@ class ScheduleTest {
     @Test
     void createInterview는_startedAt이_null이면_NPE() {
         LocalDateTime t = LocalDateTime.of(2025, 12, 10, 19, 0);
-        assertThatThrownBy(() -> Schedule.register(
+        assertThatThrownBy(() -> Schedule.registerInterview(
             author,
             etcStage, // ETC stage
             "1차 면접",
             "강남구 테헤란로",
             ScheduleResult.WAITING,
-            null,
-            null,
             null
         )).isInstanceOf(NullPointerException.class);
     }

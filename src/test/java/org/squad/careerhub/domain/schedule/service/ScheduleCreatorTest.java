@@ -29,14 +29,16 @@ import org.squad.careerhub.domain.schedule.repository.ScheduleJpaRepository;
 import org.squad.careerhub.domain.schedule.service.dto.NewEtcSchedule;
 import org.squad.careerhub.domain.schedule.service.dto.NewInterviewSchedule;
 
-class ScheduleManagerTest extends TestDoubleSupport {
+class ScheduleCreatorTest extends TestDoubleSupport {
 
     @Mock
     ScheduleJpaRepository scheduleJpaRepository;
-    @InjectMocks
-    ScheduleManager scheduleManager;
+
     @Mock
     private ApplicationStageJpaRepository applicationStageJpaRepository;
+
+    @InjectMocks
+    ScheduleCreator scheduleCreator;
 
     private Application mockApplicationWithId(Long applicationId) {
         Application app = mock(Application.class);
@@ -78,7 +80,7 @@ class ScheduleManagerTest extends TestDoubleSupport {
         when(scheduleJpaRepository.saveAll(anyList()))
                 .thenAnswer(inv -> inv.getArgument(0));
 
-        scheduleManager.createInterviewSchedules(app, List.of(s1, s2));
+        scheduleCreator.createInterviewSchedules(app, List.of(s1, s2));
 
         ArgumentCaptor<List<Schedule>> captor = ArgumentCaptor.forClass(List.class);
         verify(scheduleJpaRepository).saveAll(captor.capture());
@@ -94,8 +96,8 @@ class ScheduleManagerTest extends TestDoubleSupport {
     void createInterviewSchedule_newInterviewSchedule이_null이면_NPE_and_save호출없다() {
         Application app = mock(Application.class);
 
-        assertThatThrownBy(() -> scheduleManager.createInterviewSchedule(app, null))
-                .isInstanceOf(NullPointerException.class);
+        assertThatThrownBy(() -> scheduleCreator.createInterviewSchedule(app, null))
+            .isInstanceOf(NullPointerException.class);
 
         verify(scheduleJpaRepository, never()).save(any());
         verify(scheduleJpaRepository, never()).saveAll(any());
@@ -109,7 +111,7 @@ class ScheduleManagerTest extends TestDoubleSupport {
                 .build();
 
         assertThatThrownBy(
-                () -> scheduleManager.createInterviewSchedules(null, List.of(s1)))
+                () -> scheduleCreator.createInterviewSchedules(null, List.of(s1)))
                 .isInstanceOf(NullPointerException.class);
 
         verify(scheduleJpaRepository, never()).save(any());
@@ -142,7 +144,7 @@ class ScheduleManagerTest extends TestDoubleSupport {
                 .thenAnswer(inv -> inv.getArgument(0));
 
         // when
-        Schedule saved = scheduleManager.createEtcSchedule(app, cmd);
+        Schedule saved = scheduleCreator.createEtcSchedule(app, cmd);
 
         // then
         verify(scheduleJpaRepository).save(any(Schedule.class));
@@ -159,7 +161,7 @@ class ScheduleManagerTest extends TestDoubleSupport {
                 .endedAt(null)
                 .build();
 
-        assertThatThrownBy(() -> scheduleManager.createEtcSchedule(null, cmd))
+        assertThatThrownBy(() -> scheduleCreator.createEtcSchedule(null, cmd))
                 .isInstanceOf(NullPointerException.class);
 
         verify(scheduleJpaRepository, never()).save(any());
