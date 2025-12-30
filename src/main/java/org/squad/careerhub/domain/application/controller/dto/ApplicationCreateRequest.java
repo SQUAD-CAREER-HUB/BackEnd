@@ -25,11 +25,11 @@ public record ApplicationCreateRequest(
 
     public NewApplication toNewApplication() {
         return NewApplication.builder()
-                .jobPostingUrl(jobPosting().jobPostingUrl())
-                .company(jobPosting().company())
-                .position(jobPosting().position())
+                .jobPostingUrl(jobPosting.jobPostingUrl())
+                .company(jobPosting.company())
+                .position(jobPosting.position())
                 .deadline(jobPosting.deadline())
-                .jobLocation(jobPosting().jobLocation())
+                .jobLocation(jobPosting.jobLocation())
                 .stageType(stage.stageType())
                 .applicationMethod(stage.docsStageCreateRequest() == null ?
                         ApplicationMethod.EMPTY : stage.docsStageCreateRequest().applicationMethod()
