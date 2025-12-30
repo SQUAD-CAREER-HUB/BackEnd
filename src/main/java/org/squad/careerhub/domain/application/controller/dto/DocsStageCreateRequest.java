@@ -6,6 +6,7 @@ import lombok.Builder;
 import org.squad.careerhub.domain.application.entity.ApplicationMethod;
 import org.squad.careerhub.domain.application.entity.ScheduleResult;
 import org.squad.careerhub.domain.application.entity.SubmissionStatus;
+import org.squad.careerhub.domain.schedule.service.dto.NewDocsSchedule;
 
 @Schema(description = "서류 전형 생성 요청 DTO")
 @Builder
@@ -22,5 +23,12 @@ public record DocsStageCreateRequest(
         @NotNull(message = "전형 결과는 필수 값입니다.")
         ScheduleResult scheduleResult
 ) {
+
+    public NewDocsSchedule toNewDocsSchedule() {
+        return NewDocsSchedule.builder()
+                .submissionStatus(submissionStatus)
+                .scheduleResult(scheduleResult)
+                .build();
+    }
 
 }

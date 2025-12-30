@@ -7,7 +7,6 @@ import java.util.List;
 import lombok.Builder;
 import org.squad.careerhub.domain.application.entity.ApplicationStatus;
 import org.squad.careerhub.domain.application.entity.StageType;
-import org.squad.careerhub.domain.application.service.dto.NewStage;
 import org.squad.careerhub.domain.schedule.service.dto.NewEtcSchedule;
 import org.squad.careerhub.domain.schedule.service.dto.NewInterviewSchedule;
 
@@ -34,16 +33,7 @@ public record StageRequest(
         ApplicationStatus finalApplicationStatus
 ) {
 
-    public NewStage toNewStage() {
-        return NewStage.builder()
-                .stageType(stageType)
-                .finalApplicationStatus(finalApplicationStatus)
-                .newEtcSchedules(toNewEtcSchedules())
-                .newInterviewSchedules(toNewInterviewSchedules())
-                .build();
-    }
-
-    private List<NewEtcSchedule> toNewEtcSchedules() {
+    public List<NewEtcSchedule> toNewEtcSchedules() {
         if (etcSchedules == null) {
             return List.of();
         }
@@ -52,7 +42,7 @@ public record StageRequest(
                 .toList();
     }
 
-    private List<NewInterviewSchedule> toNewInterviewSchedules() {
+    public List<NewInterviewSchedule> toNewInterviewSchedules() {
         if (interviewSchedules == null) {
             return List.of();
         }

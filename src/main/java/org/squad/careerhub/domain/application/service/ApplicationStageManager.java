@@ -47,16 +47,14 @@ public class ApplicationStageManager {
     }
 
     private boolean hasDocumentStage(Application application) {
-        return applicationStageJpaRepository.existsByApplicationAndStageType(application,
-                StageType.DOCUMENT);
+        return applicationStageJpaRepository.existsByApplicationAndStageType(application, StageType.DOCUMENT);
     }
 
     private ApplicationStage createInterviewStage(Application application, NewStage newStage) {
-        ApplicationStage interviewStage = applicationStageJpaRepository.save(
-                ApplicationStage.create(
-                        application,
-                        StageType.INTERVIEW
-                ));
+        ApplicationStage interviewStage = applicationStageJpaRepository.save(ApplicationStage.create(
+                application,
+                StageType.INTERVIEW
+        ));
         scheduleManager.createInterviewSchedules(application, newStage.newInterviewSchedules());
 
         return interviewStage;

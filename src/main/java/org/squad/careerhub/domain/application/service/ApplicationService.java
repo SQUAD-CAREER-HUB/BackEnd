@@ -13,7 +13,6 @@ import org.squad.careerhub.domain.application.service.dto.SearchCondition;
 import org.squad.careerhub.domain.application.service.dto.response.ApplicationDetailPageResponse;
 import org.squad.careerhub.domain.application.service.dto.response.ApplicationStatisticsResponse;
 import org.squad.careerhub.domain.application.service.dto.response.ApplicationSummaryResponse;
-import org.squad.careerhub.domain.schedule.service.ScheduleManager;
 import org.squad.careerhub.global.support.Cursor;
 import org.squad.careerhub.global.support.PageResponse;
 
@@ -24,8 +23,6 @@ public class ApplicationService {
     private final ApplicationManager applicationManager;
     private final ApplicationReader applicationReader;
     private final ApplicationPolicyValidator applicationPolicyValidator;
-    private final ApplicationFileManager applicationFileManager;
-    private final ScheduleManager scheduleManager;
     private final ApplicationStageManager applicationStageManager;
 
     /**
@@ -44,7 +41,7 @@ public class ApplicationService {
             List<MultipartFile> files,
             Long authorId
     ) {
-        applicationPolicyValidator.validateNewStage(newStage);
+        applicationPolicyValidator.validateNewStage(newStage, newApplication.finalApplicationStatus());
 
         Application application = applicationManager.create(newApplication, files, authorId);
 

@@ -18,7 +18,7 @@ public enum ErrorStatus {
     NOT_FOUND_MEMBER (404, "회원을 찾을 수 없습니다."),
 
     // APPLICATION
-    INVALID_MEMO_RULE                     (400, "지원서 생성 시 기타 전형 진행 중인 경우에만 메모를 작성해야 합니다."),
+    INVALID_DOCS_STAGE_RULE               (400, "지원서 생성 시 전형 단계가 서류 전형일 경우에만 서류 전형 정보를 입력할 수 있습니다."),
     INVALID_ETC_STAGE_RULE                (400, "지원서 생성 시 기타 전형 진행 중인 경우에만 기타 전형 정보를 입력해야 합니다."),
     INVALID_SCHEDULE_TYPE_RULE            (400, "지원서 작성 시 전형 단계가 면접 유형일 경우에만 면접 일정 생성이 가능합니다."),
     INVALID_FINAL_APPLICATION_STATUS_RULE (400 , "지원서 작성 시 전형 단계가 지원 종료일 경우에만 지원서 최종 상태를 입력할 수 있습니다."),
@@ -68,7 +68,7 @@ public enum ErrorStatus {
     FORBIDDEN_ERROR        (403, "접근 권한이 없습니다."),
     INTERNAL_SERVER_ERROR  (500, "서버 내부 에러"),
 
-    ;
+   ;
 
     private final int statusCode;
     private final String message;

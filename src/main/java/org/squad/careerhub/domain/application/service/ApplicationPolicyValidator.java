@@ -2,6 +2,7 @@ package org.squad.careerhub.domain.application.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import org.squad.careerhub.domain.application.entity.ApplicationStatus;
 import org.squad.careerhub.domain.application.service.dto.NewStage;
 import org.squad.careerhub.global.error.CareerHubException;
 import org.squad.careerhub.global.error.ErrorStatus;
@@ -11,7 +12,12 @@ import org.squad.careerhub.global.error.ErrorStatus;
 public class ApplicationPolicyValidator {
 
     // 지원서 생성 시 전형에 따른 입력 규칙 검증
-    public void validateNewStage(NewStage newStage) {
+    public void validateNewStage(NewStage newStage, ApplicationStatus finalApplicationStatus) {
+
+        if (newStage.newDocsSchedule() != null && !newStage.stageType().isDocument()) {
+            throw new CareerHubException(ErrorStatus.INVALID_DOCS_STAGE_RULE);
+        }
+
         // 기타 전형 일정은 기타 전형 단계 일 때만 입력 가능
         if (!newStage.newEtcSchedules().isEmpty() && !newStage.stageType().isEtc()) {
             throw new CareerHubException(ErrorStatus.INVALID_ETC_STAGE_RULE);
@@ -24,7 +30,7 @@ public class ApplicationPolicyValidator {
         }
 
         // 지원서 최종 상태는 지원 종료 단계에서만 입력 가능
-        if (newStage.finalApplicationStatus() != null && !newStage.stageType().isApplicationClose()) {
+        if (finalApplicationStatus != ApplicationStatus.IN_PROGRESS && !newStage.stageType().isApplicationClose()) {
             throw new CareerHubException(ErrorStatus.INVALID_FINAL_APPLICATION_STATUS_RULE);
         }
     }

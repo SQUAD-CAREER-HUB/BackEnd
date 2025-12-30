@@ -17,13 +17,15 @@ import org.squad.careerhub.TestDoubleSupport;
 import org.squad.careerhub.domain.application.entity.Application;
 import org.squad.careerhub.domain.application.entity.ApplicationStage;
 import org.squad.careerhub.domain.application.entity.ScheduleResult;
+import org.squad.careerhub.domain.application.entity.ScheduleResult;
 import org.squad.careerhub.domain.application.entity.StageType;
 import org.squad.careerhub.domain.application.entity.SubmissionStatus;
 import org.squad.careerhub.domain.application.repository.ApplicationStageJpaRepository;
 import org.squad.careerhub.domain.application.service.dto.NewStage;
 import org.squad.careerhub.domain.schedule.service.ScheduleManager;
-import org.squad.careerhub.domain.schedule.service.dto.NewDocumentSchedule;
+import org.squad.careerhub.domain.schedule.service.dto.NewDocsSchedule;
 import org.squad.careerhub.domain.schedule.service.dto.NewEtcSchedule;
+import org.squad.careerhub.domain.application.service.dto.NewStage;
 
 class ApplicationStageManagerUnitTest extends TestDoubleSupport {
 
@@ -48,7 +50,9 @@ class ApplicationStageManagerUnitTest extends TestDoubleSupport {
         // given
         var documentNewStage = NewStage.builder()
                 .stageType(StageType.DOCUMENT)
-                .submissionStatus(SubmissionStatus.NOT_SUBMITTED)
+                .newDocsSchedule(new NewDocsSchedule(SubmissionStatus.NOT_SUBMITTED, ScheduleResult.WAITING))
+                .newEtcSchedules(List.of())
+                .newInterviewSchedules(List.of())
                 .build();
         var documentStage = ApplicationStage.create(testApplication, StageType.DOCUMENT);
         given(applicationStageJpaRepository.save(any())).willReturn(documentStage);
@@ -59,10 +63,7 @@ class ApplicationStageManagerUnitTest extends TestDoubleSupport {
         // then
         assertThat(result.getStageType()).isEqualTo(StageType.DOCUMENT);
         verify(applicationStageJpaRepository, times(1)).save(any());
-        verify(scheduleManager, times(1)).createDocumentSchedule(testApplication,
-                new NewDocumentSchedule(testApplication.getDeadline(),
-                        documentNewStage.submissionStatus(),
-                        ScheduleResult.WAITING));
+        verify(scheduleManager, times(1)).createDocumentSchedule(testApplication, documentNewStage.newDocsSchedule());
     }
 
     @Test
@@ -76,27 +77,19 @@ class ApplicationStageManagerUnitTest extends TestDoubleSupport {
         given(applicationStageJpaRepository.save(any())).willReturn(interviewStage);
 
         // when
-        var applicationStage = applicationStageManager.createWithSchedule(testApplication,
-                interviewNewStage);
+        var applicationStage = applicationStageManager.createWithSchedule(testApplication, interviewNewStage);
 
         // then
         assertThat(applicationStage.getStageType()).isEqualTo(StageType.INTERVIEW);
         verify(applicationStageJpaRepository, times(2)).save(any());
-        verify(scheduleManager, times(1)).createInterviewSchedules(testApplication,
-                interviewNewStage.newInterviewSchedules());
+        verify(scheduleManager, times(1)).createInterviewSchedules(testApplication, interviewNewStage.newInterviewSchedules());
     }
 
     @Test
     void 기타_전형_생성_시_서류_전형도_함꼐_저장되고_기타_일정_메서드를_호출한다() {
         // given
         var customStageName = "코딩테스트";
-        var etcSchedules = List.of(new NewEtcSchedule(
-                        customStageName,
-                        now(),
-                        now().plusDays(2),
-                        ScheduleResult.WAITING
-                )
-        );
+        var etcSchedules = List.of(new NewEtcSchedule(customStageName, now(), now().plusDays(2), ScheduleResult.WAITING));
         var etcNewStage = NewStage.builder()
                 .stageType(StageType.ETC)
                 .newEtcSchedules(etcSchedules)
@@ -106,13 +99,11 @@ class ApplicationStageManagerUnitTest extends TestDoubleSupport {
         given(applicationStageJpaRepository.save(any())).willReturn(etcStage);
 
         // when
-        var applicationStage = applicationStageManager.createWithSchedule(testApplication,
-                etcNewStage);
+        var applicationStage = applicationStageManager.createWithSchedule(testApplication, etcNewStage);
 
         // then
         assertThat(applicationStage.getStageType()).isEqualTo(StageType.ETC);
         verify(applicationStageJpaRepository, times(2)).save(any());
-        verify(scheduleManager, times(1)).createEtcSchedule(testApplication,
-                etcSchedules.getFirst());
+        verify(scheduleManager, times(1)).createEtcSchedule(testApplication, etcSchedules.getFirst());
     }
 }

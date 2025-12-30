@@ -21,11 +21,13 @@ import org.squad.careerhub.TestDoubleSupport;
 import org.squad.careerhub.domain.application.entity.Application;
 import org.squad.careerhub.domain.application.entity.ApplicationMethod;
 import org.squad.careerhub.domain.application.entity.ApplicationStatus;
+import org.squad.careerhub.domain.application.entity.ScheduleResult;
 import org.squad.careerhub.domain.application.entity.StageType;
 import org.squad.careerhub.domain.application.entity.SubmissionStatus;
 import org.squad.careerhub.domain.application.service.dto.NewApplication;
 import org.squad.careerhub.domain.application.service.dto.NewStage;
 import org.squad.careerhub.domain.member.entity.Member;
+import org.squad.careerhub.domain.schedule.service.dto.NewDocsSchedule;
 
 @RequiredArgsConstructor
 class ApplicationServiceUnitTest extends TestDoubleSupport {
@@ -50,7 +52,7 @@ class ApplicationServiceUnitTest extends TestDoubleSupport {
         var application = createApplication(mockMember, newApplicationDto);
         ReflectionTestUtils.setField(application, "id", 1L);
 
-        doNothing().when(applicationPolicyValidator).validateNewStage(any());
+        doNothing().when(applicationPolicyValidator).validateNewStage(any(), any());
         given(applicationManager.create(any(), anyList(), anyLong())).willReturn(application);
 
         // when
@@ -83,7 +85,7 @@ class ApplicationServiceUnitTest extends TestDoubleSupport {
     private NewStage createDocumentNewStage() {
         return NewStage.builder()
                 .stageType(StageType.DOCUMENT)
-                .submissionStatus(SubmissionStatus.NOT_SUBMITTED)
+                .newDocsSchedule(new NewDocsSchedule(SubmissionStatus.NOT_SUBMITTED, ScheduleResult.WAITING))
                 .newInterviewSchedules(List.of())
                 .build();
     }
