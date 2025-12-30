@@ -22,7 +22,7 @@ public record EtcScheduleCreateRequest(
         @Schema(description = "일정 종료 일시")
         LocalDateTime endedAt,
 
-        @Schema(description = "전형 결과(캘린더에서 생성 시 기본 WAITING)", example = "WAITING")
+        @Schema(description = "전형 결과(캘린더에서 생성 시 기본 WAITING 이므로 값 안넣으셔도 됩니다.)", example = "WAITING")
         ScheduleResult scheduleResult
 ) {
 

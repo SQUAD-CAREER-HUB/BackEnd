@@ -23,15 +23,15 @@ public record InterviewScheduleCreateRequest(
         @NotBlank(message = "면접 장소는 필수 값입니다.")
         String location,
 
-        @Schema(description = "전형 결과(캘린더에서 생성 시 기본 WAITING)", example = "WAITING")
+        @Schema(description = "전형 결과(캘린더에서 생성 시 기본 WAITING 이므로 값 안넣으셔도 됩니다.)", example = "WAITING")
         ScheduleResult scheduleResult
 ) {
 
     public NewInterviewSchedule toNewInterviewSchedule() {
         return NewInterviewSchedule.builder()
+                .scheduleName(scheduleName)
                 .startedAt(startedAt)
                 .location(location)
-                .scheduleName(scheduleName)
                 .scheduleResult(scheduleResult == null ? ScheduleResult.WAITING : scheduleResult)
                 .build();
     }
