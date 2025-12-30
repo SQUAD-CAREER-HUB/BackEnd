@@ -31,138 +31,138 @@ import org.squad.careerhub.domain.schedule.service.dto.NewInterviewSchedule;
 
 class ScheduleManagerTest extends TestDoubleSupport {
 
-        @Mock
-        ScheduleJpaRepository scheduleJpaRepository;
-        @InjectMocks
-        ScheduleManager scheduleManager;
-        @Mock
-        private ApplicationStageJpaRepository applicationStageJpaRepository;
+    @Mock
+    ScheduleJpaRepository scheduleJpaRepository;
+    @InjectMocks
+    ScheduleManager scheduleManager;
+    @Mock
+    private ApplicationStageJpaRepository applicationStageJpaRepository;
 
-        private Application mockApplicationWithId(long applicationId) {
-                Application app = mock(Application.class);
-                when(app.getId()).thenReturn(applicationId);
-                return app;
-        }
+    private Application mockApplicationWithId(Long applicationId) {
+        Application app = mock(Application.class);
+        when(app.getId()).thenReturn(applicationId);
+        return app;
+    }
 
-        private ApplicationStage mockStage(Application app, StageType stageType) {
-                return mock(ApplicationStage.class);
-        }
+    private ApplicationStage mockStage() {
+        return mock(ApplicationStage.class);
+    }
 
 
-        @Test
-        void createInterviewSchedule_면접일정이면_SAVE한다() {
-                // given
-                Application app = mockApplicationWithId(10L);
+    @Test
+    void createInterviewSchedule_면접일정이면_SAVE한다() {
+        // given
+        Application app = mockApplicationWithId(10L);
 
-                Member author = mock(Member.class);
-                when(app.getAuthor()).thenReturn(author);
+        Member author = mock(Member.class);
+        when(app.getAuthor()).thenReturn(author);
 
-                ApplicationStage stage = mockStage(app, StageType.INTERVIEW);
+        ApplicationStage stage = mockStage();
 
-                when(applicationStageJpaRepository.findByApplicationIdAndStageType(eq(10L),
-                        eq(StageType.INTERVIEW)))
-                        .thenReturn(Optional.of(stage));
+        when(applicationStageJpaRepository.findByApplicationIdAndStageType(eq(10L),
+                eq(StageType.INTERVIEW)))
+                .thenReturn(Optional.of(stage));
 
-                NewInterviewSchedule s1 = NewInterviewSchedule.builder()
-                        .scheduleName("1차")
-                        .startedAt(LocalDateTime.of(2025, 12, 10, 19, 0))
-                        .location("서울")
-                        .build();
+        NewInterviewSchedule s1 = NewInterviewSchedule.builder()
+                .scheduleName("1차")
+                .startedAt(LocalDateTime.of(2025, 12, 10, 19, 0))
+                .location("서울")
+                .build();
 
-                NewInterviewSchedule s2 = NewInterviewSchedule.builder()
-                        .scheduleName("임원")
-                        .startedAt(LocalDateTime.of(2025, 12, 12, 14, 0))
-                        .location("판교")
-                        .build();
+        NewInterviewSchedule s2 = NewInterviewSchedule.builder()
+                .scheduleName("임원")
+                .startedAt(LocalDateTime.of(2025, 12, 12, 14, 0))
+                .location("판교")
+                .build();
 
-                when(scheduleJpaRepository.saveAll(anyList()))
-                        .thenAnswer(inv -> inv.getArgument(0));
+        when(scheduleJpaRepository.saveAll(anyList()))
+                .thenAnswer(inv -> inv.getArgument(0));
 
-                scheduleManager.createInterviewSchedules(app, List.of(s1, s2));
+        scheduleManager.createInterviewSchedules(app, List.of(s1, s2));
 
-                ArgumentCaptor<List<Schedule>> captor = ArgumentCaptor.forClass(List.class);
-                verify(scheduleJpaRepository).saveAll(captor.capture());
-                verify(scheduleJpaRepository, never()).save(any());
+        ArgumentCaptor<List<Schedule>> captor = ArgumentCaptor.forClass(List.class);
+        verify(scheduleJpaRepository).saveAll(captor.capture());
+        verify(scheduleJpaRepository, never()).save(any());
 
-                List<Schedule> saved = captor.getValue();
-                assertThat(saved).hasSize(2);
-                assertThat(saved).extracting(Schedule::getScheduleName)
-                        .containsExactlyInAnyOrder("1차", "임원");
-        }
+        List<Schedule> saved = captor.getValue();
+        assertThat(saved).hasSize(2);
+        assertThat(saved).extracting(Schedule::getScheduleName)
+                .containsExactlyInAnyOrder("1차", "임원");
+    }
 
-        @Test
-        void createInterviewSchedule_newInterviewSchedule이_null이면_NPE_and_save호출없다() {
-                Application app = mock(Application.class);
+    @Test
+    void createInterviewSchedule_newInterviewSchedule이_null이면_NPE_and_save호출없다() {
+        Application app = mock(Application.class);
 
-                assertThatThrownBy(() -> scheduleManager.createInterviewSchedule(app, null))
-                        .isInstanceOf(NullPointerException.class);
+        assertThatThrownBy(() -> scheduleManager.createInterviewSchedule(app, null))
+                .isInstanceOf(NullPointerException.class);
 
-                verify(scheduleJpaRepository, never()).save(any());
-                verify(scheduleJpaRepository, never()).saveAll(any());
-        }
+        verify(scheduleJpaRepository, never()).save(any());
+        verify(scheduleJpaRepository, never()).saveAll(any());
+    }
 
-        @Test
-        void createInterviewSchedules_application이_null이면_NPE_and_repo호출없다() {
-                NewInterviewSchedule s1 = NewInterviewSchedule.builder()
-                        .scheduleName("1차 면접")
-                        .startedAt(now())
-                        .build();
+    @Test
+    void createInterviewSchedules_application이_null이면_NPE_and_repo호출없다() {
+        NewInterviewSchedule s1 = NewInterviewSchedule.builder()
+                .scheduleName("1차 면접")
+                .startedAt(now())
+                .build();
 
-                assertThatThrownBy(
-                        () -> scheduleManager.createInterviewSchedules(null, List.of(s1)))
-                        .isInstanceOf(NullPointerException.class);
+        assertThatThrownBy(
+                () -> scheduleManager.createInterviewSchedules(null, List.of(s1)))
+                .isInstanceOf(NullPointerException.class);
 
-                verify(scheduleJpaRepository, never()).save(any());
-                verify(scheduleJpaRepository, never()).saveAll(any());
-        }
+        verify(scheduleJpaRepository, never()).save(any());
+        verify(scheduleJpaRepository, never()).saveAll(any());
+    }
 
-        @Test
-        void createEtcSchedule_기타일정이면_SAVE_호출한다() {
-                // given
-                Application app = mock(Application.class);
-                when(app.getId()).thenReturn(10L);
+    @Test
+    void createEtcSchedule_기타일정이면_SAVE_호출한다() {
+        // given
+        Application app = mock(Application.class);
+        when(app.getId()).thenReturn(10L);
 
-                Member author = mock(Member.class);
-                when(app.getAuthor()).thenReturn(author);
+        Member author = mock(Member.class);
+        when(app.getAuthor()).thenReturn(author);
 
-                ApplicationStage stage = mock(ApplicationStage.class);
-                when(stage.getStageType()).thenReturn(StageType.ETC);
+        ApplicationStage stage = mock(ApplicationStage.class);
+        when(stage.getStageType()).thenReturn(StageType.ETC);
 
-                when(applicationStageJpaRepository.findByApplicationIdAndStageType(10L,
-                        StageType.ETC))
-                        .thenReturn(Optional.of(stage));
+        when(applicationStageJpaRepository.findByApplicationIdAndStageType(10L,
+                StageType.ETC))
+                .thenReturn(Optional.of(stage));
 
-                NewEtcSchedule cmd = NewEtcSchedule.builder()
-                        .scheduleName("과제")
-                        .startedAt(LocalDateTime.of(2025, 12, 5, 23, 59))
-                        .endedAt(null)
-                        .build();
+        NewEtcSchedule cmd = NewEtcSchedule.builder()
+                .scheduleName("과제")
+                .startedAt(LocalDateTime.of(2025, 12, 5, 23, 59))
+                .endedAt(null)
+                .build();
 
-                when(scheduleJpaRepository.save(any(Schedule.class)))
-                        .thenAnswer(inv -> inv.getArgument(0));
+        when(scheduleJpaRepository.save(any(Schedule.class)))
+                .thenAnswer(inv -> inv.getArgument(0));
 
-                // when
-                Schedule saved = scheduleManager.createEtcSchedule(app, cmd);
+        // when
+        Schedule saved = scheduleManager.createEtcSchedule(app, cmd);
 
-                // then
-                verify(scheduleJpaRepository).save(any(Schedule.class));
-                assertThat(saved.getApplicationStage().getStageType()).isEqualTo(StageType.ETC);
-                assertThat(saved.getScheduleName()).isEqualTo("과제");
-                assertThat(saved.getStartedAt()).isEqualTo(LocalDateTime.of(2025, 12, 5, 23, 59));
-        }
+        // then
+        verify(scheduleJpaRepository).save(any(Schedule.class));
+        assertThat(saved.getApplicationStage().getStageType()).isEqualTo(StageType.ETC);
+        assertThat(saved.getScheduleName()).isEqualTo("과제");
+        assertThat(saved.getStartedAt()).isEqualTo(LocalDateTime.of(2025, 12, 5, 23, 59));
+    }
 
-        @Test
-        void createEtcSchedule_application이_null이면_NPE_and_save호출없다() {
-                NewEtcSchedule cmd = NewEtcSchedule.builder()
-                        .scheduleName("과제 제출")
-                        .startedAt(now())
-                        .endedAt(null)
-                        .build();
+    @Test
+    void createEtcSchedule_application이_null이면_NPE_and_save호출없다() {
+        NewEtcSchedule cmd = NewEtcSchedule.builder()
+                .scheduleName("과제 제출")
+                .startedAt(now())
+                .endedAt(null)
+                .build();
 
-                assertThatThrownBy(() -> scheduleManager.createEtcSchedule(null, cmd))
-                        .isInstanceOf(NullPointerException.class);
+        assertThatThrownBy(() -> scheduleManager.createEtcSchedule(null, cmd))
+                .isInstanceOf(NullPointerException.class);
 
-                verify(scheduleJpaRepository, never()).save(any());
-        }
+        verify(scheduleJpaRepository, never()).save(any());
+    }
 }
 

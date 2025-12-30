@@ -29,63 +29,63 @@ public class ScheduleManager {
     private final ScheduleJpaRepository scheduleJpaRepository;
     private final ApplicationStageJpaRepository applicationStageJpaRepository;
 
-    public Schedule createInterviewSchedule(Application app, NewInterviewSchedule dto) {
+    public Schedule createInterviewSchedule(Application app, NewInterviewSchedule schedule) {
         return createSingle(app, StageType.INTERVIEW, stage ->
                 Schedule.register(
                         app.getAuthor(),
                         stage,
-                        dto.scheduleName(),
-                        dto.location(),
+                        schedule.scheduleName(),
+                        schedule.location(),
                         ScheduleResult.WAITING,
                         null,
-                        requireNonNull(dto.startedAt()),
+                        requireNonNull(schedule.startedAt()),
                         null
                 )
         );
     }
 
     public List<Schedule> createInterviewSchedules(Application app,
-            List<NewInterviewSchedule> dtos) {
-        return createBulk(app, StageType.INTERVIEW, dtos, dto ->
+            List<NewInterviewSchedule> schedules) {
+        return createBulk(app, StageType.INTERVIEW, schedules, schedule ->
                 stage -> Schedule.register(
                         app.getAuthor(),
                         stage,
-                        dto.scheduleName(),
-                        dto.location(),
+                        schedule.scheduleName(),
+                        schedule.location(),
                         ScheduleResult.WAITING,
                         null,
-                        dto.startedAt(),
+                        schedule.startedAt(),
                         null
                 )
         );
     }
 
-    public Schedule createEtcSchedule(Application app, NewEtcSchedule dto) {
+    public Schedule createEtcSchedule(Application app, NewEtcSchedule schedule) {
         return createSingle(app, StageType.ETC, stage ->
                 Schedule.register(
                         app.getAuthor(),
                         stage,
-                        dto.scheduleName(),
+                        schedule.scheduleName(),
                         null,
                         ScheduleResult.WAITING,
                         null,
-                        dto.startedAt(),
-                        dto.endedAt()
+                        schedule.startedAt(),
+                        schedule.endedAt()
                 )
         );
     }
 
-    public List<Schedule> createEtcSchedules(Application app, List<NewEtcSchedule> dtos) {
-        return createBulk(app, StageType.ETC, dtos, dto ->
+    public List<Schedule> createEtcSchedules(Application app, List<NewEtcSchedule> schedules) {
+        return createBulk(app, StageType.ETC, schedules, schedule ->
                 stage -> Schedule.register(
                         app.getAuthor(),
                         stage,
-                        dto.scheduleName(),
+                        schedule.scheduleName(),
                         null,
                         ScheduleResult.WAITING,
                         null,
-                        dto.startedAt(),
-                        dto.endedAt()
+                        schedule.startedAt(),
+                        schedule.endedAt()
                 )
         );
     }
