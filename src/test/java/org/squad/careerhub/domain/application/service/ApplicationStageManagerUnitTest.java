@@ -102,6 +102,6 @@ class ApplicationStageManagerUnitTest extends TestDoubleSupport {
         // then
         assertThat(applicationStage.getStageType()).isEqualTo(StageType.ETC);
         verify(applicationStageJpaRepository, times(2)).save(any());
-        verify(scheduleCreator, times(1)).createEtcSchedule(testApplication, etcSchedules.getFirst());
+        verify(scheduleCreator, times(1)).createEtcSchedules(testApplication, etcSchedules);
     }
 }
