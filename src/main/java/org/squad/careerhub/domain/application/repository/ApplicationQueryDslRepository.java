@@ -5,6 +5,7 @@ import static org.squad.careerhub.domain.application.entity.QApplication.applica
 import static org.squad.careerhub.domain.application.entity.QApplicationStage.applicationStage;
 import static org.squad.careerhub.domain.schedule.entity.QSchedule.schedule;
 import static org.squad.careerhub.global.utils.DateTimeUtils.now;
+
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.JPAExpressions;

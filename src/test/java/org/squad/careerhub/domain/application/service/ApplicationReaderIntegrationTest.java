@@ -15,7 +15,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.squad.careerhub.IntegrationTestSupport;
 import org.squad.careerhub.domain.application.entity.Application;
 import org.squad.careerhub.domain.application.entity.ApplicationMethod;
-import org.squad.careerhub.domain.application.entity.ApplicationStage;
 import org.squad.careerhub.domain.application.entity.ApplicationStatus;
 import org.squad.careerhub.domain.application.entity.ScheduleResult;
 import org.squad.careerhub.domain.application.entity.StageType;
@@ -23,8 +22,6 @@ import org.squad.careerhub.domain.application.entity.SubmissionStatus;
 import org.squad.careerhub.domain.application.repository.ApplicationJpaRepository;
 import org.squad.careerhub.domain.application.repository.dto.BeforeDeadlineApplicationResponse;
 import org.squad.careerhub.domain.application.service.dto.NewApplication;
-import org.squad.careerhub.domain.application.service.dto.NewApplicationInfo;
-import org.squad.careerhub.domain.application.service.dto.NewJobPosting;
 import org.squad.careerhub.domain.application.service.dto.NewStage;
 import org.squad.careerhub.domain.application.service.dto.SearchCondition;
 import org.squad.careerhub.domain.application.service.dto.response.ApplicationStatisticsResponse;
@@ -34,8 +31,6 @@ import org.squad.careerhub.domain.application.service.dto.response.ScheduleStage
 import org.squad.careerhub.domain.member.entity.Member;
 import org.squad.careerhub.domain.member.entity.SocialProvider;
 import org.squad.careerhub.domain.member.repository.MemberJpaRepository;
-import org.squad.careerhub.domain.schedule.entity.Schedule;
-import org.squad.careerhub.domain.schedule.repository.ScheduleJpaRepository;
 import org.squad.careerhub.domain.schedule.service.dto.NewDocsSchedule;
 import org.squad.careerhub.domain.schedule.service.dto.NewEtcSchedule;
 import org.squad.careerhub.domain.schedule.service.dto.NewInterviewSchedule;
@@ -53,7 +48,6 @@ class ApplicationReaderIntegrationTest extends IntegrationTestSupport {
     final ApplicationManager applicationManager;
     final MemberJpaRepository memberRepository;
     final ApplicationJpaRepository applicationRepository;
-    final ScheduleJpaRepository scheduleJpaRepository;
     final ApplicationStageManager applicationStageManager;
 
     Member member;

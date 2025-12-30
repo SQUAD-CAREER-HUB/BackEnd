@@ -5,7 +5,6 @@ import static org.assertj.core.api.AssertionsForClassTypes.tuple;
 import static org.squad.careerhub.global.utils.DateTimeUtils.now;
 
 import jakarta.transaction.Transactional;
-import java.time.LocalDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.BeforeEach;
