@@ -31,7 +31,7 @@ import org.squad.careerhub.global.error.ErrorStatus;
 class ScheduleServiceTest extends TestDoubleSupport {
 
     @Mock
-    ScheduleManager scheduleManager;
+    ScheduleCreator scheduleCreator;
 
     @Mock
     ApplicationReader applicationReader;
@@ -55,7 +55,7 @@ class ScheduleServiceTest extends TestDoubleSupport {
         when(saved.getId()).thenReturn(100L);
         when(saved.getApplicationStage()).thenReturn(stage);
 
-        when(scheduleManager.createInterviewSchedule(eq(app), any(NewInterviewSchedule.class)))
+        when(scheduleCreator.createInterviewSchedule(eq(app), any(NewInterviewSchedule.class)))
                 .thenReturn(saved);
 
         InterviewScheduleCreateRequest req = InterviewScheduleCreateRequest.builder()
@@ -77,7 +77,7 @@ class ScheduleServiceTest extends TestDoubleSupport {
 
         ArgumentCaptor<NewInterviewSchedule> captor = ArgumentCaptor.forClass(
                 NewInterviewSchedule.class);
-        verify(scheduleManager).createInterviewSchedule(eq(app), captor.capture());
+        verify(scheduleCreator).createInterviewSchedule(eq(app), captor.capture());
 
         NewInterviewSchedule captured = captor.getValue();
         assertThat(captured.scheduleName()).isEqualTo("1차 기술면접");
@@ -172,7 +172,7 @@ class ScheduleServiceTest extends TestDoubleSupport {
         when(saved.getId()).thenReturn(200L);
         when(saved.getApplicationStage()).thenReturn(stage);
 
-        when(scheduleManager.createEtcSchedule(eq(app), any(NewEtcSchedule.class)))
+        when(scheduleCreator.createEtcSchedule(eq(app), any(NewEtcSchedule.class)))
                 .thenReturn(saved);
 
         EtcScheduleCreateRequest req = EtcScheduleCreateRequest.builder()
@@ -193,7 +193,7 @@ class ScheduleServiceTest extends TestDoubleSupport {
         verify(app).validateOwnedBy(memberId);
 
         ArgumentCaptor<NewEtcSchedule> captor = ArgumentCaptor.forClass(NewEtcSchedule.class);
-        verify(scheduleManager).createEtcSchedule(eq(app), captor.capture());
+        verify(scheduleCreator).createEtcSchedule(eq(app), captor.capture());
 
         NewEtcSchedule captured = captor.getValue();
         assertThat(captured.scheduleName()).isEqualTo("과제 제출");

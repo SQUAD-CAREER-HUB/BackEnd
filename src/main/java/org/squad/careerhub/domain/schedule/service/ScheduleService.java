@@ -13,7 +13,7 @@ import org.squad.careerhub.domain.schedule.service.dto.response.ScheduleResponse
 @Service
 public class ScheduleService {
 
-    private final ScheduleManager scheduleManager;
+    private final ScheduleCreator scheduleCreator;
     private final ApplicationReader applicationReader;
 
     public ScheduleResponse createInterviewSchedule(
@@ -24,7 +24,7 @@ public class ScheduleService {
         Application app = applicationReader.findApplication(applicationId);
         app.validateOwnedBy(memberId);
 
-        Schedule saved = scheduleManager.createInterviewSchedule(app, newInterviewSchedule);
+        Schedule saved = scheduleCreator.createInterviewSchedule(app, newInterviewSchedule);
 
         return ScheduleResponse.from(saved);
     }
@@ -37,10 +37,9 @@ public class ScheduleService {
         Application app = applicationReader.findApplication(applicationId);
         app.validateOwnedBy(memberId);
 
-        Schedule saved = scheduleManager.createEtcSchedule(app, newEtcSchedule);
+        Schedule saved = scheduleCreator.createEtcSchedule(app, newEtcSchedule);
 
         return ScheduleResponse.from(saved);
     }
-
 
 }

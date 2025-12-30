@@ -1,7 +1,5 @@
 package org.squad.careerhub.domain.schedule.service;
 
-import static java.util.Objects.requireNonNull;
-
 import java.util.List;
 import java.util.function.Function;
 import lombok.RequiredArgsConstructor;
@@ -10,7 +8,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.squad.careerhub.domain.application.entity.Application;
 import org.squad.careerhub.domain.application.entity.ApplicationStage;
-import org.squad.careerhub.domain.application.entity.ScheduleResult;
 import org.squad.careerhub.domain.application.entity.StageType;
 import org.squad.careerhub.domain.application.repository.ApplicationStageJpaRepository;
 import org.squad.careerhub.domain.schedule.entity.Schedule;
@@ -21,54 +18,48 @@ import org.squad.careerhub.domain.schedule.service.dto.NewInterviewSchedule;
 import org.squad.careerhub.global.error.CareerHubException;
 import org.squad.careerhub.global.error.ErrorStatus;
 
+// 리팩토링 대상!! 중복 코드가 너무 많음
 @RequiredArgsConstructor
 @Component
 @Transactional
-public class ScheduleManager {
+public class ScheduleCreator {
 
     private final ScheduleJpaRepository scheduleJpaRepository;
     private final ApplicationStageJpaRepository applicationStageJpaRepository;
 
     public Schedule createInterviewSchedule(Application app, NewInterviewSchedule schedule) {
         return createSingle(app, StageType.INTERVIEW, stage ->
-                Schedule.register(
+                Schedule.registerInterview(
                         app.getAuthor(),
                         stage,
                         schedule.scheduleName(),
                         schedule.location(),
-                        ScheduleResult.WAITING,
-                        null,
-                        requireNonNull(schedule.startedAt()),
-                        null
+                        schedule.scheduleResult(),
+                        schedule.startedAt()
                 )
         );
     }
 
-    public List<Schedule> createInterviewSchedules(Application app,
-            List<NewInterviewSchedule> schedules) {
+    public List<Schedule> createInterviewSchedules(Application app, List<NewInterviewSchedule> schedules) {
         return createBulk(app, StageType.INTERVIEW, schedules, schedule ->
-                stage -> Schedule.register(
+                stage -> Schedule.registerInterview(
                         app.getAuthor(),
                         stage,
                         schedule.scheduleName(),
                         schedule.location(),
-                        ScheduleResult.WAITING,
-                        null,
-                        schedule.startedAt(),
-                        null
+                        schedule.scheduleResult(),
+                        schedule.startedAt()
                 )
         );
     }
 
     public Schedule createEtcSchedule(Application app, NewEtcSchedule schedule) {
         return createSingle(app, StageType.ETC, stage ->
-                Schedule.register(
+                Schedule.registerEtc(
                         app.getAuthor(),
                         stage,
                         schedule.scheduleName(),
-                        null,
-                        ScheduleResult.WAITING,
-                        null,
+                        schedule.scheduleResult(),
                         schedule.startedAt(),
                         schedule.endedAt()
                 )
@@ -77,15 +68,27 @@ public class ScheduleManager {
 
     public List<Schedule> createEtcSchedules(Application app, List<NewEtcSchedule> schedules) {
         return createBulk(app, StageType.ETC, schedules, schedule ->
-                stage -> Schedule.register(
+                stage -> Schedule.registerEtc(
                         app.getAuthor(),
                         stage,
                         schedule.scheduleName(),
-                        null,
-                        ScheduleResult.WAITING,
-                        null,
+                        schedule.scheduleResult(),
                         schedule.startedAt(),
                         schedule.endedAt()
+                )
+        );
+    }
+
+    public Schedule createDocumentSchedule(Application app, NewDocsSchedule schedule) {
+        return createSingle(app, StageType.DOCUMENT, stage ->
+                Schedule.registerDocs(
+                        app.getAuthor(),
+                        stage,
+                        StageType.DOCUMENT.getDescription(),
+                        schedule.submissionStatus(),
+                        schedule.scheduleResult(),
+                        app.getDeadline(), // startedAt 가정은 deadline과 같습니다
+                        app.getDeadline() // endedAt 가정은 deadline과 같습니다
                 )
         );
     }
@@ -101,39 +104,20 @@ public class ScheduleManager {
         return scheduleJpaRepository.save(schedule);
     }
 
-    public Schedule createDocumentSchedule(Application app, NewDocsSchedule newDocsSchedule) {
-        ApplicationStage stage = getOrCreateStage(app, StageType.DOCUMENT);
-
-        app.updateCurrentStageType(StageType.DOCUMENT);
-
-        Schedule schedule = Schedule.register(
-                app.getAuthor(),
-                stage,
-                StageType.DOCUMENT.getDescription(),
-                null,
-                newDocsSchedule.scheduleResult(),
-                newDocsSchedule.submissionStatus(),
-                app.getDeadline(),
-                app.getDeadline() // 서류 전형 일정은 startedAt와 endedAt이 동일함
-        );
-
-        return scheduleJpaRepository.save(schedule);
-    }
-
     private <T> List<Schedule> createBulk(
             Application app,
             StageType stageType,
-            List<T> dtos,
+            List<T> targets,
             Function<T, Function<ApplicationStage, Schedule>> scheduleFactory
     ) {
-        if (dtos == null || dtos.isEmpty()) {
+        if (targets == null || targets.isEmpty()) {
             return List.of();
         }
 
         ApplicationStage stage = prepareStage(app, stageType);
 
-        List<Schedule> schedules = dtos.stream()
-                .map(dto -> scheduleFactory.apply(dto).apply(stage))
+        List<Schedule> schedules = targets.stream()
+                .map(target -> scheduleFactory.apply(target).apply(stage))
                 .toList();
 
         return scheduleJpaRepository.saveAll(schedules);
@@ -153,17 +137,16 @@ public class ScheduleManager {
         return applicationStageJpaRepository
                 .findByApplicationIdAndStageType(app.getId(), stageType)
                 .orElseGet(() -> {
-                            try {
-                                ApplicationStage created = ApplicationStage.create(app, stageType);
+                    try {
+                        ApplicationStage created = ApplicationStage.create(app, stageType);
 
-                                return applicationStageJpaRepository.save(created);
-                            } catch (DataIntegrityViolationException e) {
-                                return applicationStageJpaRepository
-                                        .findByApplicationIdAndStageType(app.getId(), stageType)
-                                        .orElseThrow(() -> e);
-                            }
-                        }
-                );
+                        return applicationStageJpaRepository.save(created);
+                    } catch (DataIntegrityViolationException e) {
+                        return applicationStageJpaRepository
+                                .findByApplicationIdAndStageType(app.getId(), stageType)
+                                .orElseThrow(() -> e);
+                    }
+                });
     }
 
 }

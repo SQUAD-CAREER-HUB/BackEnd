@@ -17,15 +17,13 @@ import org.squad.careerhub.TestDoubleSupport;
 import org.squad.careerhub.domain.application.entity.Application;
 import org.squad.careerhub.domain.application.entity.ApplicationStage;
 import org.squad.careerhub.domain.application.entity.ScheduleResult;
-import org.squad.careerhub.domain.application.entity.ScheduleResult;
 import org.squad.careerhub.domain.application.entity.StageType;
 import org.squad.careerhub.domain.application.entity.SubmissionStatus;
 import org.squad.careerhub.domain.application.repository.ApplicationStageJpaRepository;
 import org.squad.careerhub.domain.application.service.dto.NewStage;
-import org.squad.careerhub.domain.schedule.service.ScheduleManager;
+import org.squad.careerhub.domain.schedule.service.ScheduleCreator;
 import org.squad.careerhub.domain.schedule.service.dto.NewDocsSchedule;
 import org.squad.careerhub.domain.schedule.service.dto.NewEtcSchedule;
-import org.squad.careerhub.domain.application.service.dto.NewStage;
 
 class ApplicationStageManagerUnitTest extends TestDoubleSupport {
 
@@ -33,7 +31,7 @@ class ApplicationStageManagerUnitTest extends TestDoubleSupport {
     ApplicationStageJpaRepository applicationStageJpaRepository;
 
     @Mock
-    ScheduleManager scheduleManager;
+    ScheduleCreator scheduleCreator;
 
     @InjectMocks
     private ApplicationStageManager applicationStageManager;
@@ -63,7 +61,7 @@ class ApplicationStageManagerUnitTest extends TestDoubleSupport {
         // then
         assertThat(result.getStageType()).isEqualTo(StageType.DOCUMENT);
         verify(applicationStageJpaRepository, times(1)).save(any());
-        verify(scheduleManager, times(1)).createDocumentSchedule(testApplication, documentNewStage.newDocsSchedule());
+        verify(scheduleCreator, times(1)).createDocumentSchedule(testApplication, documentNewStage.newDocsSchedule());
     }
 
     @Test
@@ -82,7 +80,7 @@ class ApplicationStageManagerUnitTest extends TestDoubleSupport {
         // then
         assertThat(applicationStage.getStageType()).isEqualTo(StageType.INTERVIEW);
         verify(applicationStageJpaRepository, times(2)).save(any());
-        verify(scheduleManager, times(1)).createInterviewSchedules(testApplication, interviewNewStage.newInterviewSchedules());
+        verify(scheduleCreator, times(1)).createInterviewSchedules(testApplication, interviewNewStage.newInterviewSchedules());
     }
 
     @Test
@@ -104,6 +102,6 @@ class ApplicationStageManagerUnitTest extends TestDoubleSupport {
         // then
         assertThat(applicationStage.getStageType()).isEqualTo(StageType.ETC);
         verify(applicationStageJpaRepository, times(2)).save(any());
-        verify(scheduleManager, times(1)).createEtcSchedule(testApplication, etcSchedules.getFirst());
+        verify(scheduleCreator, times(1)).createEtcSchedule(testApplication, etcSchedules.getFirst());
     }
 }
