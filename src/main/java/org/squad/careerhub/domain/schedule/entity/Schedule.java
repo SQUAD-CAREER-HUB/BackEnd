@@ -75,6 +75,7 @@ public class Schedule extends BaseEntity {
             LocalDateTime endedAt
     ) {
         Schedule schedule = new Schedule();
+
         schedule.author = requireNonNull(author);
         schedule.applicationStage = requireNonNull(applicationStage);
         schedule.scheduleName = scheduleName;
@@ -83,6 +84,7 @@ public class Schedule extends BaseEntity {
         schedule.location = location;
         schedule.startedAt = requireNonNull(startedAt);
         schedule.endedAt = endedAt;
+
         return schedule;
     }
 
@@ -101,4 +103,5 @@ public class Schedule extends BaseEntity {
         this.startedAt = requireNonNull(startedAt);
         this.endedAt = endedAt;
     }
+
 }
