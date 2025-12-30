@@ -60,7 +60,7 @@ public class ScheduleController extends ScheduleDocsController {
     }
 
     @Override
-    @GetMapping("/schedule")
+    @GetMapping("/schedules")
     public ResponseEntity<ScheduleListResponse> getSchedule(
             @RequestParam
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
