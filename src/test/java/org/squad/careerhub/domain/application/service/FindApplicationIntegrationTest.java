@@ -76,15 +76,15 @@ class FindApplicationIntegrationTest extends IntegrationTestSupport {
                 "originalFileName",
                 "pdf")
         );
-        createApplicationSchedule(
+        scheduleJpaRepository.save(Schedule.registerDocs(
+                member,
                 docsStage,
                 stageType.getDescription(),
-                null,
-                ScheduleResult.WAITING,
                 SubmissionStatus.SUBMITTED,
+                ScheduleResult.WAITING,
                 now(),
                 app.getDeadline()
-        );
+        ));
 
         // when
         var applicationDetailPageResponse = applicationReader.findApplication(app.getId(), member.getId());
@@ -159,51 +159,47 @@ class FindApplicationIntegrationTest extends IntegrationTestSupport {
         var etcStage = applicationStageJpaRepository.save(ApplicationStage.create(app, StageType.ETC));
         var interviewStage = applicationStageJpaRepository.save(ApplicationStage.create(app, StageType.INTERVIEW));
 
-        var docsSchedule = createApplicationSchedule(
+        var docsSchedule = scheduleJpaRepository.save(Schedule.registerDocs(
+                member,
                 docsStage,
                 StageType.DOCUMENT.getDescription(),
-                null,
-                ScheduleResult.PASS,
                 SubmissionStatus.SUBMITTED,
+                ScheduleResult.PASS,
                 now(),
                 app.getDeadline()
-        );
-        var codingTestSchedule = createApplicationSchedule(
+        ));
+        var codingTestSchedule = scheduleJpaRepository.save(Schedule.registerEtc(
+                member,
                 etcStage,
                 "코딩테스트",
-                null,
                 ScheduleResult.PASS,
-                null,
-                now().plusDays(1),
-                null
-        );
-        var studySchedule = createApplicationSchedule(
+                now(),
+                now().plusDays(1)
+        ));
+        var studySchedule = scheduleJpaRepository.save(Schedule.registerEtc(
+                member,
                 etcStage,
                 "과제전형",
-                null,
                 ScheduleResult.PASS,
-                null,
                 now().plusDays(2),
                 now().plusDays(3)
-        );
-        var firstInterview = createApplicationSchedule(
+        ));
+        var firstInterview = scheduleJpaRepository.save(Schedule.registerInterview(
+                member,
                 interviewStage,
                 "1차 면접",
                 "판교",
                 ScheduleResult.PASS,
-                null,
-                now().plusDays(3),
-                null
-        );
-        var secInterview = createApplicationSchedule(
+                now().plusDays(3)
+        ));
+        var secInterview = scheduleJpaRepository.save(Schedule.registerInterview(
+                member,
                 interviewStage,
                 "2차 면접",
                 "판교",
                 ScheduleResult.WAITING,
-                null,
-                now().plusDays(5),
-                null
-        );
+                now().plusDays(5)
+        ));
 
         // when
         var applicationDetailPageResponse = applicationReader.findApplication(app.getId(), member.getId());
@@ -261,7 +257,7 @@ class FindApplicationIntegrationTest extends IntegrationTestSupport {
                         codingTestSchedule.getScheduleName(),
                         codingTestSchedule.getScheduleResult(),
                         codingTestSchedule.getStartedAt(),
-                        null
+                        codingTestSchedule.getEndedAt()
                 ),
                 tuple(
                         etcStage.getId(),
@@ -319,15 +315,15 @@ class FindApplicationIntegrationTest extends IntegrationTestSupport {
         var docsStage = applicationStageJpaRepository.save(ApplicationStage.create(app, StageType.DOCUMENT));
         var etcStage = applicationStageJpaRepository.save(ApplicationStage.create(app, StageType.ETC));
 
-        var docsSchedule = createApplicationSchedule(
+        var docsSchedule = scheduleJpaRepository.save(Schedule.registerDocs(
+                member,
                 docsStage,
                 StageType.DOCUMENT.getDescription(),
-                null,
-                ScheduleResult.PASS,
                 SubmissionStatus.SUBMITTED,
+                ScheduleResult.PASS,
                 now(),
                 app.getDeadline()
-        );
+        ));
 
         // when
         var applicationDetailPageResponse = applicationReader.findApplication(app.getId(), member.getId());
@@ -415,15 +411,16 @@ class FindApplicationIntegrationTest extends IntegrationTestSupport {
         ));
         var docsStage = applicationStageJpaRepository.save(ApplicationStage.create(app, StageType.DOCUMENT));
 
-        var docsSchedule = createApplicationSchedule(
+
+        var docsSchedule = scheduleJpaRepository.save(Schedule.registerDocs(
+                member,
                 docsStage,
                 StageType.DOCUMENT.getDescription(),
-                null,
-                ScheduleResult.PASS,
                 SubmissionStatus.SUBMITTED,
+                ScheduleResult.PASS,
                 now(),
                 app.getDeadline()
-        );
+        ));
         // when
         var applicationDetailPageResponse = applicationReader.findApplication(app.getId(), member.getId());
 
@@ -472,28 +469,6 @@ class FindApplicationIntegrationTest extends IntegrationTestSupport {
 
         var interviewStageTimeLines = applicationDetailPageResponse.applicationStageTimeLine().interviewStageTimeLine();
         assertThat(interviewStageTimeLines).isEmpty();
-    }
-
-    private Schedule createApplicationSchedule(
-            ApplicationStage applicationStage,
-            String scheduleName,
-            String location,
-            ScheduleResult scheduleResult,
-            SubmissionStatus submissionStatus,
-            LocalDateTime startedAt,
-            LocalDateTime endedAt
-    ) {
-        Schedule schedule = Schedule.register(
-                member,
-                applicationStage,
-                scheduleName,
-                location,
-                scheduleResult,
-                submissionStatus,
-                startedAt,
-                endedAt
-        );
-        return scheduleJpaRepository.save(schedule);
     }
 
 }
