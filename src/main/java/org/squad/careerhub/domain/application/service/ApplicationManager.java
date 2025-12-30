@@ -26,9 +26,9 @@ public class ApplicationManager {
     public Application create(
             NewApplication newApplication,
             List<MultipartFile> files,
-            Long memberId
+            Long authorId
     ) {
-        Member author = memberReader.find(memberId);
+        Member author = memberReader.find(authorId);
         Application application = applicationJpaRepository.save(Application.create(
                 author,
                 newApplication.jobPostingUrl(),
