@@ -62,11 +62,11 @@ class ApplicationReaderIntegrationTest extends IntegrationTestSupport {
     @BeforeEach
     void setUp() {
         member = memberJpaRepository.save(Member.create(
-            "test@gmail.com",
-            SocialProvider.KAKAO,
-            "socialId",
-            "TestUser",
-            "profile.png"
+                "test@gmail.com",
+                SocialProvider.KAKAO,
+                "socialId",
+                "TestUser",
+                "profile.png"
         ));
     }
 
@@ -81,16 +81,16 @@ class ApplicationReaderIntegrationTest extends IntegrationTestSupport {
 
         // when
         PageResponse<ApplicationSummaryResponse> response = applicationReader.findApplications(
-            condition, cursor, member.getId());
+                condition, cursor, member.getId());
 
         // then
         assertThat(response.contents()).hasSize(size);
         assertThat(response).extracting(
-            PageResponse::hasNext,
-            PageResponse::nextCursorId
+                PageResponse::hasNext,
+                PageResponse::nextCursorId
         ).containsExactly(
-            false,
-            null
+                false,
+                null
         );
     }
 
@@ -98,43 +98,54 @@ class ApplicationReaderIntegrationTest extends IntegrationTestSupport {
     void 유형별_조회된_값들을_검증한다() {
         // given
         var docsApp = createApplication(
-            "FE",
-            NewStage.builder()
-                .stageType(StageType.DOCUMENT)
-                .submissionStatus(SubmissionStatus.SUBMITTED)
-                .newInterviewSchedules(List.of())
-                .build()
+                "FE",
+                NewStage.builder()
+                        .stageType(StageType.DOCUMENT)
+                        .submissionStatus(SubmissionStatus.SUBMITTED)
+                        .newInterviewSchedules(List.of())
+                        .build()
         );
         var baseTime = now();
 
-        var newEtcSchedule = new NewEtcSchedule("임원 면접", baseTime.plusDays(1),
-            baseTime.plusDays(1));
-        var etcApp = createApplication(
-            "BE",
-            NewStage.builder()
-                .stageType(StageType.ETC)
-                .newEtcSchedules(List.of(newEtcSchedule))
-                .newInterviewSchedules(List.of())
-                .build()
+        var newEtcSchedule = new NewEtcSchedule(
+                "임원 면접",
+                baseTime,
+                baseTime.plusHours(1),
+                ScheduleResult.WAITING
         );
 
-        var newInterviewSchedule = new NewInterviewSchedule("임원 면접",
-            baseTime.plusDays(1), "판교");
+        var etcApp = createApplication(
+                "BE",
+                NewStage.builder()
+                        .stageType(StageType.ETC)
+                        .newEtcSchedules(List.of(newEtcSchedule))
+                        .newInterviewSchedules(List.of())
+                        .build()
+        );
+
+        var newInterviewSchedule = new NewInterviewSchedule(
+                "임원 면접",
+                baseTime,
+                "판교",
+                ScheduleResult.WAITING
+        );
+
         var interviewApp = createApplication(
-            "DevOps",
-            NewStage.builder()
-                .stageType(StageType.INTERVIEW)
-                .newInterviewSchedules(List.of(newInterviewSchedule))
-                .build()
+                "DevOps",
+                NewStage.builder()
+                        .stageType(StageType.INTERVIEW)
+                        .newEtcSchedules(List.of())
+                        .newInterviewSchedules(List.of(newInterviewSchedule))
+                        .build()
         );
 
         var closeApp = createApplication(
-            "BE",
-            NewStage.builder()
-                .stageType(StageType.APPLICATION_CLOSE)
-                .finalApplicationStatus(ApplicationStatus.FINAL_PASS)
-                .newInterviewSchedules(List.of())
-                .build()
+                "BE",
+                NewStage.builder()
+                        .stageType(StageType.APPLICATION_CLOSE)
+                        .finalApplicationStatus(ApplicationStatus.FINAL_PASS)
+                        .newInterviewSchedules(List.of())
+                        .build()
         );
 
         var condition = SearchCondition.builder().build();
@@ -142,151 +153,151 @@ class ApplicationReaderIntegrationTest extends IntegrationTestSupport {
 
         // when
         PageResponse<ApplicationSummaryResponse> response = applicationReader.findApplications(
-            condition, cursor, member.getId());
+                condition, cursor, member.getId());
 
         // then
         assertThat(response.contents()).hasSize(4);
         assertThat(response).extracting(
-            PageResponse::hasNext,
-            PageResponse::nextCursorId
+                PageResponse::hasNext,
+                PageResponse::nextCursorId
         ).containsExactly(
-            false,
-            null
+                false,
+                null
         );
 
         // 1. 서류 전형 검증
         var feResponse = response.contents().stream()
-            .filter(r -> r.position().equals("FE"))
-            .findFirst()
-            .orElseThrow();
+                .filter(r -> r.position().equals("FE"))
+                .findFirst()
+                .orElseThrow();
 
         assertThat(feResponse).isNotNull()
-            .extracting(
-                ApplicationSummaryResponse::applicationId,
-                ApplicationSummaryResponse::company,
-                ApplicationSummaryResponse::position,
-                ApplicationSummaryResponse::currentStageType,
-                ApplicationSummaryResponse::currentScheduleResult,
-                ApplicationSummaryResponse::applicationStatus
-            )
-            .containsExactly(
-                docsApp.getId(),
-                docsApp.getCompany(),
-                docsApp.getPosition(),
-                StageType.DOCUMENT.getDescription(),
-                ScheduleResult.WAITING.name(),
-                ApplicationStatus.IN_PROGRESS.name()
-            );
+                .extracting(
+                        ApplicationSummaryResponse::applicationId,
+                        ApplicationSummaryResponse::company,
+                        ApplicationSummaryResponse::position,
+                        ApplicationSummaryResponse::currentStageType,
+                        ApplicationSummaryResponse::currentScheduleResult,
+                        ApplicationSummaryResponse::applicationStatus
+                )
+                .containsExactly(
+                        docsApp.getId(),
+                        docsApp.getCompany(),
+                        docsApp.getPosition(),
+                        StageType.DOCUMENT.getDescription(),
+                        ScheduleResult.WAITING.name(),
+                        ApplicationStatus.IN_PROGRESS.name()
+                );
         assertThat(feResponse.scheduleStage()).isNull();
         assertThat(feResponse.docsStage()).isNotNull()
-            .extracting(
-                DocsStage::deadline,
-                DocsStage::applicationMethod
-            )
-            .containsExactly(
-                docsApp.getDeadline().truncatedTo(ChronoUnit.MICROS),
-                docsApp.getApplicationMethod().getDescription()
-            );
+                .extracting(
+                        DocsStage::deadline,
+                        DocsStage::applicationMethod
+                )
+                .containsExactly(
+                        docsApp.getDeadline().truncatedTo(ChronoUnit.MICROS),
+                        docsApp.getApplicationMethod().getDescription()
+                );
 
         // 2. 기타 전형 검증
         var beEtcResponse = response.contents().stream()
-            .filter(r -> r.position().equals("BE") && r.currentStageType()
-                .equals(StageType.ETC.getDescription()))
-            .findFirst()
-            .orElseThrow();
+                .filter(r -> r.position().equals("BE") && r.currentStageType()
+                        .equals(StageType.ETC.getDescription()))
+                .findFirst()
+                .orElseThrow();
 
         assertThat(beEtcResponse).isNotNull()
-            .extracting(
-                ApplicationSummaryResponse::applicationId,
-                ApplicationSummaryResponse::company,
-                ApplicationSummaryResponse::position,
-                ApplicationSummaryResponse::currentStageType,
-                ApplicationSummaryResponse::currentScheduleResult,
-                ApplicationSummaryResponse::applicationStatus
-            )
-            .containsExactly(
-                etcApp.getId(),
-                etcApp.getCompany(),
-                etcApp.getPosition(),
-                StageType.ETC.getDescription(),
-                ScheduleResult.WAITING.name(),
-                ApplicationStatus.IN_PROGRESS.name()
-            );
+                .extracting(
+                        ApplicationSummaryResponse::applicationId,
+                        ApplicationSummaryResponse::company,
+                        ApplicationSummaryResponse::position,
+                        ApplicationSummaryResponse::currentStageType,
+                        ApplicationSummaryResponse::currentScheduleResult,
+                        ApplicationSummaryResponse::applicationStatus
+                )
+                .containsExactly(
+                        etcApp.getId(),
+                        etcApp.getCompany(),
+                        etcApp.getPosition(),
+                        StageType.ETC.getDescription(),
+                        ScheduleResult.WAITING.name(),
+                        ApplicationStatus.IN_PROGRESS.name()
+                );
 
         assertThat(beEtcResponse.docsStage()).isNull();
         assertThat(beEtcResponse.scheduleStage()).isNotNull()
-            .extracting(
-                ScheduleStage::scheduleName,
-                ScheduleStage::location,
-                ScheduleStage::nextScheduleAt
-            )
-            .containsExactly(
-                "임원 면접",
-                null,
-                newEtcSchedule.startedAt()
-            );
+                .extracting(
+                        ScheduleStage::scheduleName,
+                        ScheduleStage::location,
+                        ScheduleStage::nextScheduleAt
+                )
+                .containsExactly(
+                        "임원 면접",
+                        null,
+                        newEtcSchedule.startedAt()
+                );
 
         // 3. 면접 전형 검증 (DevOps)
         var devOpsResponse = response.contents().stream()
-            .filter(r -> r.position().equals("DevOps"))
-            .findFirst()
-            .orElseThrow();
+                .filter(r -> r.position().equals("DevOps"))
+                .findFirst()
+                .orElseThrow();
 
         assertThat(devOpsResponse).isNotNull()
-            .extracting(
-                ApplicationSummaryResponse::applicationId,
-                ApplicationSummaryResponse::company,
-                ApplicationSummaryResponse::position,
-                ApplicationSummaryResponse::currentStageType,
-                ApplicationSummaryResponse::currentScheduleResult,
-                ApplicationSummaryResponse::applicationStatus
-            )
-            .containsExactly(
-                interviewApp.getId(),
-                interviewApp.getCompany(),
-                interviewApp.getPosition(),
-                StageType.INTERVIEW.getDescription(),
-                ScheduleResult.WAITING.name(),
-                ApplicationStatus.IN_PROGRESS.name()
-            );
+                .extracting(
+                        ApplicationSummaryResponse::applicationId,
+                        ApplicationSummaryResponse::company,
+                        ApplicationSummaryResponse::position,
+                        ApplicationSummaryResponse::currentStageType,
+                        ApplicationSummaryResponse::currentScheduleResult,
+                        ApplicationSummaryResponse::applicationStatus
+                )
+                .containsExactly(
+                        interviewApp.getId(),
+                        interviewApp.getCompany(),
+                        interviewApp.getPosition(),
+                        StageType.INTERVIEW.getDescription(),
+                        ScheduleResult.WAITING.name(),
+                        ApplicationStatus.IN_PROGRESS.name()
+                );
 
         assertThat(devOpsResponse.docsStage()).isNull();
         assertThat(devOpsResponse.scheduleStage()).isNotNull()
-            .extracting(
-                ScheduleStage::scheduleName,
-                ScheduleStage::location,
-                ScheduleStage::nextScheduleAt
-            )
-            .containsExactly(
-                newInterviewSchedule.scheduleName(),
-                newInterviewSchedule.location(),
-                newInterviewSchedule.startedAt()
-            );
+                .extracting(
+                        ScheduleStage::scheduleName,
+                        ScheduleStage::location,
+                        ScheduleStage::nextScheduleAt
+                )
+                .containsExactly(
+                        newInterviewSchedule.scheduleName(),
+                        newInterviewSchedule.location(),
+                        newInterviewSchedule.startedAt()
+                );
 
         // 4. 지원 마감 검증
         var closedResponse = response.contents().stream()
-            .filter(r -> r.position().equals("BE") && r.currentStageType()
-                .equals(StageType.APPLICATION_CLOSE.getDescription()))
-            .findFirst()
-            .orElseThrow();
+                .filter(r -> r.position().equals("BE") && r.currentStageType()
+                        .equals(StageType.APPLICATION_CLOSE.getDescription()))
+                .findFirst()
+                .orElseThrow();
 
         assertThat(closedResponse)
-            .extracting(
-                ApplicationSummaryResponse::applicationId,
-                ApplicationSummaryResponse::company,
-                ApplicationSummaryResponse::position,
-                ApplicationSummaryResponse::currentStageType,
-                ApplicationSummaryResponse::currentScheduleResult,
-                ApplicationSummaryResponse::applicationStatus
-            )
-            .containsExactly(
-                closeApp.getId(),
-                closeApp.getCompany(),
-                closeApp.getPosition(),
-                StageType.APPLICATION_CLOSE.getDescription(),
-                null,
-                ApplicationStatus.FINAL_PASS.name()
-            );
+                .extracting(
+                        ApplicationSummaryResponse::applicationId,
+                        ApplicationSummaryResponse::company,
+                        ApplicationSummaryResponse::position,
+                        ApplicationSummaryResponse::currentStageType,
+                        ApplicationSummaryResponse::currentScheduleResult,
+                        ApplicationSummaryResponse::applicationStatus
+                )
+                .containsExactly(
+                        closeApp.getId(),
+                        closeApp.getCompany(),
+                        closeApp.getPosition(),
+                        StageType.APPLICATION_CLOSE.getDescription(),
+                        null,
+                        ApplicationStatus.FINAL_PASS.name()
+                );
 
         // 지원 마감은 schedule이 없을 수 있음
         assertThat(closedResponse.docsStage()).isNull();
@@ -297,67 +308,76 @@ class ApplicationReaderIntegrationTest extends IntegrationTestSupport {
     void 회사명으로_검색하여_지원서를_조회한다() {
         // given
         var docsApp = createApplication("카카오", "백엔드 개발자",
-            NewStage.builder()
-                .stageType(StageType.DOCUMENT)
-                .submissionStatus(SubmissionStatus.SUBMITTED)
-                .newInterviewSchedules(List.of())
-                .build()
+                NewStage.builder()
+                        .stageType(StageType.DOCUMENT)
+                        .submissionStatus(SubmissionStatus.SUBMITTED)
+                        .newInterviewSchedules(List.of())
+                        .build()
         );
         var baseTime = now();
-        var newEtcSchedule = new NewEtcSchedule("코딩 테스트", baseTime,
-            baseTime.plusHours(1));
+        var newEtcSchedule = new NewEtcSchedule(
+                "코딩 테스트",
+                baseTime,
+                baseTime.plusHours(1),
+                ScheduleResult.WAITING);
+
         var etcApp = createApplication("네이버", "백엔드 개발자",
-            NewStage.builder()
-                .stageType(StageType.ETC)
-                .newEtcSchedules(List.of(newEtcSchedule))
-                .newInterviewSchedules(List.of())
-                .build()
+                NewStage.builder()
+                        .stageType(StageType.ETC)
+                        .newEtcSchedules(List.of(newEtcSchedule))
+                        .newInterviewSchedules(List.of())
+                        .build()
         );
 
         createApplication("라인", "백엔드 개발자",
-            NewStage.builder()
-                .stageType(StageType.INTERVIEW)
-                .newInterviewSchedules(
-                    List.of(
-                        new NewInterviewSchedule("기술 면접", baseTime.plusDays(1),
-                            "판교")))
-                .build()
+                NewStage.builder()
+                        .stageType(StageType.INTERVIEW)
+                        .newInterviewSchedules(
+                                List.of(
+                                        new NewInterviewSchedule(
+                                                "기술 면접",
+                                                baseTime.plusDays(1),
+                                                "판교",
+                                                ScheduleResult.WAITING)
+                                )
+                        )
+                        .build()
         );
 
         var condition = SearchCondition.builder()
-            .query("네이버")
-            .build();
+                .query("네이버")
+                .build();
         var cursor = Cursor.of(null, 20);
 
         // when
         PageResponse<ApplicationSummaryResponse> response = applicationReader.findApplications(
-            condition, cursor, member.getId());
+                condition, cursor, member.getId());
 
         // then
         assertThat(response.contents()).hasSize(1);
         var docsSummaryResponse = response.contents().getFirst();
         assertThat(docsSummaryResponse).extracting(
-            ApplicationSummaryResponse::applicationId,
-            ApplicationSummaryResponse::company,
-            ApplicationSummaryResponse::position,
-            ApplicationSummaryResponse::currentStageType,
-            ApplicationSummaryResponse::currentScheduleResult
+                ApplicationSummaryResponse::applicationId,
+                ApplicationSummaryResponse::company,
+                ApplicationSummaryResponse::position,
+                ApplicationSummaryResponse::currentStageType,
+                ApplicationSummaryResponse::currentScheduleResult
         ).containsExactly(
-            etcApp.getId(),
-            etcApp.getCompany(),
-            etcApp.getPosition(),
-            etcApp.getCurrentStageType().getDescription(),
-            ScheduleResult.WAITING.name()
+                etcApp.getId(),
+                etcApp.getCompany(),
+                etcApp.getPosition(),
+                etcApp.getCurrentStageType().getDescription(),
+                ScheduleResult.WAITING.name()
         );
         assertThat(docsSummaryResponse.docsStage()).isNull();
         assertThat(docsSummaryResponse.scheduleStage()).extracting(
-            ScheduleStage::scheduleName,
-            ScheduleStage::location,
-            ScheduleStage::nextScheduleAt
+                ScheduleStage::scheduleName,
+                ScheduleStage::location,
+                ScheduleStage::nextScheduleAt
         ).containsExactly(
-            newEtcSchedule.scheduleName(),
-            null,
-            newEtcSchedule.startedAt()
+                newEtcSchedule.scheduleName(),
+                null,
+                newEtcSchedule.startedAt()
         );
     }
 
@@ -365,64 +385,72 @@ class ApplicationReaderIntegrationTest extends IntegrationTestSupport {
     void 직무명으로_검색하여_지원서를_조회한다() {
         // given
         createApplication("카카오", "FE 개발자",
-            NewStage.builder()
-                .stageType(StageType.DOCUMENT)
-                .submissionStatus(SubmissionStatus.SUBMITTED)
-                .newInterviewSchedules(List.of())
-                .build()
+                NewStage.builder()
+                        .stageType(StageType.DOCUMENT)
+                        .submissionStatus(SubmissionStatus.SUBMITTED)
+                        .newInterviewSchedules(List.of())
+                        .build()
         );
         var baseTime = now();
-        var newEtcSchedule = new NewEtcSchedule("코딩 테스트", baseTime,
-            baseTime.plusHours(1));
-        createApplication("네이버", "QA",
-            NewStage.builder()
-                .stageType(StageType.ETC)
-                .newEtcSchedules(List.of(newEtcSchedule))
-                .newInterviewSchedules(List.of())
-                .build()
+        var newEtcSchedule = new NewEtcSchedule(
+                "코딩 테스트",
+                baseTime,
+                baseTime.plusHours(1),
+                ScheduleResult.WAITING
         );
-        var newInterviewSchedule = new NewInterviewSchedule("기술 면접",
-            baseTime.plusDays(1), "판교");
+        createApplication("네이버", "QA",
+                NewStage.builder()
+                        .stageType(StageType.ETC)
+                        .newEtcSchedules(List.of(newEtcSchedule))
+                        .newInterviewSchedules(List.of())
+                        .build()
+        );
+        var newInterviewSchedule = new NewInterviewSchedule(
+                "기술 면접",
+                baseTime.plusDays(1),
+                "판교",
+                ScheduleResult.WAITING
+        );
         var interviewApp = createApplication("라인", "백엔드 개발자",
-            NewStage.builder()
-                .stageType(StageType.INTERVIEW)
-                .newInterviewSchedules(List.of(newInterviewSchedule))
-                .build()
+                NewStage.builder()
+                        .stageType(StageType.INTERVIEW)
+                        .newInterviewSchedules(List.of(newInterviewSchedule))
+                        .build()
         );
         var condition = SearchCondition.builder()
-            .query("백엔드")
-            .build();
+                .query("백엔드")
+                .build();
         var cursor = Cursor.of(null, 10);
 
         // when
         PageResponse<ApplicationSummaryResponse> response = applicationReader.findApplications(
-            condition, cursor, member.getId());
+                condition, cursor, member.getId());
 
         // then
         assertThat(response.contents()).hasSize(1);
         var interviewSummaryResponse = response.contents().getFirst();
         assertThat(interviewSummaryResponse).extracting(
-            ApplicationSummaryResponse::applicationId,
-            ApplicationSummaryResponse::company,
-            ApplicationSummaryResponse::position,
-            ApplicationSummaryResponse::currentStageType,
-            ApplicationSummaryResponse::currentScheduleResult
+                ApplicationSummaryResponse::applicationId,
+                ApplicationSummaryResponse::company,
+                ApplicationSummaryResponse::position,
+                ApplicationSummaryResponse::currentStageType,
+                ApplicationSummaryResponse::currentScheduleResult
         ).containsExactly(
-            interviewApp.getId(),
-            interviewApp.getCompany(),
-            interviewApp.getPosition(),
-            interviewApp.getCurrentStageType().getDescription(),
-            ScheduleResult.WAITING.name()
+                interviewApp.getId(),
+                interviewApp.getCompany(),
+                interviewApp.getPosition(),
+                interviewApp.getCurrentStageType().getDescription(),
+                ScheduleResult.WAITING.name()
         );
         assertThat(interviewSummaryResponse.docsStage()).isNull();
         assertThat(interviewSummaryResponse.scheduleStage()).extracting(
-            ScheduleStage::scheduleName,
-            ScheduleStage::location,
-            ScheduleStage::nextScheduleAt
+                ScheduleStage::scheduleName,
+                ScheduleStage::location,
+                ScheduleStage::nextScheduleAt
         ).containsExactly(
-            newInterviewSchedule.scheduleName(),
-            newInterviewSchedule.location(),
-            newInterviewSchedule.startedAt()
+                newInterviewSchedule.scheduleName(),
+                newInterviewSchedule.location(),
+                newInterviewSchedule.startedAt()
         );
     }
 
@@ -430,65 +458,75 @@ class ApplicationReaderIntegrationTest extends IntegrationTestSupport {
     void 전형_타입으로_필터링하여_지원서를_조회한다() {
         // given
         createApplication("카카오", "FE 개발자",
-            NewStage.builder()
-                .stageType(StageType.DOCUMENT)
-                .submissionStatus(SubmissionStatus.SUBMITTED)
-                .newInterviewSchedules(List.of())
-                .build()
+                NewStage.builder()
+                        .stageType(StageType.DOCUMENT)
+                        .submissionStatus(SubmissionStatus.SUBMITTED)
+                        .newInterviewSchedules(List.of())
+                        .build()
         );
         var baseTime = now();
-        var newEtcSchedule = new NewEtcSchedule("코딩 테스트", baseTime,
-            baseTime.plusHours(1));
-        createApplication("네이버", "QA",
-            NewStage.builder()
-                .stageType(StageType.ETC)
-                .newEtcSchedules(List.of(newEtcSchedule))
-                .newInterviewSchedules(List.of())
-                .build()
+        var newEtcSchedule = new NewEtcSchedule(
+                "코딩 테스트",
+                baseTime,
+                baseTime.plusHours(1),
+                ScheduleResult.WAITING
         );
-        var newInterviewSchedule = new NewInterviewSchedule("기술 면접",
-            baseTime.plusDays(1), "판교");
+
+        createApplication("네이버", "QA",
+                NewStage.builder()
+                        .stageType(StageType.ETC)
+                        .newEtcSchedules(List.of(newEtcSchedule))
+                        .newInterviewSchedules(List.of())
+                        .build()
+        );
+        var newInterviewSchedule = new NewInterviewSchedule(
+                "기술 면접",
+                baseTime.plusDays(1),
+                "판교",
+                ScheduleResult.WAITING
+        );
+
         var interviewApp = createApplication("라인", "백엔드 개발자",
-            NewStage.builder()
-                .stageType(StageType.INTERVIEW)
-                .newInterviewSchedules(List.of(newInterviewSchedule))
-                .build()
+                NewStage.builder()
+                        .stageType(StageType.INTERVIEW)
+                        .newInterviewSchedules(List.of(newInterviewSchedule))
+                        .build()
         );
 
         var condition = SearchCondition.builder()
-            .stageTypes(List.of(StageType.INTERVIEW))
-            .build();
+                .stageTypes(List.of(StageType.INTERVIEW))
+                .build();
         var cursor = Cursor.of(null, 20);
 
         // when
         PageResponse<ApplicationSummaryResponse> response = applicationReader.findApplications(
-            condition, cursor, member.getId());
+                condition, cursor, member.getId());
 
         // then
         assertThat(response.contents()).hasSize(1);
         var interviewSummaryResponse = response.contents().getFirst();
         assertThat(interviewSummaryResponse).extracting(
-            ApplicationSummaryResponse::applicationId,
-            ApplicationSummaryResponse::company,
-            ApplicationSummaryResponse::position,
-            ApplicationSummaryResponse::currentStageType,
-            ApplicationSummaryResponse::currentScheduleResult
+                ApplicationSummaryResponse::applicationId,
+                ApplicationSummaryResponse::company,
+                ApplicationSummaryResponse::position,
+                ApplicationSummaryResponse::currentStageType,
+                ApplicationSummaryResponse::currentScheduleResult
         ).containsExactly(
-            interviewApp.getId(),
-            interviewApp.getCompany(),
-            interviewApp.getPosition(),
-            interviewApp.getCurrentStageType().getDescription(),
-            ScheduleResult.WAITING.name()
+                interviewApp.getId(),
+                interviewApp.getCompany(),
+                interviewApp.getPosition(),
+                interviewApp.getCurrentStageType().getDescription(),
+                ScheduleResult.WAITING.name()
         );
         assertThat(interviewSummaryResponse.docsStage()).isNull();
         assertThat(interviewSummaryResponse.scheduleStage()).extracting(
-            ScheduleStage::scheduleName,
-            ScheduleStage::location,
-            ScheduleStage::nextScheduleAt
+                ScheduleStage::scheduleName,
+                ScheduleStage::location,
+                ScheduleStage::nextScheduleAt
         ).containsExactly(
-            newInterviewSchedule.scheduleName(),
-            newInterviewSchedule.location(),
-            newInterviewSchedule.startedAt()
+                newInterviewSchedule.scheduleName(),
+                newInterviewSchedule.location(),
+                newInterviewSchedule.startedAt()
         );
     }
 
@@ -496,114 +534,132 @@ class ApplicationReaderIntegrationTest extends IntegrationTestSupport {
     void 여러_가지_전형_타입으로_필터링하여_지원서를_조회한다() {
         // given
         var docsApp = createApplication("카카오", "FE 개발자",
-            NewStage.builder()
-                .stageType(StageType.DOCUMENT)
-                .submissionStatus(SubmissionStatus.SUBMITTED)
-                .newInterviewSchedules(List.of())
-                .build()
+                NewStage.builder()
+                        .stageType(StageType.DOCUMENT)
+                        .submissionStatus(SubmissionStatus.SUBMITTED)
+                        .newInterviewSchedules(List.of())
+                        .build()
         );
         var baseTime = now();
-        var newEtcSchedule = new NewEtcSchedule("코딩 테스트", baseTime,
-            baseTime.plusHours(1));
-        createApplication("네이버", "QA",
-            NewStage.builder()
-                .stageType(StageType.ETC)
-                .newEtcSchedules(List.of(newEtcSchedule))
-                .newInterviewSchedules(List.of())
-                .build()
+        var newEtcSchedule = new NewEtcSchedule(
+                "코딩 테스트",
+                baseTime,
+                baseTime.plusHours(1),
+                ScheduleResult.WAITING
         );
-        var newInterviewSchedule = new NewInterviewSchedule("기술 면접",
-            baseTime.plusDays(1), "판교");
+        createApplication("네이버", "QA",
+                NewStage.builder()
+                        .stageType(StageType.ETC)
+                        .newEtcSchedules(List.of(newEtcSchedule))
+                        .newInterviewSchedules(List.of())
+                        .build()
+        );
+        var newInterviewSchedule = new NewInterviewSchedule(
+                "기술 면접",
+                baseTime.plusDays(1),
+                "판교",
+                ScheduleResult.WAITING
+        );
         var interviewApp = createApplication("라인", "백엔드 개발자",
-            NewStage.builder()
-                .stageType(StageType.INTERVIEW)
-                .newInterviewSchedules(List.of(newInterviewSchedule))
-                .build()
+                NewStage.builder()
+                        .stageType(StageType.INTERVIEW)
+                        .newInterviewSchedules(List.of(newInterviewSchedule))
+                        .build()
         );
 
         var condition = SearchCondition.builder()
-            .stageTypes(List.of(StageType.INTERVIEW, StageType.DOCUMENT))
-            .build();
+                .stageTypes(List.of(StageType.INTERVIEW, StageType.DOCUMENT))
+                .build();
         var cursor = Cursor.of(null, 20);
 
         // when
         PageResponse<ApplicationSummaryResponse> response = applicationReader.findApplications(
-            condition, cursor, member.getId());
+                condition, cursor, member.getId());
 
         // then
         assertThat(response.contents()).hasSize(2)
-            .extracting(ApplicationSummaryResponse::company)
-            .containsExactlyInAnyOrder(docsApp.getCompany(), interviewApp.getCompany());
+                .extracting(ApplicationSummaryResponse::company)
+                .containsExactlyInAnyOrder(docsApp.getCompany(), interviewApp.getCompany());
     }
 
     @Test
     void 서류_제출_상태로_필터링하여_지원서를_조회한다() {
         // given
         var appSubmitted = createApplication("카카오", "FE 개발자",
-            NewStage.builder()
-                .stageType(StageType.DOCUMENT)
-                .submissionStatus(SubmissionStatus.SUBMITTED)
-                .newInterviewSchedules(List.of())
-                .build()
+                NewStage.builder()
+                        .stageType(StageType.DOCUMENT)
+                        .submissionStatus(SubmissionStatus.SUBMITTED)
+                        .newInterviewSchedules(List.of())
+                        .build()
         );
 
         createApplication("네이버", "FE 개발자",
-            NewStage.builder()
-                .stageType(StageType.INTERVIEW)
-                .newInterviewSchedules(
-                    List.of(new NewInterviewSchedule("1차 면접", now(), "강남")))
-                .build()
+                NewStage.builder()
+                        .stageType(StageType.INTERVIEW)
+                        .newInterviewSchedules(
+                                List.of(new NewInterviewSchedule(
+                                        "기술 면접",
+                                        now().plusDays(1),
+                                        "판교",
+                                        ScheduleResult.WAITING
+                                )))
+                        .build()
         );
 
         var condition = new SearchCondition(
-            null,
-            List.of(StageType.DOCUMENT),
-            List.of(SubmissionStatus.SUBMITTED),
-            null
+                null,
+                List.of(StageType.DOCUMENT),
+                List.of(SubmissionStatus.SUBMITTED),
+                null
         );
         var cursor = Cursor.of(null, 20);
 
         // when
         PageResponse<ApplicationSummaryResponse> response =
-            applicationReader.findApplications(condition, cursor, member.getId());
+                applicationReader.findApplications(condition, cursor, member.getId());
 
         // then
         assertThat(response.contents()).hasSize(1);
 
         var res = response.contents().getFirst();
         assertThat(res).extracting(
-            ApplicationSummaryResponse::applicationId,
-            ApplicationSummaryResponse::company,
-            ApplicationSummaryResponse::position,
-            ApplicationSummaryResponse::currentStageType,
-            ApplicationSummaryResponse::currentScheduleResult
+                ApplicationSummaryResponse::applicationId,
+                ApplicationSummaryResponse::company,
+                ApplicationSummaryResponse::position,
+                ApplicationSummaryResponse::currentStageType,
+                ApplicationSummaryResponse::currentScheduleResult
         ).containsExactly(
-            appSubmitted.getId(),
-            appSubmitted.getCompany(),
-            appSubmitted.getPosition(),
-            appSubmitted.getCurrentStageType().getDescription(),
-            ScheduleResult.WAITING.name()
+                appSubmitted.getId(),
+                appSubmitted.getCompany(),
+                appSubmitted.getPosition(),
+                appSubmitted.getCurrentStageType().getDescription(),
+                ScheduleResult.WAITING.name()
         );
 
         assertThat(res.scheduleStage()).isNull();
         assertThat(res.docsStage()).isNotNull()
-            .extracting(DocsStage::deadline, DocsStage::applicationMethod)
-            .containsExactly(
-                appSubmitted.getDeadline(),
-                appSubmitted.getApplicationMethod().getDescription()
-            );
+                .extracting(DocsStage::deadline, DocsStage::applicationMethod)
+                .containsExactly(
+                        appSubmitted.getDeadline(),
+                        appSubmitted.getApplicationMethod().getDescription()
+                );
     }
 
     @Test
     void 가장_가까운_면접_일정이_포함되어_조회된다() {
         // given
         var baseTime = now();
-        var newInterviewSchedule = new NewInterviewSchedule("기술 면접", baseTime.plusDays(1), "판교");
+        var newInterviewSchedule = new NewInterviewSchedule(
+                "기술 면접",
+                baseTime.plusDays(1),
+                "판교",
+                ScheduleResult.WAITING
+        );
         var interviewApp = createApplication("카카오", "백엔드 개발자",
-            NewStage.builder()
-                .stageType(StageType.INTERVIEW)
-                .newInterviewSchedules(List.of(newInterviewSchedule))
-                .build()
+                NewStage.builder()
+                        .stageType(StageType.INTERVIEW)
+                        .newInterviewSchedules(List.of(newInterviewSchedule))
+                        .build()
         );
 
         var condition = SearchCondition.builder().build();
@@ -611,37 +667,37 @@ class ApplicationReaderIntegrationTest extends IntegrationTestSupport {
 
         // when
         PageResponse<ApplicationSummaryResponse> response = applicationReader.findApplications(
-            condition, cursor, member.getId());
+                condition, cursor, member.getId());
 
         // then
         assertThat(response.contents()).hasSize(1);
         var interviewSummaryResponse = response.contents().getFirst();
         assertThat(interviewSummaryResponse).extracting(
-            ApplicationSummaryResponse::applicationId,
-            ApplicationSummaryResponse::company,
-            ApplicationSummaryResponse::position,
-            ApplicationSummaryResponse::currentStageType,
-            ApplicationSummaryResponse::currentScheduleResult
+                ApplicationSummaryResponse::applicationId,
+                ApplicationSummaryResponse::company,
+                ApplicationSummaryResponse::position,
+                ApplicationSummaryResponse::currentStageType,
+                ApplicationSummaryResponse::currentScheduleResult
         ).containsExactly(
-            interviewApp.getId(),
-            interviewApp.getCompany(),
-            interviewApp.getPosition(),
-            interviewApp.getCurrentStageType().getDescription(),
-            ScheduleResult.WAITING.name()
+                interviewApp.getId(),
+                interviewApp.getCompany(),
+                interviewApp.getPosition(),
+                interviewApp.getCurrentStageType().getDescription(),
+                ScheduleResult.WAITING.name()
         );
         assertThat(interviewSummaryResponse.docsStage()).isNull();
         var responseScheduleStage = interviewSummaryResponse.scheduleStage();
         assertThat(responseScheduleStage).isNotNull()
-            .extracting(
-                ScheduleStage::scheduleName,
-                ScheduleStage::location,
-                ScheduleStage::nextScheduleAt
-            )
-            .containsExactly(
-                newInterviewSchedule.scheduleName(),
-                newInterviewSchedule.location(),
-                newInterviewSchedule.startedAt()
-            );
+                .extracting(
+                        ScheduleStage::scheduleName,
+                        ScheduleStage::location,
+                        ScheduleStage::nextScheduleAt
+                )
+                .containsExactly(
+                        newInterviewSchedule.scheduleName(),
+                        newInterviewSchedule.location(),
+                        newInterviewSchedule.startedAt()
+                );
     }
 
     @Test
@@ -662,7 +718,7 @@ class ApplicationReaderIntegrationTest extends IntegrationTestSupport {
         // when - 두 번째 페이지
         var secondCursor = Cursor.of(firstPage.nextCursorId(), 10);
         var secondPage = applicationReader.findApplications(condition, secondCursor,
-            member.getId());
+                member.getId());
 
         // then - 두 번째 페이지
         assertThat(secondPage.contents()).hasSize(5);
@@ -674,19 +730,19 @@ class ApplicationReaderIntegrationTest extends IntegrationTestSupport {
     void 다른_사용자의_지원서는_조회되지_않는다() {
         // given
         createApplication("백엔드 개발자",
-            NewStage.builder()
-                .stageType(StageType.DOCUMENT)
-                .submissionStatus(SubmissionStatus.SUBMITTED)
-                .newInterviewSchedules(List.of())
-                .build()
+                NewStage.builder()
+                        .stageType(StageType.DOCUMENT)
+                        .submissionStatus(SubmissionStatus.SUBMITTED)
+                        .newInterviewSchedules(List.of())
+                        .build()
         );
 
         var otherMember = Member.create(
-            "other@example.com",
-            SocialProvider.GOOGLE,
-            "otherSocialId",
-            "다른사용자",
-            "otherProfileUrl"
+                "other@example.com",
+                SocialProvider.GOOGLE,
+                "otherSocialId",
+                "다른사용자",
+                "otherProfileUrl"
         );
         memberRepository.save(otherMember);
 
@@ -695,18 +751,18 @@ class ApplicationReaderIntegrationTest extends IntegrationTestSupport {
 
         // when
         PageResponse<ApplicationSummaryResponse> response = applicationReader.findApplications(
-            condition, cursor,
-            otherMember.getId());
+                condition, cursor,
+                otherMember.getId());
 
         // then
         assertThat(response).isNotNull().extracting(
-            PageResponse::contents,
-            PageResponse::hasNext,
-            PageResponse::nextCursorId
+                PageResponse::contents,
+                PageResponse::hasNext,
+                PageResponse::nextCursorId
         ).containsExactly(
-            List.of(),
-            false,
-            null
+                List.of(),
+                false,
+                null
         );
     }
 
@@ -714,11 +770,11 @@ class ApplicationReaderIntegrationTest extends IntegrationTestSupport {
     void 빈_결과에서도_페이지네이션_정보가_올바르게_반환된다() {
         // given
         var emptyMember = Member.create(
-            "empty@example.com",
-            SocialProvider.KAKAO,
-            "emptySocialId",
-            "지원서없는사용자",
-            "emptyProfileUrl"
+                "empty@example.com",
+                SocialProvider.KAKAO,
+                "emptySocialId",
+                "지원서없는사용자",
+                "emptyProfileUrl"
         );
         memberRepository.save(emptyMember);
 
@@ -727,8 +783,8 @@ class ApplicationReaderIntegrationTest extends IntegrationTestSupport {
 
         // when
         PageResponse<ApplicationSummaryResponse> response = applicationReader.findApplications(
-            condition, cursor,
-            emptyMember.getId());
+                condition, cursor,
+                emptyMember.getId());
 
         // then
         assertThat(response.contents()).isEmpty();
@@ -740,51 +796,60 @@ class ApplicationReaderIntegrationTest extends IntegrationTestSupport {
     void 복합_조건으로_검색이_가능하다() {
         // given
         createApplication("카카오", "백엔드 개발자",
-            NewStage.builder()
-                .stageType(StageType.DOCUMENT)
-                .submissionStatus(SubmissionStatus.SUBMITTED)
-                .newInterviewSchedules(List.of())
-                .build()
+                NewStage.builder()
+                        .stageType(StageType.DOCUMENT)
+                        .submissionStatus(SubmissionStatus.SUBMITTED)
+                        .newInterviewSchedules(List.of())
+                        .build()
         );
         var baseTime = now();
-        var newEtcSchedule = new NewEtcSchedule("코딩 테스트", baseTime,
-            baseTime.plusHours(1));
-        createApplication("네이버", "QA 개발자",
-            NewStage.builder()
-                .stageType(StageType.ETC)
-                .newEtcSchedules(List.of(newEtcSchedule))
-                .newInterviewSchedules(List.of())
-                .build()
+        var newEtcSchedule = new NewEtcSchedule(
+                "코딩 테스트",
+                baseTime,
+                baseTime.plusHours(1),
+                ScheduleResult.WAITING
         );
 
-        var newInterviewSchedule = new NewInterviewSchedule("기술 면접",
-            baseTime.plusDays(1), "판교");
+        createApplication("네이버", "QA 개발자",
+                NewStage.builder()
+                        .stageType(StageType.ETC)
+                        .newEtcSchedules(List.of(newEtcSchedule))
+                        .newInterviewSchedules(List.of())
+                        .build()
+        );
+
+        var newInterviewSchedule = new NewInterviewSchedule(
+                "기술 면접",
+                baseTime.plusDays(1),
+                "판교",
+                ScheduleResult.WAITING
+        );
         createApplication("라인", "백엔드 개발자",
-            NewStage.builder()
-                .stageType(StageType.INTERVIEW)
-                .newInterviewSchedules(List.of(newInterviewSchedule))
-                .build()
+                NewStage.builder()
+                        .stageType(StageType.INTERVIEW)
+                        .newInterviewSchedules(List.of(newInterviewSchedule))
+                        .build()
         );
 
         var condition = new SearchCondition(
-            "개발자",
-            List.of(StageType.INTERVIEW, StageType.ETC),
-            List.of(),
-            List.of()
+                "개발자",
+                List.of(StageType.INTERVIEW, StageType.ETC),
+                List.of(),
+                List.of()
         );
         var cursor = Cursor.of(null, 20);
 
         // when
         PageResponse<ApplicationSummaryResponse> response = applicationReader.findApplications(
-            condition, cursor, member.getId());
+                condition, cursor, member.getId());
 
         // then
         assertThat(response.contents()).hasSize(2);
         assertThat(response.contents()).extracting(
-            ApplicationSummaryResponse::company
+                ApplicationSummaryResponse::company
         ).containsExactlyInAnyOrder(
-            "네이버",
-            "라인"
+                "네이버",
+                "라인"
         );
     }
 
@@ -792,39 +857,39 @@ class ApplicationReaderIntegrationTest extends IntegrationTestSupport {
     void 전체_지원서_개수와_각_전형별_지원서_개수를_조회한다() {
         // given
         var finalDocsApplications = createBulkApplications(member, StageType.DOCUMENT,
-            ApplicationStatus.FINAL_PASS, 20);
+                ApplicationStatus.FINAL_PASS, 20);
         var etcApplications = createBulkApplications(member, StageType.ETC,
-            ApplicationStatus.FINAL_PASS, 20);
+                ApplicationStatus.FINAL_PASS, 20);
         var interviewApplications = createBulkApplications(member, StageType.INTERVIEW,
-            ApplicationStatus.FINAL_PASS, 20);
+                ApplicationStatus.FINAL_PASS, 20);
         var finalPassApplications = createBulkApplications(member, StageType.APPLICATION_CLOSE,
-            ApplicationStatus.FINAL_PASS, 20);
+                ApplicationStatus.FINAL_PASS, 20);
         var finalFailApplications = createBulkApplications(member, StageType.APPLICATION_CLOSE,
-            ApplicationStatus.FINAL_FAIL, 20);
+                ApplicationStatus.FINAL_FAIL, 20);
 
         int totalCount = finalDocsApplications.size()
-            + etcApplications.size()
-            + interviewApplications.size()
-            + finalPassApplications.size()
-            + finalFailApplications.size();
+                + etcApplications.size()
+                + interviewApplications.size()
+                + finalPassApplications.size()
+                + finalFailApplications.size();
         // when
         var applicationStatistics = applicationReader.getApplicationStatistics(member.getId());
 
         // then
         assertThat(applicationStatistics).extracting(
-            ApplicationStatisticsResponse::totalApplicationCount,
-            ApplicationStatisticsResponse::docStageCount,
-            ApplicationStatisticsResponse::interviewStageCount,
-            ApplicationStatisticsResponse::etcStageCount,
-            ApplicationStatisticsResponse::finalPassedCount,
-            ApplicationStatisticsResponse::finalFailedCount
+                ApplicationStatisticsResponse::totalApplicationCount,
+                ApplicationStatisticsResponse::docStageCount,
+                ApplicationStatisticsResponse::interviewStageCount,
+                ApplicationStatisticsResponse::etcStageCount,
+                ApplicationStatisticsResponse::finalPassedCount,
+                ApplicationStatisticsResponse::finalFailedCount
         ).containsExactly(
-            totalCount,
-            finalDocsApplications.size(),
-            interviewApplications.size(),
-            etcApplications.size(),
-            finalPassApplications.size(),
-            finalFailApplications.size()
+                totalCount,
+                finalDocsApplications.size(),
+                interviewApplications.size(),
+                etcApplications.size(),
+                finalPassApplications.size(),
+                finalFailApplications.size()
         );
     }
 
@@ -835,10 +900,10 @@ class ApplicationReaderIntegrationTest extends IntegrationTestSupport {
 
         // then
         assertThat(applicationStatistics).extracting(
-            ApplicationStatisticsResponse::totalApplicationCount,
-            ApplicationStatisticsResponse::interviewStageCount,
-            ApplicationStatisticsResponse::etcStageCount,
-            ApplicationStatisticsResponse::finalPassedCount
+                ApplicationStatisticsResponse::totalApplicationCount,
+                ApplicationStatisticsResponse::interviewStageCount,
+                ApplicationStatisticsResponse::etcStageCount,
+                ApplicationStatisticsResponse::finalPassedCount
         ).containsExactly(0, 0, 0, 0);
     }
 
@@ -846,88 +911,88 @@ class ApplicationReaderIntegrationTest extends IntegrationTestSupport {
     void 마감_되지_않은_서류_전형_지원서를_조회한다() {
         // given
         var app1 = createApplication(NewStage.builder()
-                .stageType(StageType.DOCUMENT)
-                .submissionStatus(SubmissionStatus.SUBMITTED)
-                .newInterviewSchedules(List.of())
-                .build(),
-            now().minusDays(1)
+                        .stageType(StageType.DOCUMENT)
+                        .submissionStatus(SubmissionStatus.SUBMITTED)
+                        .newInterviewSchedules(List.of())
+                        .build(),
+                now().minusDays(1)
         );
         var app2 = createApplication(NewStage.builder()
-                .stageType(StageType.DOCUMENT)
-                .submissionStatus(SubmissionStatus.NOT_SUBMITTED)
-                .newInterviewSchedules(List.of())
-                .build(),
-            now().plusDays(1)
+                        .stageType(StageType.DOCUMENT)
+                        .submissionStatus(SubmissionStatus.NOT_SUBMITTED)
+                        .newInterviewSchedules(List.of())
+                        .build(),
+                now().plusDays(1)
         );
         var app3 = createApplication(NewStage.builder()
-                .stageType(StageType.DOCUMENT)
-                .submissionStatus(SubmissionStatus.SUBMITTED)
-                .newInterviewSchedules(List.of())
-                .build(),
-            now().plusDays(2)
+                        .stageType(StageType.DOCUMENT)
+                        .submissionStatus(SubmissionStatus.SUBMITTED)
+                        .newInterviewSchedules(List.of())
+                        .build(),
+                now().plusDays(2)
         );
 
         // when
         var response = applicationReader.findBeforeDeadlineApplications(member.getId(),
-            new Cursor(null, 20));
+                new Cursor(null, 20));
 
         // then
         assertThat(response).isNotNull().extracting(
-            PageResponse::hasNext,
-            PageResponse::nextCursorId
+                PageResponse::hasNext,
+                PageResponse::nextCursorId
         ).containsExactly(
-            false,
-            null
+                false,
+                null
         );
 
         // 모든 지원서의 데드라인이 미래인지 검증
         assertThat(response.contents())
-            .allMatch(app -> !app.deadline().isBefore(now()));
+                .allMatch(app -> !app.deadline().isBefore(now()));
 
         // 제출 상태 검증
         assertThat(response.contents()).hasSize(2)
-            .extracting(BeforeDeadlineApplicationResponse::submissionStatus)
-            .contains(SubmissionStatus.SUBMITTED, SubmissionStatus.NOT_SUBMITTED);
+                .extracting(BeforeDeadlineApplicationResponse::submissionStatus)
+                .contains(SubmissionStatus.SUBMITTED, SubmissionStatus.NOT_SUBMITTED);
     }
 
     private void createApplicationSchedule(
-        ApplicationStage applicationStage,
-        String scheduleName,
-        String location,
-        ScheduleResult scheduleResult,
-        SubmissionStatus submissionStatus,
-        LocalDateTime startedAt,
-        LocalDateTime endedAt
+            ApplicationStage applicationStage,
+            String scheduleName,
+            String location,
+            ScheduleResult scheduleResult,
+            SubmissionStatus submissionStatus,
+            LocalDateTime startedAt,
+            LocalDateTime endedAt
     ) {
         Schedule schedule = Schedule.register(
-            member,
-            applicationStage,
-            scheduleName,
-            location,
-            scheduleResult,
-            submissionStatus,
-            startedAt,
-            endedAt
+                member,
+                applicationStage,
+                scheduleName,
+                location,
+                scheduleResult,
+                submissionStatus,
+                startedAt,
+                endedAt
         );
         scheduleJpaRepository.save(schedule);
     }
 
     private List<Application> createBulkApplications(Member member, StageType stageType,
-        ApplicationStatus applicationStatus,
-        int count) {
+            ApplicationStatus applicationStatus,
+            int count) {
         List<Application> applications = new ArrayList<>();
 
         for (int i = 0; i < count; i++) {
             Application app = Application.create(
-                member,
-                "https://example.com/job/" + i,
-                "회사" + i,
-                "포지션" + i,
-                "지역" + i,
-                stageType,
-                applicationStatus,
-                ApplicationMethod.values()[i % ApplicationMethod.values().length],
-                now().plusDays(30)
+                    member,
+                    "https://example.com/job/" + i,
+                    "회사" + i,
+                    "포지션" + i,
+                    "지역" + i,
+                    stageType,
+                    applicationStatus,
+                    ApplicationMethod.values()[i % ApplicationMethod.values().length],
+                    now().plusDays(30)
             );
             applications.add(app);
         }
@@ -943,11 +1008,11 @@ class ApplicationReaderIntegrationTest extends IntegrationTestSupport {
         List<Application> applications = new ArrayList<>();
         for (int i = 0; i < size; i++) {
             Application application = createApplication(
-                "Position " + i,
-                NewStage.builder()
-                    .stageType(StageType.DOCUMENT)
-                    .submissionStatus(SubmissionStatus.NOT_SUBMITTED)
-                    .build()
+                    "Position " + i,
+                    NewStage.builder()
+                            .stageType(StageType.DOCUMENT)
+                            .submissionStatus(SubmissionStatus.NOT_SUBMITTED)
+                            .build()
             );
             applications.add(applicationRepository.save(application));
         }
@@ -967,27 +1032,27 @@ class ApplicationReaderIntegrationTest extends IntegrationTestSupport {
     }
 
     private Application createApplication(String company, String position, NewStage newStage,
-        LocalDateTime deadline) {
+            LocalDateTime deadline) {
         var newJobPosting = NewJobPosting.builder()
-            .jobPostingUrl("jobPostingUrl")
-            .company(company)
-            .position(position)
-            .jobLocation("seoul")
-            .build();
+                .jobPostingUrl("jobPostingUrl")
+                .company(company)
+                .position(position)
+                .jobLocation("seoul")
+                .build();
         var newApplicationInfo = NewApplicationInfo.builder()
-            .applicationMethod(ApplicationMethod.EMAIL)
-            .deadline(deadline)
-            .build();
+                .applicationMethod(ApplicationMethod.EMAIL)
+                .deadline(deadline)
+                .build();
 
         Application app = applicationManager.create(newJobPosting, newApplicationInfo, newStage,
-            List.of(), member.getId());
+                List.of(), member.getId());
         applicationStageManager.createWithSchedule(app, newStage);
         return app;
     }
 
     private Optional<ApplicationStage> getStage(Application app, StageType type) {
         return Optional.of(applicationStageJpaRepository
-            .findByApplicationIdAndStageType(app.getId(), type)
-            .orElseThrow());
+                .findByApplicationIdAndStageType(app.getId(), type)
+                .orElseThrow());
     }
 }

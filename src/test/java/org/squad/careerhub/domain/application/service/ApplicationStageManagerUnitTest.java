@@ -90,7 +90,13 @@ class ApplicationStageManagerUnitTest extends TestDoubleSupport {
     void 기타_전형_생성_시_서류_전형도_함꼐_저장되고_기타_일정_메서드를_호출한다() {
         // given
         var customStageName = "코딩테스트";
-        var etcSchedules = List.of(new NewEtcSchedule(customStageName, now(), now().plusDays(2)));
+        var etcSchedules = List.of(new NewEtcSchedule(
+                        customStageName,
+                        now(),
+                        now().plusDays(2),
+                        ScheduleResult.WAITING
+                )
+        );
         var etcNewStage = NewStage.builder()
                 .stageType(StageType.ETC)
                 .newEtcSchedules(etcSchedules)
