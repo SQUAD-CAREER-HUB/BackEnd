@@ -913,15 +913,18 @@ class ApplicationReaderIntegrationTest extends IntegrationTestSupport {
     }
 
     private Application createApplication(String company, String position, NewStage newStage, LocalDateTime deadline) {
+        ApplicationStatus status = newStage.stageType() == StageType.APPLICATION_CLOSE ?
+                ApplicationStatus.FINAL_PASS : ApplicationStatus.IN_PROGRESS;
+
         NewApplication newApplication = NewApplication.builder()
                 .jobPostingUrl("https://www.careerhub.com/job/12345")
                 .company(company)
                 .position(position)
-                .jobLocation("New York, NY")
+                .jobLocation("서울 강남구")
                 .deadline(deadline)
                 .stageType(newStage.stageType())
                 .applicationMethod(ApplicationMethod.EMAIL)
-                .finalApplicationStatus(ApplicationStatus.FINAL_PASS)
+                .finalApplicationStatus(status)
                 .build();
 
         Application app = applicationManager.create(newApplication, List.of(), member.getId());
