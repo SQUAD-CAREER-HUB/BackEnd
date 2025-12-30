@@ -16,10 +16,10 @@ public class ScheduleService {
     private final ScheduleManager scheduleManager;
     private final ApplicationReader applicationReader;
 
-    public ScheduleResponse createInterviewFromCalendar(
-        Long applicationId,
-        NewInterviewSchedule newInterviewSchedule,
-        Long memberId
+    public ScheduleResponse createInterviewSchedule(
+            Long applicationId,
+            NewInterviewSchedule newInterviewSchedule,
+            Long memberId
     ) {
         Application app = applicationReader.findApplication(applicationId);
         app.validateOwnedBy(memberId);
@@ -29,16 +29,16 @@ public class ScheduleService {
         return ScheduleResponse.from(saved);
     }
 
-    public ScheduleResponse createEtcFromCalendar(
-        Long applicationId,
-        NewEtcSchedule newEtcSchedule,
-        Long memberId
+    public ScheduleResponse createEtcSchedule(
+            Long applicationId,
+            NewEtcSchedule newEtcSchedule,
+            Long memberId
     ) {
         Application app = applicationReader.findApplication(applicationId);
         app.validateOwnedBy(memberId);
 
         Schedule saved = scheduleManager.createEtcSchedule(app, newEtcSchedule);
-        
+
         return ScheduleResponse.from(saved);
     }
 

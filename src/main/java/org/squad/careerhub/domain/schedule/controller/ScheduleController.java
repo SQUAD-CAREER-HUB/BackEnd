@@ -9,6 +9,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -23,51 +24,53 @@ import org.squad.careerhub.domain.schedule.service.dto.ScheduleResponse;
 import org.squad.careerhub.global.annotation.LoginMember;
 
 @RestController
-@RequestMapping("/v1/schedule")
+@RequestMapping("/v1")
 @RequiredArgsConstructor
 public class ScheduleController extends ScheduleDocsController {
 
     private final ScheduleService scheduleService;
 
     @Override
-    @PostMapping("/interview")
-    public ResponseEntity<ScheduleResponse> createInterviewFromCalendar(
-        @Valid @RequestBody InterviewScheduleCreateRequest request,
-        @LoginMember Long memberId
+    @PostMapping("/applications/{applicationId}/schedules/interview")
+    public ResponseEntity<ScheduleResponse> createInterviewSchedule(
+            @PathVariable Long applicationId,
+            @Valid @RequestBody InterviewScheduleCreateRequest request,
+            @LoginMember Long memberId
     ) {
-        ScheduleResponse response = scheduleService.createInterviewFromCalendar(
-            request.applicationId(),
-            request.toNewInterviewSchedule(),
-            memberId
+        ScheduleResponse response = scheduleService.createInterviewSchedule(
+                applicationId,
+                request.toNewInterviewSchedule(),
+                memberId
         );
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @Override
-    @PostMapping("/etc")
-    public ResponseEntity<ScheduleResponse> createEtcFromCalendar(
-        @Valid @RequestBody EtcScheduleCreateRequest request,
-        @LoginMember Long memberId
+    @PostMapping("/applications/{applicationId}/schedules/etc")
+    public ResponseEntity<ScheduleResponse> createEtcSchedule(
+            @PathVariable Long applicationId,
+            @Valid @RequestBody EtcScheduleCreateRequest request,
+            @LoginMember Long memberId
     ) {
-        ScheduleResponse response = scheduleService.createEtcFromCalendar(
-            request.applicationId(),
-            request.toNewEtcSchedule(),
-            memberId);
+        ScheduleResponse response = scheduleService.createEtcSchedule(
+                applicationId,
+                request.toNewEtcSchedule(),
+                memberId);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @Override
-    @GetMapping
+    @GetMapping("/schedule")
     public ResponseEntity<ScheduleListResponse> getSchedule(
-        @RequestParam
-        @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
-        @RequestParam
-        @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to,
-        @RequestParam
-        String companyName,
-        @RequestParam
-        List<StageType> stageTypes,
-        @LoginMember Long memberId
+            @RequestParam
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
+            @RequestParam
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to,
+            @RequestParam
+            String companyName,
+            @RequestParam
+            List<StageType> stageTypes,
+            @LoginMember Long memberId
     ) {
         return ResponseEntity.ok(ScheduleListResponse.mock());
     }

@@ -56,19 +56,18 @@ class ScheduleServiceTest extends TestDoubleSupport {
         when(saved.getApplicationStage()).thenReturn(stage);
 
         when(scheduleManager.createInterviewSchedule(eq(app), any(NewInterviewSchedule.class)))
-            .thenReturn(saved);
+                .thenReturn(saved);
 
         InterviewScheduleCreateRequest req = InterviewScheduleCreateRequest.builder()
-            .applicationId(applicationId)
-            .scheduleName("1차 기술면접")
-            .startedAt(LocalDateTime.of(2025, 12, 10, 19, 0))
-            .location("서울")
-            .build();
+                .scheduleName("1차 기술면접")
+                .startedAt(LocalDateTime.of(2025, 12, 10, 19, 0))
+                .location("서울")
+                .build();
 
-        ScheduleResponse res = scheduleService.createInterviewFromCalendar(
-            req.applicationId(),
-            req.toNewInterviewSchedule(),
-            memberId
+        ScheduleResponse res = scheduleService.createInterviewSchedule(
+                applicationId,
+                req.toNewInterviewSchedule(),
+                memberId
         );
 
         assertThat(res.id()).isEqualTo(100L);
@@ -77,7 +76,7 @@ class ScheduleServiceTest extends TestDoubleSupport {
         verify(app).validateOwnedBy(memberId);
 
         ArgumentCaptor<NewInterviewSchedule> captor = ArgumentCaptor.forClass(
-            NewInterviewSchedule.class);
+                NewInterviewSchedule.class);
         verify(scheduleManager).createInterviewSchedule(eq(app), captor.capture());
 
         NewInterviewSchedule captured = captor.getValue();
@@ -91,19 +90,19 @@ class ScheduleServiceTest extends TestDoubleSupport {
     void createInterviewFromCalendar_applicationId가_null이면_BAD_REQUEST() {
         // given
         NewInterviewSchedule cmd = NewInterviewSchedule.builder()
-            .scheduleName("1차 면접")
-            .startedAt(now())
-            .location("서울")
-            .build();
+                .scheduleName("1차 면접")
+                .startedAt(now())
+                .location("서울")
+                .build();
 
         when(applicationReader.findApplication(null))
-            .thenThrow(new CareerHubException(ErrorStatus.BAD_REQUEST));
+                .thenThrow(new CareerHubException(ErrorStatus.BAD_REQUEST));
 
         // when & then
-        assertThatThrownBy(() -> scheduleService.createInterviewFromCalendar(null, cmd, 1L))
-            .isInstanceOf(CareerHubException.class)
-            .extracting("errorStatus")
-            .isEqualTo(ErrorStatus.BAD_REQUEST);
+        assertThatThrownBy(() -> scheduleService.createInterviewSchedule(null, cmd, 1L))
+                .isInstanceOf(CareerHubException.class)
+                .extracting("errorStatus")
+                .isEqualTo(ErrorStatus.BAD_REQUEST);
     }
 
     @Test
@@ -112,20 +111,20 @@ class ScheduleServiceTest extends TestDoubleSupport {
         Long applicationId = 999L;
 
         when(applicationReader.findApplication(applicationId))
-            .thenThrow(new CareerHubException(ErrorStatus.NOT_FOUND));
+                .thenThrow(new CareerHubException(ErrorStatus.NOT_FOUND));
 
         NewInterviewSchedule cmd = NewInterviewSchedule.builder()
-            .scheduleName("면접")
-            .startedAt(now())
-            .location("서울")
-            .build();
+                .scheduleName("면접")
+                .startedAt(now())
+                .location("서울")
+                .build();
 
         // when & then
         assertThatThrownBy(
-            () -> scheduleService.createInterviewFromCalendar(applicationId, cmd, 1L))
-            .isInstanceOf(CareerHubException.class)
-            .extracting("errorStatus")
-            .isEqualTo(ErrorStatus.NOT_FOUND);
+                () -> scheduleService.createInterviewSchedule(applicationId, cmd, 1L))
+                .isInstanceOf(CareerHubException.class)
+                .extracting("errorStatus")
+                .isEqualTo(ErrorStatus.NOT_FOUND);
     }
 
     @Test
@@ -138,20 +137,20 @@ class ScheduleServiceTest extends TestDoubleSupport {
         when(applicationReader.findApplication(applicationId)).thenReturn(app);
 
         Mockito.doThrow(new CareerHubException(ErrorStatus.FORBIDDEN_ERROR))
-            .when(app).validateOwnedBy(memberId);
+                .when(app).validateOwnedBy(memberId);
 
         NewInterviewSchedule cmd = NewInterviewSchedule.builder()
-            .scheduleName("면접")
-            .startedAt(now())
-            .location("서울")
-            .build();
+                .scheduleName("면접")
+                .startedAt(now())
+                .location("서울")
+                .build();
 
         // when & then
         assertThatThrownBy(
-            () -> scheduleService.createInterviewFromCalendar(applicationId, cmd, memberId))
-            .isInstanceOf(CareerHubException.class)
-            .extracting("errorStatus")
-            .isEqualTo(ErrorStatus.FORBIDDEN_ERROR);
+                () -> scheduleService.createInterviewSchedule(applicationId, cmd, memberId))
+                .isInstanceOf(CareerHubException.class)
+                .extracting("errorStatus")
+                .isEqualTo(ErrorStatus.FORBIDDEN_ERROR);
     }
 
     @Test
@@ -174,19 +173,18 @@ class ScheduleServiceTest extends TestDoubleSupport {
         when(saved.getApplicationStage()).thenReturn(stage);
 
         when(scheduleManager.createEtcSchedule(eq(app), any(NewEtcSchedule.class)))
-            .thenReturn(saved);
+                .thenReturn(saved);
 
         EtcScheduleCreateRequest req = EtcScheduleCreateRequest.builder()
-            .applicationId(applicationId)
-            .scheduleName("과제 제출")
-            .startedAt(LocalDateTime.of(2025, 12, 5, 23, 59))
-            .endedAt(null)
-            .build();
+                .scheduleName("과제 제출")
+                .startedAt(LocalDateTime.of(2025, 12, 5, 23, 59))
+                .endedAt(null)
+                .build();
 
         NewEtcSchedule cmd = req.toNewEtcSchedule();
 
         // when
-        ScheduleResponse res = scheduleService.createEtcFromCalendar(applicationId, cmd, memberId);
+        ScheduleResponse res = scheduleService.createEtcSchedule(applicationId, cmd, memberId);
 
         // then
         assertThat(res.id()).isEqualTo(200L);
