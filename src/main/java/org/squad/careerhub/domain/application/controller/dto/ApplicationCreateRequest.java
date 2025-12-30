@@ -43,7 +43,9 @@ public record ApplicationCreateRequest(
     public NewStage toNewStage() {
         return NewStage.builder()
                 .stageType(stage.stageType())
-                .newDocsSchedule(stage.docsStageCreateRequest().toNewDocsSchedule())
+                .newDocsSchedule(stage.docsStageCreateRequest() == null ?
+                        null : stage.docsStageCreateRequest().toNewDocsSchedule()
+                )
                 .newEtcSchedules(stage.toNewEtcSchedules())
                 .newInterviewSchedules(stage.toNewInterviewSchedules())
                 .build();
