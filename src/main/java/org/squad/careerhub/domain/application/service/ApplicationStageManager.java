@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.squad.careerhub.domain.application.entity.Application;
 import org.squad.careerhub.domain.application.entity.ApplicationStage;
+import org.squad.careerhub.domain.application.entity.ScheduleResult;
 import org.squad.careerhub.domain.application.entity.StageType;
 import org.squad.careerhub.domain.application.repository.ApplicationStageJpaRepository;
 import org.squad.careerhub.domain.application.service.dto.NewStage;
@@ -46,14 +47,16 @@ public class ApplicationStageManager {
     }
 
     private boolean hasDocumentStage(Application application) {
-        return applicationStageJpaRepository.existsByApplicationAndStageType(application, StageType.DOCUMENT);
+        return applicationStageJpaRepository.existsByApplicationAndStageType(application,
+                StageType.DOCUMENT);
     }
 
     private ApplicationStage createInterviewStage(Application application, NewStage newStage) {
-        ApplicationStage interviewStage = applicationStageJpaRepository.save(ApplicationStage.create(
-                application,
-                StageType.INTERVIEW
-        ));
+        ApplicationStage interviewStage = applicationStageJpaRepository.save(
+                ApplicationStage.create(
+                        application,
+                        StageType.INTERVIEW
+                ));
         scheduleManager.createInterviewSchedules(application, newStage.newInterviewSchedules());
 
         return interviewStage;
@@ -65,10 +68,12 @@ public class ApplicationStageManager {
                 StageType.DOCUMENT
         ));
         scheduleManager.createDocumentSchedule(application,
-            new NewDocumentSchedule(
-                newStage.stageType(),
-                application.getDeadline(),
-                newStage.submissionStatus()));
+                new NewDocumentSchedule(
+                        application.getDeadline(),
+                        newStage.submissionStatus(),
+                        ScheduleResult.WAITING // 추가될거로 예상해서 미리 넣어둠 stage에서 값 가져오는 걸로 변경해야함
+                )
+        );
 
         return documentStage;
     }

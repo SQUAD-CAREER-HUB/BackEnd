@@ -2,6 +2,7 @@ package org.squad.careerhub.domain.application.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.squad.careerhub.global.utils.DateTimeUtils.now;
+
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
@@ -24,7 +25,6 @@ import org.squad.careerhub.domain.application.repository.ApplicationJpaRepositor
 import org.squad.careerhub.domain.application.repository.ApplicationStageJpaRepository;
 import org.squad.careerhub.domain.application.repository.dto.BeforeDeadlineApplicationResponse;
 import org.squad.careerhub.domain.application.service.dto.NewApplicationInfo;
-import org.squad.careerhub.domain.schedule.service.dto.NewEtcSchedule;
 import org.squad.careerhub.domain.application.service.dto.NewJobPosting;
 import org.squad.careerhub.domain.application.service.dto.NewStage;
 import org.squad.careerhub.domain.application.service.dto.SearchCondition;
@@ -37,6 +37,7 @@ import org.squad.careerhub.domain.member.entity.SocialProvider;
 import org.squad.careerhub.domain.member.repository.MemberJpaRepository;
 import org.squad.careerhub.domain.schedule.entity.Schedule;
 import org.squad.careerhub.domain.schedule.repository.ScheduleJpaRepository;
+import org.squad.careerhub.domain.schedule.service.dto.NewEtcSchedule;
 import org.squad.careerhub.domain.schedule.service.dto.NewInterviewSchedule;
 import org.squad.careerhub.global.support.Cursor;
 import org.squad.careerhub.global.support.PageResponse;
@@ -79,7 +80,8 @@ class ApplicationReaderIntegrationTest extends IntegrationTestSupport {
         var cursor = Cursor.of(null, 10);
 
         // when
-        PageResponse<ApplicationSummaryResponse> response = applicationReader.findApplications(condition, cursor, member.getId());
+        PageResponse<ApplicationSummaryResponse> response = applicationReader.findApplications(
+                condition, cursor, member.getId());
 
         // then
         assertThat(response.contents()).hasSize(size);
@@ -105,7 +107,13 @@ class ApplicationReaderIntegrationTest extends IntegrationTestSupport {
         );
         var baseTime = now();
 
-        var newEtcSchedule = new NewEtcSchedule(StageType.INTERVIEW, "임원 면접", baseTime.plusDays(1), baseTime.plusDays(1));
+        var newEtcSchedule = new NewEtcSchedule(
+                "임원 면접",
+                baseTime,
+                baseTime.plusHours(1),
+                ScheduleResult.WAITING
+        );
+
         var etcApp = createApplication(
                 "BE",
                 NewStage.builder()
@@ -115,11 +123,18 @@ class ApplicationReaderIntegrationTest extends IntegrationTestSupport {
                         .build()
         );
 
-        var newInterviewSchedule = new NewInterviewSchedule(StageType.INTERVIEW, "임원 면접", baseTime.plusDays(1), "판교");
+        var newInterviewSchedule = new NewInterviewSchedule(
+                "임원 면접",
+                baseTime,
+                "판교",
+                ScheduleResult.WAITING
+        );
+
         var interviewApp = createApplication(
                 "DevOps",
                 NewStage.builder()
                         .stageType(StageType.INTERVIEW)
+                        .newEtcSchedules(List.of())
                         .newInterviewSchedules(List.of(newInterviewSchedule))
                         .build()
         );
@@ -137,7 +152,8 @@ class ApplicationReaderIntegrationTest extends IntegrationTestSupport {
         var cursor = Cursor.of(null, 10);
 
         // when
-        PageResponse<ApplicationSummaryResponse> response = applicationReader.findApplications(condition, cursor, member.getId());
+        PageResponse<ApplicationSummaryResponse> response = applicationReader.findApplications(
+                condition, cursor, member.getId());
 
         // then
         assertThat(response.contents()).hasSize(4);
@@ -185,7 +201,8 @@ class ApplicationReaderIntegrationTest extends IntegrationTestSupport {
 
         // 2. 기타 전형 검증
         var beEtcResponse = response.contents().stream()
-                .filter(r -> r.position().equals("BE") && r.currentStageType().equals(StageType.ETC.getDescription()))
+                .filter(r -> r.position().equals("BE") && r.currentStageType()
+                        .equals(StageType.ETC.getDescription()))
                 .findFirst()
                 .orElseThrow();
 
@@ -298,7 +315,12 @@ class ApplicationReaderIntegrationTest extends IntegrationTestSupport {
                         .build()
         );
         var baseTime = now();
-        var newEtcSchedule = new NewEtcSchedule(StageType.ETC, "코딩 테스트", baseTime, baseTime.plusHours(1));
+        var newEtcSchedule = new NewEtcSchedule(
+                "코딩 테스트",
+                baseTime,
+                baseTime.plusHours(1),
+                ScheduleResult.WAITING);
+
         var etcApp = createApplication("네이버", "백엔드 개발자",
                 NewStage.builder()
                         .stageType(StageType.ETC)
@@ -311,8 +333,14 @@ class ApplicationReaderIntegrationTest extends IntegrationTestSupport {
                 NewStage.builder()
                         .stageType(StageType.INTERVIEW)
                         .newInterviewSchedules(
-                                List.of(new NewInterviewSchedule(StageType.INTERVIEW, "기술 면접", baseTime.plusDays(1),
-                                        "판교")))
+                                List.of(
+                                        new NewInterviewSchedule(
+                                                "기술 면접",
+                                                baseTime.plusDays(1),
+                                                "판교",
+                                                ScheduleResult.WAITING)
+                                )
+                        )
                         .build()
         );
 
@@ -322,7 +350,8 @@ class ApplicationReaderIntegrationTest extends IntegrationTestSupport {
         var cursor = Cursor.of(null, 20);
 
         // when
-        PageResponse<ApplicationSummaryResponse> response = applicationReader.findApplications(condition, cursor, member.getId());
+        PageResponse<ApplicationSummaryResponse> response = applicationReader.findApplications(
+                condition, cursor, member.getId());
 
         // then
         assertThat(response.contents()).hasSize(1);
@@ -363,7 +392,12 @@ class ApplicationReaderIntegrationTest extends IntegrationTestSupport {
                         .build()
         );
         var baseTime = now();
-        var newEtcSchedule = new NewEtcSchedule(StageType.ETC, "코딩 테스트", baseTime, baseTime.plusHours(1));
+        var newEtcSchedule = new NewEtcSchedule(
+                "코딩 테스트",
+                baseTime,
+                baseTime.plusHours(1),
+                ScheduleResult.WAITING
+        );
         createApplication("네이버", "QA",
                 NewStage.builder()
                         .stageType(StageType.ETC)
@@ -371,7 +405,12 @@ class ApplicationReaderIntegrationTest extends IntegrationTestSupport {
                         .newInterviewSchedules(List.of())
                         .build()
         );
-        var newInterviewSchedule = new NewInterviewSchedule(StageType.INTERVIEW, "기술 면접", baseTime.plusDays(1), "판교");
+        var newInterviewSchedule = new NewInterviewSchedule(
+                "기술 면접",
+                baseTime.plusDays(1),
+                "판교",
+                ScheduleResult.WAITING
+        );
         var interviewApp = createApplication("라인", "백엔드 개발자",
                 NewStage.builder()
                         .stageType(StageType.INTERVIEW)
@@ -384,7 +423,8 @@ class ApplicationReaderIntegrationTest extends IntegrationTestSupport {
         var cursor = Cursor.of(null, 10);
 
         // when
-        PageResponse<ApplicationSummaryResponse> response = applicationReader.findApplications(condition, cursor, member.getId());
+        PageResponse<ApplicationSummaryResponse> response = applicationReader.findApplications(
+                condition, cursor, member.getId());
 
         // then
         assertThat(response.contents()).hasSize(1);
@@ -425,7 +465,13 @@ class ApplicationReaderIntegrationTest extends IntegrationTestSupport {
                         .build()
         );
         var baseTime = now();
-        var newEtcSchedule = new NewEtcSchedule(StageType.ETC, "코딩 테스트", baseTime, baseTime.plusHours(1));
+        var newEtcSchedule = new NewEtcSchedule(
+                "코딩 테스트",
+                baseTime,
+                baseTime.plusHours(1),
+                ScheduleResult.WAITING
+        );
+
         createApplication("네이버", "QA",
                 NewStage.builder()
                         .stageType(StageType.ETC)
@@ -433,7 +479,13 @@ class ApplicationReaderIntegrationTest extends IntegrationTestSupport {
                         .newInterviewSchedules(List.of())
                         .build()
         );
-        var newInterviewSchedule = new NewInterviewSchedule(StageType.INTERVIEW, "기술 면접", baseTime.plusDays(1), "판교");
+        var newInterviewSchedule = new NewInterviewSchedule(
+                "기술 면접",
+                baseTime.plusDays(1),
+                "판교",
+                ScheduleResult.WAITING
+        );
+
         var interviewApp = createApplication("라인", "백엔드 개발자",
                 NewStage.builder()
                         .stageType(StageType.INTERVIEW)
@@ -447,7 +499,8 @@ class ApplicationReaderIntegrationTest extends IntegrationTestSupport {
         var cursor = Cursor.of(null, 20);
 
         // when
-        PageResponse<ApplicationSummaryResponse> response = applicationReader.findApplications(condition, cursor, member.getId());
+        PageResponse<ApplicationSummaryResponse> response = applicationReader.findApplications(
+                condition, cursor, member.getId());
 
         // then
         assertThat(response.contents()).hasSize(1);
@@ -488,7 +541,12 @@ class ApplicationReaderIntegrationTest extends IntegrationTestSupport {
                         .build()
         );
         var baseTime = now();
-        var newEtcSchedule = new NewEtcSchedule(StageType.ETC, "코딩 테스트", baseTime, baseTime.plusHours(1));
+        var newEtcSchedule = new NewEtcSchedule(
+                "코딩 테스트",
+                baseTime,
+                baseTime.plusHours(1),
+                ScheduleResult.WAITING
+        );
         createApplication("네이버", "QA",
                 NewStage.builder()
                         .stageType(StageType.ETC)
@@ -496,7 +554,12 @@ class ApplicationReaderIntegrationTest extends IntegrationTestSupport {
                         .newInterviewSchedules(List.of())
                         .build()
         );
-        var newInterviewSchedule = new NewInterviewSchedule(StageType.INTERVIEW, "기술 면접", baseTime.plusDays(1), "판교");
+        var newInterviewSchedule = new NewInterviewSchedule(
+                "기술 면접",
+                baseTime.plusDays(1),
+                "판교",
+                ScheduleResult.WAITING
+        );
         var interviewApp = createApplication("라인", "백엔드 개발자",
                 NewStage.builder()
                         .stageType(StageType.INTERVIEW)
@@ -510,7 +573,8 @@ class ApplicationReaderIntegrationTest extends IntegrationTestSupport {
         var cursor = Cursor.of(null, 20);
 
         // when
-        PageResponse<ApplicationSummaryResponse> response = applicationReader.findApplications(condition, cursor, member.getId());
+        PageResponse<ApplicationSummaryResponse> response = applicationReader.findApplications(
+                condition, cursor, member.getId());
 
         // then
         assertThat(response.contents()).hasSize(2)
@@ -522,64 +586,75 @@ class ApplicationReaderIntegrationTest extends IntegrationTestSupport {
     void 서류_제출_상태로_필터링하여_지원서를_조회한다() {
         // given
         var appSubmitted = createApplication("카카오", "FE 개발자",
-            NewStage.builder()
-                .stageType(StageType.DOCUMENT)
-                .submissionStatus(SubmissionStatus.SUBMITTED)
-                .newInterviewSchedules(List.of())
-                .build()
+                NewStage.builder()
+                        .stageType(StageType.DOCUMENT)
+                        .submissionStatus(SubmissionStatus.SUBMITTED)
+                        .newInterviewSchedules(List.of())
+                        .build()
         );
 
         createApplication("네이버", "FE 개발자",
-            NewStage.builder()
-                .stageType(StageType.INTERVIEW)
-                .newInterviewSchedules(List.of(new NewInterviewSchedule(StageType.INTERVIEW, "1차 면접" , now(), "강남")))
-                .build()
+                NewStage.builder()
+                        .stageType(StageType.INTERVIEW)
+                        .newInterviewSchedules(
+                                List.of(new NewInterviewSchedule(
+                                        "기술 면접",
+                                        now().plusDays(1),
+                                        "판교",
+                                        ScheduleResult.WAITING
+                                )))
+                        .build()
         );
 
         var condition = new SearchCondition(
-            null,
-            List.of(StageType.DOCUMENT),
-            List.of(SubmissionStatus.SUBMITTED),
-            null
+                null,
+                List.of(StageType.DOCUMENT),
+                List.of(SubmissionStatus.SUBMITTED),
+                null
         );
         var cursor = Cursor.of(null, 20);
 
         // when
         PageResponse<ApplicationSummaryResponse> response =
-            applicationReader.findApplications(condition, cursor, member.getId());
+                applicationReader.findApplications(condition, cursor, member.getId());
 
         // then
         assertThat(response.contents()).hasSize(1);
 
         var res = response.contents().getFirst();
         assertThat(res).extracting(
-            ApplicationSummaryResponse::applicationId,
-            ApplicationSummaryResponse::company,
-            ApplicationSummaryResponse::position,
-            ApplicationSummaryResponse::currentStageType,
-            ApplicationSummaryResponse::currentScheduleResult
+                ApplicationSummaryResponse::applicationId,
+                ApplicationSummaryResponse::company,
+                ApplicationSummaryResponse::position,
+                ApplicationSummaryResponse::currentStageType,
+                ApplicationSummaryResponse::currentScheduleResult
         ).containsExactly(
-            appSubmitted.getId(),
-            appSubmitted.getCompany(),
-            appSubmitted.getPosition(),
-            appSubmitted.getCurrentStageType().getDescription(),
-            ScheduleResult.WAITING.name()
+                appSubmitted.getId(),
+                appSubmitted.getCompany(),
+                appSubmitted.getPosition(),
+                appSubmitted.getCurrentStageType().getDescription(),
+                ScheduleResult.WAITING.name()
         );
 
         assertThat(res.scheduleStage()).isNull();
         assertThat(res.docsStage()).isNotNull()
-            .extracting(DocsStage::deadline, DocsStage::applicationMethod)
-            .containsExactly(
-                appSubmitted.getDeadline(),
-                appSubmitted.getApplicationMethod().getDescription()
-            );
+                .extracting(DocsStage::deadline, DocsStage::applicationMethod)
+                .containsExactly(
+                        appSubmitted.getDeadline(),
+                        appSubmitted.getApplicationMethod().getDescription()
+                );
     }
 
     @Test
     void 가장_가까운_면접_일정이_포함되어_조회된다() {
         // given
         var baseTime = now();
-        var newInterviewSchedule = new NewInterviewSchedule(StageType.INTERVIEW, "기술 면접", baseTime.plusDays(1), "판교");
+        var newInterviewSchedule = new NewInterviewSchedule(
+                "기술 면접",
+                baseTime.plusDays(1),
+                "판교",
+                ScheduleResult.WAITING
+        );
         var interviewApp = createApplication("카카오", "백엔드 개발자",
                 NewStage.builder()
                         .stageType(StageType.INTERVIEW)
@@ -591,7 +666,8 @@ class ApplicationReaderIntegrationTest extends IntegrationTestSupport {
         var cursor = Cursor.of(null, 20);
 
         // when
-        PageResponse<ApplicationSummaryResponse> response = applicationReader.findApplications(condition, cursor, member.getId());
+        PageResponse<ApplicationSummaryResponse> response = applicationReader.findApplications(
+                condition, cursor, member.getId());
 
         // then
         assertThat(response.contents()).hasSize(1);
@@ -641,7 +717,8 @@ class ApplicationReaderIntegrationTest extends IntegrationTestSupport {
 
         // when - 두 번째 페이지
         var secondCursor = Cursor.of(firstPage.nextCursorId(), 10);
-        var secondPage = applicationReader.findApplications(condition, secondCursor, member.getId());
+        var secondPage = applicationReader.findApplications(condition, secondCursor,
+                member.getId());
 
         // then - 두 번째 페이지
         assertThat(secondPage.contents()).hasSize(5);
@@ -673,7 +750,8 @@ class ApplicationReaderIntegrationTest extends IntegrationTestSupport {
         var cursor = Cursor.of(null, 20);
 
         // when
-        PageResponse<ApplicationSummaryResponse> response = applicationReader.findApplications(condition, cursor,
+        PageResponse<ApplicationSummaryResponse> response = applicationReader.findApplications(
+                condition, cursor,
                 otherMember.getId());
 
         // then
@@ -704,7 +782,8 @@ class ApplicationReaderIntegrationTest extends IntegrationTestSupport {
         var cursor = Cursor.of(null, 20);
 
         // when
-        PageResponse<ApplicationSummaryResponse> response = applicationReader.findApplications(condition, cursor,
+        PageResponse<ApplicationSummaryResponse> response = applicationReader.findApplications(
+                condition, cursor,
                 emptyMember.getId());
 
         // then
@@ -724,7 +803,13 @@ class ApplicationReaderIntegrationTest extends IntegrationTestSupport {
                         .build()
         );
         var baseTime = now();
-        var newEtcSchedule = new NewEtcSchedule(StageType.ETC, "코딩 테스트", baseTime, baseTime.plusHours(1));
+        var newEtcSchedule = new NewEtcSchedule(
+                "코딩 테스트",
+                baseTime,
+                baseTime.plusHours(1),
+                ScheduleResult.WAITING
+        );
+
         createApplication("네이버", "QA 개발자",
                 NewStage.builder()
                         .stageType(StageType.ETC)
@@ -733,7 +818,12 @@ class ApplicationReaderIntegrationTest extends IntegrationTestSupport {
                         .build()
         );
 
-        var newInterviewSchedule = new NewInterviewSchedule(StageType.INTERVIEW, "기술 면접", baseTime.plusDays(1), "판교");
+        var newInterviewSchedule = new NewInterviewSchedule(
+                "기술 면접",
+                baseTime.plusDays(1),
+                "판교",
+                ScheduleResult.WAITING
+        );
         createApplication("라인", "백엔드 개발자",
                 NewStage.builder()
                         .stageType(StageType.INTERVIEW)
@@ -750,7 +840,8 @@ class ApplicationReaderIntegrationTest extends IntegrationTestSupport {
         var cursor = Cursor.of(null, 20);
 
         // when
-        PageResponse<ApplicationSummaryResponse> response = applicationReader.findApplications(condition, cursor, member.getId());
+        PageResponse<ApplicationSummaryResponse> response = applicationReader.findApplications(
+                condition, cursor, member.getId());
 
         // then
         assertThat(response.contents()).hasSize(2);
@@ -765,11 +856,16 @@ class ApplicationReaderIntegrationTest extends IntegrationTestSupport {
     @Test
     void 전체_지원서_개수와_각_전형별_지원서_개수를_조회한다() {
         // given
-        var finalDocsApplications = createBulkApplications(member, StageType.DOCUMENT, ApplicationStatus.FINAL_PASS, 20);
-        var etcApplications = createBulkApplications(member, StageType.ETC, ApplicationStatus.FINAL_PASS, 20);
-        var interviewApplications = createBulkApplications(member, StageType.INTERVIEW, ApplicationStatus.FINAL_PASS, 20);
-        var finalPassApplications = createBulkApplications(member, StageType.APPLICATION_CLOSE, ApplicationStatus.FINAL_PASS, 20);
-        var finalFailApplications = createBulkApplications(member, StageType.APPLICATION_CLOSE, ApplicationStatus.FINAL_FAIL, 20);
+        var finalDocsApplications = createBulkApplications(member, StageType.DOCUMENT,
+                ApplicationStatus.FINAL_PASS, 20);
+        var etcApplications = createBulkApplications(member, StageType.ETC,
+                ApplicationStatus.FINAL_PASS, 20);
+        var interviewApplications = createBulkApplications(member, StageType.INTERVIEW,
+                ApplicationStatus.FINAL_PASS, 20);
+        var finalPassApplications = createBulkApplications(member, StageType.APPLICATION_CLOSE,
+                ApplicationStatus.FINAL_PASS, 20);
+        var finalFailApplications = createBulkApplications(member, StageType.APPLICATION_CLOSE,
+                ApplicationStatus.FINAL_FAIL, 20);
 
         int totalCount = finalDocsApplications.size()
                 + etcApplications.size()
@@ -837,7 +933,8 @@ class ApplicationReaderIntegrationTest extends IntegrationTestSupport {
         );
 
         // when
-        var response = applicationReader.findBeforeDeadlineApplications(member.getId(), new Cursor(null, 20));
+        var response = applicationReader.findBeforeDeadlineApplications(member.getId(),
+                new Cursor(null, 20));
 
         // then
         assertThat(response).isNotNull().extracting(
@@ -880,7 +977,8 @@ class ApplicationReaderIntegrationTest extends IntegrationTestSupport {
         scheduleJpaRepository.save(schedule);
     }
 
-    private List<Application> createBulkApplications(Member member, StageType stageType, ApplicationStatus applicationStatus,
+    private List<Application> createBulkApplications(Member member, StageType stageType,
+            ApplicationStatus applicationStatus,
             int count) {
         List<Application> applications = new ArrayList<>();
 
@@ -933,7 +1031,8 @@ class ApplicationReaderIntegrationTest extends IntegrationTestSupport {
         return createApplication("company", "BE", newStage, deadline);
     }
 
-    private Application createApplication(String company, String position, NewStage newStage, LocalDateTime deadline) {
+    private Application createApplication(String company, String position, NewStage newStage,
+            LocalDateTime deadline) {
         var newJobPosting = NewJobPosting.builder()
                 .jobPostingUrl("jobPostingUrl")
                 .company(company)
@@ -945,13 +1044,15 @@ class ApplicationReaderIntegrationTest extends IntegrationTestSupport {
                 .deadline(deadline)
                 .build();
 
-        Application app = applicationManager.create(newJobPosting, newApplicationInfo, newStage, List.of(), member.getId());
+        Application app = applicationManager.create(newJobPosting, newApplicationInfo, newStage,
+                List.of(), member.getId());
         applicationStageManager.createWithSchedule(app, newStage);
         return app;
     }
+
     private Optional<ApplicationStage> getStage(Application app, StageType type) {
         return Optional.of(applicationStageJpaRepository
-            .findByApplicationIdAndStageType(app.getId(), type)
-            .orElseThrow());
+                .findByApplicationIdAndStageType(app.getId(), type)
+                .orElseThrow());
     }
 }

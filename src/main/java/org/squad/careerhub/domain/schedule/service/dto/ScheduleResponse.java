@@ -31,9 +31,6 @@ public record ScheduleResponse(
         allowableValues = {"DOCUMENT", "ETC", "INTERVIEW", "APPLICATION_CLOSE"})
     StageType stageType,
 
-    @Schema(description = "전형명(서류/면접/기타 등)", example = "1차 면접")
-    String stageName,
-
     @Schema(description = "일정 제목", example = "과제 제출")
     String scheduleName,
 

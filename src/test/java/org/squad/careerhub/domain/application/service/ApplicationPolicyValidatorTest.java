@@ -2,16 +2,18 @@ package org.squad.careerhub.domain.application.service;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.squad.careerhub.global.utils.DateTimeUtils.now;
+
 import java.util.Collections;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.squad.careerhub.TestDoubleSupport;
 import org.squad.careerhub.domain.application.entity.ApplicationStatus;
+import org.squad.careerhub.domain.application.entity.ScheduleResult;
 import org.squad.careerhub.domain.application.entity.StageType;
 import org.squad.careerhub.domain.application.entity.SubmissionStatus;
-import org.squad.careerhub.domain.schedule.service.dto.NewEtcSchedule;
 import org.squad.careerhub.domain.application.service.dto.NewStage;
+import org.squad.careerhub.domain.schedule.service.dto.NewEtcSchedule;
 import org.squad.careerhub.domain.schedule.service.dto.NewInterviewSchedule;
 import org.squad.careerhub.global.error.CareerHubException;
 import org.squad.careerhub.global.error.ErrorStatus;
@@ -25,37 +27,58 @@ class ApplicationPolicyValidatorTest extends TestDoubleSupport {
     void 기타_일정은_기타_전형일_때만_가능하다() {
         // given
         var etcNewStage = new NewStage(
-            StageType.ETC,
-            null,
-            null,
-            Collections.singletonList(
-                new NewEtcSchedule(StageType.ETC, "코딩 테스트", now(), null)),
-            List.of()
+                StageType.ETC,
+                null,
+                null,
+                Collections.singletonList(
+                        new NewEtcSchedule(
+                                "코딩 테스트",
+                                now(),
+                                now().plusHours(1),
+                                ScheduleResult.WAITING
+                        )),
+                List.of()
         );
 
         var documentStage = new NewStage(
-            StageType.DOCUMENT,
-            SubmissionStatus.SUBMITTED,
-            null,
-            Collections.singletonList(new NewEtcSchedule(
-                StageType.ETC,
-                "코딩테스트",
-                now().plusDays(3),
-                null
-            )),
-            List.of()
+                StageType.DOCUMENT,
+                SubmissionStatus.SUBMITTED,
+                null,
+                Collections.singletonList(new NewEtcSchedule(
+                        "코딩 테스트",
+                        now(),
+                        now().plusHours(1),
+                        ScheduleResult.WAITING
+                )),
+                List.of()
         );
 
         var interviewStage = NewStage.builder()
                 .stageType(StageType.INTERVIEW)
-                .newEtcSchedules(List.of(new NewEtcSchedule(StageType.ETC, "코딩 테스트", now(), now().plusDays(2))))
+                .newEtcSchedules(
+                        List.of(new NewEtcSchedule(
+                                        "코딩 테스트",
+                                        now(),
+                                        now().plusHours(1),
+                                        ScheduleResult.WAITING
+                                )
+                        )
+                )
                 .newInterviewSchedules(List.of())
                 .build();
 
         var finalStage = NewStage.builder()
                 .stageType(StageType.APPLICATION_CLOSE)
                 .finalApplicationStatus(ApplicationStatus.FINAL_PASS)
-                .newEtcSchedules(List.of(new NewEtcSchedule(StageType.ETC, "코딩 테스트", now(), now().plusDays(2))))
+                .newEtcSchedules(
+                        List.of(new NewEtcSchedule(
+                                        "코딩 테스트",
+                                        now(),
+                                        now().plusHours(1),
+                                        ScheduleResult.WAITING
+                                )
+                        )
+                )
                 .newInterviewSchedules(List.of())
                 .build();
 
@@ -82,7 +105,12 @@ class ApplicationPolicyValidatorTest extends TestDoubleSupport {
         var etcNewStage = NewStage.builder()
                 .stageType(StageType.ETC)
                 .newInterviewSchedules(
-                        List.of(new NewInterviewSchedule(StageType.INTERVIEW, "1차 면접", now(), "서울 본사"))
+                        List.of(new NewInterviewSchedule(
+                                "기술 면접",
+                                now().plusDays(1),
+                                "판교",
+                                ScheduleResult.WAITING
+                        ))
                 )
                 .newEtcSchedules(List.of())
                 .build();
@@ -91,7 +119,12 @@ class ApplicationPolicyValidatorTest extends TestDoubleSupport {
                 .stageType(StageType.DOCUMENT)
                 .submissionStatus(SubmissionStatus.SUBMITTED)
                 .newInterviewSchedules(
-                        List.of(new NewInterviewSchedule(StageType.INTERVIEW, "1차 면접", now(), "서울 본사"))
+                        List.of(new NewInterviewSchedule(
+                                "기술 면접",
+                                now().plusDays(1),
+                                "판교",
+                                ScheduleResult.WAITING
+                        ))
                 )
                 .newEtcSchedules(List.of())
                 .build();
@@ -99,7 +132,12 @@ class ApplicationPolicyValidatorTest extends TestDoubleSupport {
         var interviewStage = NewStage.builder()
                 .stageType(StageType.INTERVIEW)
                 .newInterviewSchedules(
-                        List.of(new NewInterviewSchedule(StageType.INTERVIEW, "1차 면접", now(), "서울 본사"))
+                        List.of(new NewInterviewSchedule(
+                                "기술 면접",
+                                now().plusDays(1),
+                                "판교",
+                                ScheduleResult.WAITING
+                        ))
                 )
                 .newEtcSchedules(List.of())
                 .build();
@@ -109,7 +147,12 @@ class ApplicationPolicyValidatorTest extends TestDoubleSupport {
                 .finalApplicationStatus(ApplicationStatus.FINAL_PASS)
                 .newEtcSchedules(List.of())
                 .newInterviewSchedules(
-                        List.of(new NewInterviewSchedule(StageType.INTERVIEW, "1차 면접", now(), "서울 본사"))
+                        List.of(new NewInterviewSchedule(
+                                "기술 면접",
+                                now().plusDays(1),
+                                "판교",
+                                ScheduleResult.WAITING
+                        ))
                 )
                 .build();
         // when & then

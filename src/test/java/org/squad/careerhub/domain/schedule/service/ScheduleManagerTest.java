@@ -33,20 +33,18 @@ class ScheduleManagerTest extends TestDoubleSupport {
 
     @Mock
     ScheduleJpaRepository scheduleJpaRepository;
-
+    @InjectMocks
+    ScheduleManager scheduleManager;
     @Mock
     private ApplicationStageJpaRepository applicationStageJpaRepository;
 
-    @InjectMocks
-    ScheduleManager scheduleManager;
-
-    private Application mockApplicationWithId(long applicationId) {
+    private Application mockApplicationWithId(Long applicationId) {
         Application app = mock(Application.class);
         when(app.getId()).thenReturn(applicationId);
         return app;
     }
 
-    private ApplicationStage mockStage(Application app, StageType stageType) {
+    private ApplicationStage mockStage() {
         return mock(ApplicationStage.class);
     }
 
@@ -59,27 +57,26 @@ class ScheduleManagerTest extends TestDoubleSupport {
         Member author = mock(Member.class);
         when(app.getAuthor()).thenReturn(author);
 
-        ApplicationStage stage = mockStage(app, StageType.INTERVIEW);
+        ApplicationStage stage = mockStage();
 
-        when(applicationStageJpaRepository.findByApplicationIdAndStageType(eq(10L), eq(StageType.INTERVIEW)))
-            .thenReturn(Optional.of(stage));
+        when(applicationStageJpaRepository.findByApplicationIdAndStageType(eq(10L),
+                eq(StageType.INTERVIEW)))
+                .thenReturn(Optional.of(stage));
 
         NewInterviewSchedule s1 = NewInterviewSchedule.builder()
-            .stageType(StageType.INTERVIEW)
-            .scheduleName("1차")
-            .startedAt(LocalDateTime.of(2025, 12, 10, 19, 0))
-            .location("서울")
-            .build();
+                .scheduleName("1차")
+                .startedAt(LocalDateTime.of(2025, 12, 10, 19, 0))
+                .location("서울")
+                .build();
 
         NewInterviewSchedule s2 = NewInterviewSchedule.builder()
-            .stageType(StageType.INTERVIEW)
-            .scheduleName("임원")
-            .startedAt(LocalDateTime.of(2025, 12, 12, 14, 0))
-            .location("판교")
-            .build();
+                .scheduleName("임원")
+                .startedAt(LocalDateTime.of(2025, 12, 12, 14, 0))
+                .location("판교")
+                .build();
 
         when(scheduleJpaRepository.saveAll(anyList()))
-            .thenAnswer(inv -> inv.getArgument(0));
+                .thenAnswer(inv -> inv.getArgument(0));
 
         scheduleManager.createInterviewSchedules(app, List.of(s1, s2));
 
@@ -90,7 +87,7 @@ class ScheduleManagerTest extends TestDoubleSupport {
         List<Schedule> saved = captor.getValue();
         assertThat(saved).hasSize(2);
         assertThat(saved).extracting(Schedule::getScheduleName)
-            .containsExactlyInAnyOrder("1차", "임원");
+                .containsExactlyInAnyOrder("1차", "임원");
     }
 
     @Test
@@ -98,7 +95,7 @@ class ScheduleManagerTest extends TestDoubleSupport {
         Application app = mock(Application.class);
 
         assertThatThrownBy(() -> scheduleManager.createInterviewSchedule(app, null))
-            .isInstanceOf(NullPointerException.class);
+                .isInstanceOf(NullPointerException.class);
 
         verify(scheduleJpaRepository, never()).save(any());
         verify(scheduleJpaRepository, never()).saveAll(any());
@@ -107,13 +104,13 @@ class ScheduleManagerTest extends TestDoubleSupport {
     @Test
     void createInterviewSchedules_application이_null이면_NPE_and_repo호출없다() {
         NewInterviewSchedule s1 = NewInterviewSchedule.builder()
-            .stageType(StageType.INTERVIEW)
-            .scheduleName("1차 면접")
-            .startedAt(now())
-            .build();
+                .scheduleName("1차 면접")
+                .startedAt(now())
+                .build();
 
-        assertThatThrownBy(() -> scheduleManager.createInterviewSchedules(null, List.of(s1)))
-            .isInstanceOf(NullPointerException.class);
+        assertThatThrownBy(
+                () -> scheduleManager.createInterviewSchedules(null, List.of(s1)))
+                .isInstanceOf(NullPointerException.class);
 
         verify(scheduleJpaRepository, never()).save(any());
         verify(scheduleJpaRepository, never()).saveAll(any());
@@ -131,18 +128,18 @@ class ScheduleManagerTest extends TestDoubleSupport {
         ApplicationStage stage = mock(ApplicationStage.class);
         when(stage.getStageType()).thenReturn(StageType.ETC);
 
-        when(applicationStageJpaRepository.findByApplicationIdAndStageType(10L, StageType.ETC))
-            .thenReturn(Optional.of(stage));
+        when(applicationStageJpaRepository.findByApplicationIdAndStageType(10L,
+                StageType.ETC))
+                .thenReturn(Optional.of(stage));
 
         NewEtcSchedule cmd = NewEtcSchedule.builder()
-            .stageType(StageType.ETC)
-            .scheduleName("과제")
-            .startedAt(LocalDateTime.of(2025, 12, 5, 23, 59))
-            .endedAt(null)
-            .build();
+                .scheduleName("과제")
+                .startedAt(LocalDateTime.of(2025, 12, 5, 23, 59))
+                .endedAt(null)
+                .build();
 
         when(scheduleJpaRepository.save(any(Schedule.class)))
-            .thenAnswer(inv -> inv.getArgument(0));
+                .thenAnswer(inv -> inv.getArgument(0));
 
         // when
         Schedule saved = scheduleManager.createEtcSchedule(app, cmd);
@@ -157,14 +154,13 @@ class ScheduleManagerTest extends TestDoubleSupport {
     @Test
     void createEtcSchedule_application이_null이면_NPE_and_save호출없다() {
         NewEtcSchedule cmd = NewEtcSchedule.builder()
-            .stageType(StageType.ETC)
-            .scheduleName("과제 제출")
-            .startedAt(now())
-            .endedAt(null)
-            .build();
+                .scheduleName("과제 제출")
+                .startedAt(now())
+                .endedAt(null)
+                .build();
 
         assertThatThrownBy(() -> scheduleManager.createEtcSchedule(null, cmd))
-            .isInstanceOf(NullPointerException.class);
+                .isInstanceOf(NullPointerException.class);
 
         verify(scheduleJpaRepository, never()).save(any());
     }
