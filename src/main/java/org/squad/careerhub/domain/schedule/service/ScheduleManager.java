@@ -3,6 +3,7 @@ package org.squad.careerhub.domain.schedule.service;
 import static java.util.Objects.requireNonNull;
 
 import java.util.List;
+import java.util.function.Function;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Component;
@@ -28,61 +29,116 @@ public class ScheduleManager {
     private final ScheduleJpaRepository scheduleJpaRepository;
     private final ApplicationStageJpaRepository applicationStageJpaRepository;
 
-    public Schedule createInterviewSchedule(Application app,
-        NewInterviewSchedule interviewSchedule) {
-        ApplicationStage stage = getOrCreateStage(app, StageType.INTERVIEW);
-        app.updateCurrentStageType(StageType.INTERVIEW);
-
-        Schedule schedule = Schedule.register(
-            app.getAuthor(),
-            stage,
-            interviewSchedule.scheduleName(),
-            interviewSchedule.location(),
-            ScheduleResult.WAITING,
-            null,
-            requireNonNull(interviewSchedule.startedAt()),
-            null
+    public Schedule createInterviewSchedule(Application app, NewInterviewSchedule dto) {
+        return createSingle(app, StageType.INTERVIEW, stage ->
+                Schedule.register(
+                        app.getAuthor(),
+                        stage,
+                        dto.scheduleName(),
+                        dto.location(),
+                        ScheduleResult.WAITING,
+                        null,
+                        requireNonNull(dto.startedAt()),
+                        null
+                )
         );
+    }
+
+    public List<Schedule> createInterviewSchedules(Application app,
+            List<NewInterviewSchedule> dtos) {
+        return createBulk(app, StageType.INTERVIEW, dtos, dto ->
+                stage -> Schedule.register(
+                        app.getAuthor(),
+                        stage,
+                        dto.scheduleName(),
+                        dto.location(),
+                        ScheduleResult.WAITING,
+                        null,
+                        dto.startedAt(),
+                        null
+                )
+        );
+    }
+
+    public Schedule createEtcSchedule(Application app, NewEtcSchedule dto) {
+        return createSingle(app, StageType.ETC, stage ->
+                Schedule.register(
+                        app.getAuthor(),
+                        stage,
+                        dto.scheduleName(),
+                        null,
+                        ScheduleResult.WAITING,
+                        null,
+                        dto.startedAt(),
+                        dto.endedAt()
+                )
+        );
+    }
+
+    public List<Schedule> createEtcSchedules(Application app, List<NewEtcSchedule> dtos) {
+        return createBulk(app, StageType.ETC, dtos, dto ->
+                stage -> Schedule.register(
+                        app.getAuthor(),
+                        stage,
+                        dto.scheduleName(),
+                        null,
+                        ScheduleResult.WAITING,
+                        null,
+                        dto.startedAt(),
+                        dto.endedAt()
+                )
+        );
+    }
+
+    public Schedule createDocumentSchedule(Application app, NewDocumentSchedule dto) {
+        return createSingle(app, StageType.DOCUMENT, stage ->
+                Schedule.register(
+                        app.getAuthor(),
+                        stage,
+                        StageType.DOCUMENT.getDescription(),
+                        null,
+                        dto.scheduleResult(),
+                        dto.submissionStatus(),
+                        app.getDeadline(),
+                        dto.endedAt()
+                )
+        );
+    }
+
+    private Schedule createSingle(
+            Application app,
+            StageType stageType,
+            Function<ApplicationStage, Schedule> scheduleFactory
+    ) {
+        ApplicationStage stage = prepareStage(app, stageType);
+        Schedule schedule = scheduleFactory.apply(stage);
+
         return scheduleJpaRepository.save(schedule);
     }
 
-    public void createInterviewSchedules(Application app,
-        List<NewInterviewSchedule> interviewSchedules) {
-        ApplicationStage stage = getOrCreateStage(app, StageType.INTERVIEW);
-        app.updateCurrentStageType(StageType.INTERVIEW);
+    private <T> List<Schedule> createBulk(
+            Application app,
+            StageType stageType,
+            List<T> dtos,
+            Function<T, Function<ApplicationStage, Schedule>> scheduleFactory
+    ) {
+        if (dtos == null || dtos.isEmpty()) {
+            return List.of();
+        }
 
-        List<Schedule> schedules = interviewSchedules.stream()
-            .map(schedule -> Schedule.register(
-                app.getAuthor(),
-                stage,
-                schedule.scheduleName(),
-                schedule.location(),
-                ScheduleResult.WAITING,
-                null,
-                requireNonNull(schedule.startedAt()),
-                null
-            ))
-            .toList();
+        ApplicationStage stage = prepareStage(app, stageType);
 
-        scheduleJpaRepository.saveAll(schedules);
+        List<Schedule> schedules = dtos.stream()
+                .map(dto -> scheduleFactory.apply(dto).apply(stage))
+                .toList();
+
+        return scheduleJpaRepository.saveAll(schedules);
     }
 
-    public Schedule createEtcSchedule(Application app, NewEtcSchedule etcSchedule) {
-        ApplicationStage stage = getOrCreateStage(app, StageType.ETC);
-        app.updateCurrentStageType(StageType.ETC);
-
-        Schedule schedule = Schedule.register(
-            app.getAuthor(),
-            stage,
-            requireNonNull(etcSchedule.scheduleName()),
-            null,
-            ScheduleResult.WAITING,
-            null,
-            requireNonNull(etcSchedule.startedAt()),
-            etcSchedule.endedAt()
-        );
-
-        return scheduleJpaRepository.save(schedule);
+    private ApplicationStage prepareStage(Application app, StageType stageType) {
+        ApplicationStage stage = getOrCreateStage(app, stageType);
+        app.updateCurrentStageType(stageType);
+        return stage;
     }
 
     private ApplicationStage getOrCreateStage(Application app, StageType stageType) {
@@ -91,37 +147,18 @@ public class ScheduleManager {
         }
 
         return applicationStageJpaRepository
-            .findByApplicationIdAndStageType(app.getId(), stageType)
-            .orElseGet(() -> {
-                try {
-                    ApplicationStage created = ApplicationStage.create(
-                        app,
-                        stageType
-                    );
-                    return applicationStageJpaRepository.save(created);
-                } catch (DataIntegrityViolationException e) {
-                    return applicationStageJpaRepository
-                        .findByApplicationIdAndStageType(app.getId(), stageType)
-                        .orElseThrow(() -> e);
-                }
-            });
-    }
+                .findByApplicationIdAndStageType(app.getId(), stageType)
+                .orElseGet(() -> {
+                            try {
+                                ApplicationStage created = ApplicationStage.create(app, stageType);
 
-    public Schedule createDocumentSchedule(Application app, NewDocumentSchedule documentSchedule) {
-        ApplicationStage stage = getOrCreateStage(app, StageType.DOCUMENT);
-        app.updateCurrentStageType(StageType.DOCUMENT);
-
-        Schedule schedule = Schedule.register(
-            app.getAuthor(),
-            stage,
-            StageType.DOCUMENT.getDescription(),
-            null,
-            ScheduleResult.WAITING,
-            documentSchedule.submissionStatus(),
-            app.getDeadline(),
-            documentSchedule.endedAt()
-        );
-
-        return scheduleJpaRepository.save(schedule);
+                                return applicationStageJpaRepository.save(created);
+                            } catch (DataIntegrityViolationException e) {
+                                return applicationStageJpaRepository
+                                        .findByApplicationIdAndStageType(app.getId(), stageType)
+                                        .orElseThrow(() -> e);
+                            }
+                        }
+                );
     }
 }
