@@ -19,8 +19,8 @@ import org.squad.careerhub.domain.application.entity.StageType;
 import org.squad.careerhub.domain.schedule.controller.dto.EtcScheduleCreateRequest;
 import org.squad.careerhub.domain.schedule.controller.dto.InterviewScheduleCreateRequest;
 import org.squad.careerhub.domain.schedule.service.ScheduleService;
-import org.squad.careerhub.domain.schedule.service.dto.ScheduleListResponse;
-import org.squad.careerhub.domain.schedule.service.dto.ScheduleResponse;
+import org.squad.careerhub.domain.schedule.service.dto.response.ScheduleListResponse;
+import org.squad.careerhub.domain.schedule.service.dto.response.ScheduleResponse;
 import org.squad.careerhub.global.annotation.LoginMember;
 
 @RestController

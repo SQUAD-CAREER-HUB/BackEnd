@@ -7,7 +7,7 @@ import org.squad.careerhub.domain.application.service.ApplicationReader;
 import org.squad.careerhub.domain.schedule.entity.Schedule;
 import org.squad.careerhub.domain.schedule.service.dto.NewEtcSchedule;
 import org.squad.careerhub.domain.schedule.service.dto.NewInterviewSchedule;
-import org.squad.careerhub.domain.schedule.service.dto.ScheduleResponse;
+import org.squad.careerhub.domain.schedule.service.dto.response.ScheduleResponse;
 
 @RequiredArgsConstructor
 @Service

@@ -1,4 +1,4 @@
-package org.squad.careerhub.domain.schedule.service.dto;
+package org.squad.careerhub.domain.schedule.service.dto.response;
 
 import java.time.LocalDateTime;
 import lombok.Builder;

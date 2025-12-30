@@ -18,7 +18,7 @@ import org.squad.careerhub.domain.application.entity.StageType;
 import org.squad.careerhub.domain.schedule.controller.dto.EtcScheduleCreateRequest;
 import org.squad.careerhub.domain.schedule.controller.dto.InterviewScheduleCreateRequest;
 import org.squad.careerhub.domain.schedule.service.dto.NewInterviewSchedule;
-import org.squad.careerhub.domain.schedule.service.dto.ScheduleResponse;
+import org.squad.careerhub.domain.schedule.service.dto.response.ScheduleResponse;
 import org.squad.careerhub.global.annotation.TestMember;
 
 class ScheduleControllerTest extends ControllerTestSupport {

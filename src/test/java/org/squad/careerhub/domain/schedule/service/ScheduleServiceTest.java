@@ -24,7 +24,7 @@ import org.squad.careerhub.domain.schedule.controller.dto.InterviewScheduleCreat
 import org.squad.careerhub.domain.schedule.entity.Schedule;
 import org.squad.careerhub.domain.schedule.service.dto.NewEtcSchedule;
 import org.squad.careerhub.domain.schedule.service.dto.NewInterviewSchedule;
-import org.squad.careerhub.domain.schedule.service.dto.ScheduleResponse;
+import org.squad.careerhub.domain.schedule.service.dto.response.ScheduleResponse;
 import org.squad.careerhub.global.error.CareerHubException;
 import org.squad.careerhub.global.error.ErrorStatus;
 
