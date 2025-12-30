@@ -38,12 +38,6 @@ public record EtcScheduleCreateRequest(
         String location,
 
         @Schema(
-                description = "링크",
-                example = "https://..."
-        )
-        String link,
-
-        @Schema(
                 description = "일정 결과",
                 example = "WAITING"
         )
