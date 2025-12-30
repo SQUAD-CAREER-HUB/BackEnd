@@ -13,7 +13,7 @@ public class ApplicationPolicyValidator {
 
     // 지원서 생성 시 전형에 따른 입력 규칙 검증
     public void validateNewStage(NewStage newStage, ApplicationStatus finalApplicationStatus) {
-
+        // 서류 전형 일정은 서류 전형 단계 일 때만 입력 가능
         if (newStage.newDocsSchedule() != null && !newStage.stageType().isDocument()) {
             throw new CareerHubException(ErrorStatus.INVALID_DOCS_STAGE_RULE);
         }
@@ -24,7 +24,6 @@ public class ApplicationPolicyValidator {
         }
 
         // 면접 일정은 면접 전형 단계일 때만 입력 가능
-        // 컨트롤러에서 면접 일정 DTO 가 NULL 일 경우 빈 리스트로 변환해주기 때문에 NULL 체크는 불필요
         if (!newStage.newInterviewSchedules().isEmpty() && !newStage.stageType().isInterview()) {
             throw new CareerHubException(ErrorStatus.INVALID_SCHEDULE_TYPE_RULE);
         }
