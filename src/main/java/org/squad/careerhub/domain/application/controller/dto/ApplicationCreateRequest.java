@@ -4,6 +4,8 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
+import org.squad.careerhub.domain.application.entity.ApplicationMethod;
+import org.squad.careerhub.domain.application.entity.ApplicationStatus;
 import org.squad.careerhub.domain.application.service.dto.NewApplication;
 import org.squad.careerhub.domain.application.service.dto.NewStage;
 
@@ -29,17 +31,21 @@ public record ApplicationCreateRequest(
                 .deadline(jobPosting.deadline())
                 .jobLocation(jobPosting().jobLocation())
                 .stageType(stage.stageType())
-                .applicationMethod(stage.docsStageCreateRequest().applicationMethod())
-                .finalApplicationStatus(stage.finalApplicationStatus())
+                .applicationMethod(stage.docsStageCreateRequest() == null ?
+                        ApplicationMethod.EMPTY : stage.docsStageCreateRequest().applicationMethod()
+                )
+                .finalApplicationStatus(stage.finalApplicationStatus() == null ?
+                        ApplicationStatus.IN_PROGRESS : stage.finalApplicationStatus()
+                )
                 .build();
     }
 
     public NewStage toNewStage() {
         return NewStage.builder()
                 .stageType(stage.stageType())
-                .finalApplicationStatus(stage.finalApplicationStatus())
-                .newEtcSchedules(stage.toNewStage().newEtcSchedules())
-                .newInterviewSchedules(stage.toNewStage().newInterviewSchedules())
+                .newDocsSchedule(stage.docsStageCreateRequest().toNewDocsSchedule())
+                .newEtcSchedules(stage.toNewEtcSchedules())
+                .newInterviewSchedules(stage.toNewInterviewSchedules())
                 .build();
     }
 

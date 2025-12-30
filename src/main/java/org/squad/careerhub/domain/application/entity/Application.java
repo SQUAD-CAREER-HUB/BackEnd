@@ -68,6 +68,7 @@ public class Application extends BaseEntity {
     ) {
         ApplicationStatus currentApplicationStatus = currentStageType == StageType.APPLICATION_CLOSE ?
                 applicationStatus : ApplicationStatus.IN_PROGRESS;
+
         Application application = new Application();
 
         application.author = author;
@@ -77,7 +78,7 @@ public class Application extends BaseEntity {
         application.jobLocation = requireNonNull(jobLocation);
         application.currentStageType = requireNonNull(currentStageType);
         application.applicationStatus = currentApplicationStatus;
-        application.applicationMethod = applicationMethod;
+        application.applicationMethod = requireNonNull(applicationMethod);
         application.deadline = requireNonNull(deadline);
         application.memo = null;
 
