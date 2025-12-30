@@ -12,6 +12,7 @@ import org.squad.careerhub.domain.schedule.service.dto.NewInterviewSchedule;
 @Builder
 public record InterviewScheduleCreateRequest(
         @Schema(description = "일정 이름", example = "1차(기술+인성 면접)")
+        @NotBlank(message = "일정 이름은 필수 값입니다.")
         String scheduleName,
 
         @Schema(description = "면접 일시 (ISO8601, LocalDateTime)", example = "2025-12-10T19:00:00")
@@ -20,7 +21,10 @@ public record InterviewScheduleCreateRequest(
 
         @Schema(description = "면접 장소 (온라인일 경우 '온라인 면접 링크 입력')", example = "서울 강남구 OO 빌딩 3층 회의실 | https://zoom.us/j/123456789")
         @NotBlank(message = "면접 장소는 필수 값입니다.")
-        String location
+        String location,
+
+        @Schema(description = "전형 결과(캘린더에서 생성 시 기본 WAITING)", example = "WAITING")
+        ScheduleResult scheduleResult
 ) {
 
     public NewInterviewSchedule toNewInterviewSchedule() {
@@ -28,7 +32,7 @@ public record InterviewScheduleCreateRequest(
                 .startedAt(startedAt)
                 .location(location)
                 .scheduleName(scheduleName)
-                .scheduleResult(ScheduleResult.WAITING)
+                .scheduleResult(scheduleResult == null ? ScheduleResult.WAITING : scheduleResult)
                 .build();
     }
 

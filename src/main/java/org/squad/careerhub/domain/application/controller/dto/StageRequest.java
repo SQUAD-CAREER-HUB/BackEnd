@@ -7,6 +7,8 @@ import java.util.List;
 import lombok.Builder;
 import org.squad.careerhub.domain.application.entity.ApplicationStatus;
 import org.squad.careerhub.domain.application.entity.StageType;
+import org.squad.careerhub.domain.schedule.controller.dto.EtcScheduleCreateRequest;
+import org.squad.careerhub.domain.schedule.controller.dto.InterviewScheduleCreateRequest;
 import org.squad.careerhub.domain.schedule.service.dto.NewEtcSchedule;
 import org.squad.careerhub.domain.schedule.service.dto.NewInterviewSchedule;
 
