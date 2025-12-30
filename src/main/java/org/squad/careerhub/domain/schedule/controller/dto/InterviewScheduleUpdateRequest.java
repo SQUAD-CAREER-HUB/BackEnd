@@ -2,6 +2,7 @@ package org.squad.careerhub.domain.schedule.controller.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 import lombok.Builder;
 import org.squad.careerhub.domain.application.entity.ScheduleResult;
@@ -16,7 +17,7 @@ public record InterviewScheduleUpdateRequest(
         ScheduleResult result,
 
         @Schema(description = "면접 일시 (ISO8601, LocalDateTime)", example = "2025-12-10T19:00:00")
-        @NotBlank(message = "면접일시는 필수 입력값입니다.")
+        @NotNull(message = "면접일시는 필수 입력값입니다.")
         LocalDateTime startedAt,
 
         @Schema(description = "면접 장소", example = "서울 강남구 OO빌딩 3층 회의실")
