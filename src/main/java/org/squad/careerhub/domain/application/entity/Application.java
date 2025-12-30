@@ -2,6 +2,7 @@ package org.squad.careerhub.domain.application.entity;
 
 import static java.util.Objects.requireNonNull;
 import static org.squad.careerhub.global.utils.DateTimeUtils.now;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -76,7 +77,7 @@ public class Application extends BaseEntity {
         application.jobLocation = requireNonNull(jobLocation);
         application.currentStageType = requireNonNull(currentStageType);
         application.applicationStatus = currentApplicationStatus;
-        application.applicationMethod = requireNonNull(applicationMethod);
+        application.applicationMethod = applicationMethod;
         application.deadline = requireNonNull(deadline);
         application.memo = null;
 

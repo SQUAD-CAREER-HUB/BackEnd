@@ -80,8 +80,7 @@ class ApplicationReaderIntegrationTest extends IntegrationTestSupport {
         var cursor = Cursor.of(null, 10);
 
         // when
-        PageResponse<ApplicationSummaryResponse> response = applicationReader.findApplications(
-                condition, cursor, member.getId());
+        PageResponse<ApplicationSummaryResponse> response = applicationReader.findApplications(condition, cursor, member.getId());
 
         // then
         assertThat(response.contents()).hasSize(size);
@@ -152,8 +151,7 @@ class ApplicationReaderIntegrationTest extends IntegrationTestSupport {
         var cursor = Cursor.of(null, 10);
 
         // when
-        PageResponse<ApplicationSummaryResponse> response = applicationReader.findApplications(
-                condition, cursor, member.getId());
+        PageResponse<ApplicationSummaryResponse> response = applicationReader.findApplications(condition, cursor, member.getId());
 
         // then
         assertThat(response.contents()).hasSize(4);
@@ -201,8 +199,7 @@ class ApplicationReaderIntegrationTest extends IntegrationTestSupport {
 
         // 2. 기타 전형 검증
         var beEtcResponse = response.contents().stream()
-                .filter(r -> r.position().equals("BE") && r.currentStageType()
-                        .equals(StageType.ETC.getDescription()))
+                .filter(r -> r.position().equals("BE") && r.currentStageType().equals(StageType.ETC.getDescription()))
                 .findFirst()
                 .orElseThrow();
 
@@ -350,8 +347,7 @@ class ApplicationReaderIntegrationTest extends IntegrationTestSupport {
         var cursor = Cursor.of(null, 20);
 
         // when
-        PageResponse<ApplicationSummaryResponse> response = applicationReader.findApplications(
-                condition, cursor, member.getId());
+        PageResponse<ApplicationSummaryResponse> response = applicationReader.findApplications(condition, cursor, member.getId());
 
         // then
         assertThat(response.contents()).hasSize(1);
@@ -423,8 +419,7 @@ class ApplicationReaderIntegrationTest extends IntegrationTestSupport {
         var cursor = Cursor.of(null, 10);
 
         // when
-        PageResponse<ApplicationSummaryResponse> response = applicationReader.findApplications(
-                condition, cursor, member.getId());
+        PageResponse<ApplicationSummaryResponse> response = applicationReader.findApplications(condition, cursor, member.getId());
 
         // then
         assertThat(response.contents()).hasSize(1);
@@ -499,8 +494,7 @@ class ApplicationReaderIntegrationTest extends IntegrationTestSupport {
         var cursor = Cursor.of(null, 20);
 
         // when
-        PageResponse<ApplicationSummaryResponse> response = applicationReader.findApplications(
-                condition, cursor, member.getId());
+        PageResponse<ApplicationSummaryResponse> response = applicationReader.findApplications(condition, cursor, member.getId());
 
         // then
         assertThat(response.contents()).hasSize(1);
@@ -573,8 +567,7 @@ class ApplicationReaderIntegrationTest extends IntegrationTestSupport {
         var cursor = Cursor.of(null, 20);
 
         // when
-        PageResponse<ApplicationSummaryResponse> response = applicationReader.findApplications(
-                condition, cursor, member.getId());
+        PageResponse<ApplicationSummaryResponse> response = applicationReader.findApplications(condition, cursor, member.getId());
 
         // then
         assertThat(response.contents()).hasSize(2)
@@ -666,8 +659,7 @@ class ApplicationReaderIntegrationTest extends IntegrationTestSupport {
         var cursor = Cursor.of(null, 20);
 
         // when
-        PageResponse<ApplicationSummaryResponse> response = applicationReader.findApplications(
-                condition, cursor, member.getId());
+        PageResponse<ApplicationSummaryResponse> response = applicationReader.findApplications(condition, cursor, member.getId());
 
         // then
         assertThat(response.contents()).hasSize(1);
@@ -717,8 +709,7 @@ class ApplicationReaderIntegrationTest extends IntegrationTestSupport {
 
         // when - 두 번째 페이지
         var secondCursor = Cursor.of(firstPage.nextCursorId(), 10);
-        var secondPage = applicationReader.findApplications(condition, secondCursor,
-                member.getId());
+        var secondPage = applicationReader.findApplications(condition, secondCursor, member.getId());
 
         // then - 두 번째 페이지
         assertThat(secondPage.contents()).hasSize(5);
@@ -751,8 +742,10 @@ class ApplicationReaderIntegrationTest extends IntegrationTestSupport {
 
         // when
         PageResponse<ApplicationSummaryResponse> response = applicationReader.findApplications(
-                condition, cursor,
-                otherMember.getId());
+                condition,
+                cursor,
+                otherMember.getId()
+        );
 
         // then
         assertThat(response).isNotNull().extracting(
@@ -782,8 +775,7 @@ class ApplicationReaderIntegrationTest extends IntegrationTestSupport {
         var cursor = Cursor.of(null, 20);
 
         // when
-        PageResponse<ApplicationSummaryResponse> response = applicationReader.findApplications(
-                condition, cursor,
+        PageResponse<ApplicationSummaryResponse> response = applicationReader.findApplications(condition, cursor,
                 emptyMember.getId());
 
         // then
@@ -856,16 +848,11 @@ class ApplicationReaderIntegrationTest extends IntegrationTestSupport {
     @Test
     void 전체_지원서_개수와_각_전형별_지원서_개수를_조회한다() {
         // given
-        var finalDocsApplications = createBulkApplications(member, StageType.DOCUMENT,
-                ApplicationStatus.FINAL_PASS, 20);
-        var etcApplications = createBulkApplications(member, StageType.ETC,
-                ApplicationStatus.FINAL_PASS, 20);
-        var interviewApplications = createBulkApplications(member, StageType.INTERVIEW,
-                ApplicationStatus.FINAL_PASS, 20);
-        var finalPassApplications = createBulkApplications(member, StageType.APPLICATION_CLOSE,
-                ApplicationStatus.FINAL_PASS, 20);
-        var finalFailApplications = createBulkApplications(member, StageType.APPLICATION_CLOSE,
-                ApplicationStatus.FINAL_FAIL, 20);
+        var finalDocsApplications = createBulkApplications(member, StageType.DOCUMENT, ApplicationStatus.FINAL_PASS, 20);
+        var etcApplications = createBulkApplications(member, StageType.ETC, ApplicationStatus.FINAL_PASS, 20);
+        var interviewApplications = createBulkApplications(member, StageType.INTERVIEW, ApplicationStatus.FINAL_PASS, 20);
+        var finalPassApplications = createBulkApplications(member, StageType.APPLICATION_CLOSE, ApplicationStatus.FINAL_PASS, 20);
+        var finalFailApplications = createBulkApplications(member, StageType.APPLICATION_CLOSE, ApplicationStatus.FINAL_FAIL, 20);
 
         int totalCount = finalDocsApplications.size()
                 + etcApplications.size()
@@ -933,8 +920,7 @@ class ApplicationReaderIntegrationTest extends IntegrationTestSupport {
         );
 
         // when
-        var response = applicationReader.findBeforeDeadlineApplications(member.getId(),
-                new Cursor(null, 20));
+        var response = applicationReader.findBeforeDeadlineApplications(member.getId(), new Cursor(null, 20));
 
         // then
         assertThat(response).isNotNull().extracting(
@@ -977,8 +963,7 @@ class ApplicationReaderIntegrationTest extends IntegrationTestSupport {
         scheduleJpaRepository.save(schedule);
     }
 
-    private List<Application> createBulkApplications(Member member, StageType stageType,
-            ApplicationStatus applicationStatus,
+    private List<Application> createBulkApplications(Member member, StageType stageType, ApplicationStatus applicationStatus,
             int count) {
         List<Application> applications = new ArrayList<>();
 
@@ -1049,6 +1034,7 @@ class ApplicationReaderIntegrationTest extends IntegrationTestSupport {
         applicationStageManager.createWithSchedule(app, newStage);
         return app;
     }
+
 
     private Optional<ApplicationStage> getStage(Application app, StageType type) {
         return Optional.of(applicationStageJpaRepository

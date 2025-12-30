@@ -43,8 +43,7 @@ public class ApplicationController extends ApplicationDocsController {
             @LoginMember Long memberId
     ) {
         applicationService.createApplication(
-                request.toNewJobPosting(),
-                request.toNewApplicationInfo(),
+                request.toNewApplication(),
                 request.toNewStage(),
                 files,
                 memberId

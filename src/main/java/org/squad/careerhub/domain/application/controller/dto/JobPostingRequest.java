@@ -2,6 +2,8 @@ package org.squad.careerhub.domain.application.controller.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import java.time.LocalDateTime;
 import lombok.Builder;
 import org.squad.careerhub.domain.application.service.dto.NewJobPosting;
 
@@ -19,18 +21,12 @@ public record JobPostingRequest(
         @NotBlank(message = "포지션은 필수 입력 항목입니다.")
         String position,
 
+        @Schema(description = "마감일")
+        @NotNull(message = "마감일은 필수 입력 항목입니다.")
+        LocalDateTime deadline,
+
         @Schema(description = "근무지", example = "Seoul, Korea")
         String jobLocation
 ) {
 
-    public NewJobPosting toNewJobPosting() {
-        return NewJobPosting.builder()
-                .jobPostingUrl(jobPostingUrl)
-                .company(company)
-                .position(position)
-                .jobLocation(jobLocation)
-                .build();
-    }
-
 }
-

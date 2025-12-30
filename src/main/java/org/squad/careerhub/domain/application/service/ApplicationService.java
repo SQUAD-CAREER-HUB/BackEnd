@@ -7,8 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import org.squad.careerhub.domain.application.entity.Application;
 import org.squad.careerhub.domain.application.repository.dto.BeforeDeadlineApplicationResponse;
-import org.squad.careerhub.domain.application.service.dto.NewApplicationInfo;
-import org.squad.careerhub.domain.application.service.dto.NewJobPosting;
+import org.squad.careerhub.domain.application.service.dto.NewApplication;
 import org.squad.careerhub.domain.application.service.dto.NewStage;
 import org.squad.careerhub.domain.application.service.dto.SearchCondition;
 import org.squad.careerhub.domain.application.service.dto.response.ApplicationDetailPageResponse;
@@ -32,29 +31,22 @@ public class ApplicationService {
     /**
      * 지원서를 생성합니다.
      *
-     * @param newJobPosting      새로운 채용 공고 정보
-     * @param newApplicationInfo 새로운 지원서 정보
+     * @param newApplication     새로운 지원서 정보
      * @param newStage           새로운 전형 정보
      * @param files              첨부 파일 목록
      * @param authorId           작성자 ID
      */
+
     @Transactional
     public Long createApplication(
-            NewJobPosting newJobPosting,
-            NewApplicationInfo newApplicationInfo,
+            NewApplication newApplication,
             NewStage newStage,
             List<MultipartFile> files,
             Long authorId
     ) {
         applicationPolicyValidator.validateNewStage(newStage);
 
-        Application application = applicationManager.create(
-                newJobPosting,
-                newApplicationInfo,
-                newStage,
-                files,
-                authorId
-        );
+        Application application = applicationManager.create(newApplication, files, authorId);
 
         applicationStageManager.createWithSchedule(application, newStage);
 

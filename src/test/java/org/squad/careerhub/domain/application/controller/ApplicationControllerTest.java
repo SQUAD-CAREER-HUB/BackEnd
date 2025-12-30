@@ -1,7 +1,6 @@
 package org.squad.careerhub.domain.application.controller;
 
 import static org.assertj.core.api.Assertions.assertThat;
-
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
@@ -10,7 +9,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.squad.careerhub.global.utils.DateTimeUtils.now;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import java.time.LocalDateTime;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
@@ -18,7 +16,7 @@ import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.squad.careerhub.ControllerTestSupport;
 import org.squad.careerhub.domain.application.controller.dto.ApplicationCreateRequest;
-import org.squad.careerhub.domain.application.controller.dto.ApplicationInfoRequest;
+import org.squad.careerhub.domain.application.controller.dto.DocsStageCreateRequest;
 import org.squad.careerhub.domain.application.controller.dto.JobPostingRequest;
 import org.squad.careerhub.domain.application.controller.dto.StageRequest;
 import org.squad.careerhub.domain.application.entity.ApplicationMethod;
@@ -40,7 +38,7 @@ class ApplicationControllerTest extends ControllerTestSupport {
     @Test
     void 지원서_생성요청을_한다() throws JsonProcessingException {
         // given
-        var request = createApplicationCreateRequest2();
+        var request = createApplicationCreateRequest();
 
         var file = new MockMultipartFile(
                 "files",
@@ -55,7 +53,7 @@ class ApplicationControllerTest extends ControllerTestSupport {
                 objectMapper.writeValueAsString(request).getBytes()
         );
 
-        given(applicationService.createApplication(any(), any(), any(), any(), any()))
+        given(applicationService.createApplication(any(), any(), any(), any()))
                 .willReturn(1L);
 
         // when
@@ -67,7 +65,7 @@ class ApplicationControllerTest extends ControllerTestSupport {
                 .apply(print())
                 .hasStatus(HttpStatus.CREATED);
 
-        verify(applicationService).createApplication(any(), any(), any(), any(), any());
+        verify(applicationService).createApplication(any(), any(), any(), any());
     }
 
     @TestMember
@@ -139,24 +137,23 @@ class ApplicationControllerTest extends ControllerTestSupport {
                 .hasPathSatisfying("$.applicationStageTimeLine", v -> v.assertThat().isNotEmpty());
     }
 
-    private ApplicationCreateRequest createApplicationCreateRequest2() {
+    private ApplicationCreateRequest createApplicationCreateRequest() {
         return ApplicationCreateRequest.builder()
                 .jobPosting(JobPostingRequest.builder()
                         .company("Naver")
                         .jobLocation("Seoul, Korea")
                         .position("Backend Developer")
+                        .deadline(now().plusDays(2))
                         .jobPostingUrl("https://www.naver.com/careers/12345")
                         .build())
-                .applicationInfo(
-                        ApplicationInfoRequest.builder()
-                                .applicationMethod(ApplicationMethod.HOMEPAGE)
-                                .deadline(LocalDateTime.of(2025, 3, 25, 0, 0))
-                                .build()
-                )
                 .stage(
                         StageRequest.builder()
                                 .stageType(StageType.DOCUMENT)
-                                .submissionStatus(SubmissionStatus.SUBMITTED)
+                                .docsStageCreateRequest(new DocsStageCreateRequest(
+                                        SubmissionStatus.SUBMITTED,
+                                        ApplicationMethod.EMAIL,
+                                        ScheduleResult.WAITING)
+                                )
                                 .build()
                 )
                 .build();

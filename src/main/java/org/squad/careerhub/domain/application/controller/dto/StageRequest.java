@@ -7,10 +7,9 @@ import java.util.List;
 import lombok.Builder;
 import org.squad.careerhub.domain.application.entity.ApplicationStatus;
 import org.squad.careerhub.domain.application.entity.StageType;
-import org.squad.careerhub.domain.application.entity.SubmissionStatus;
+import org.squad.careerhub.domain.application.service.dto.NewStage;
 import org.squad.careerhub.domain.schedule.service.dto.NewEtcSchedule;
 import org.squad.careerhub.domain.schedule.service.dto.NewInterviewSchedule;
-import org.squad.careerhub.domain.application.service.dto.NewStage;
 
 @Schema(description = "전형 단계 요청 DTO")
 @Builder
@@ -19,11 +18,9 @@ public record StageRequest(
         @NotNull(message = "전형 단계는 필수 입력 항목입니다.")
         StageType stageType,
 
-        @Schema(description = "서류 제출 상태 (서류 전형일 때만 입력)", example = "NOT_SUBMITTED")
-        SubmissionStatus submissionStatus,
-
-        @Schema(description = "지원서 최종 상태 (지원 종료 일 때만 입력)", example = "FINAL_PASS | FINAL_FAIL")
-        ApplicationStatus finalApplicationStatus,
+        @Schema(description = "서류 전형 정보 (서류 전형일 때만 입력)")
+        @Valid
+        DocsStageCreateRequest docsStageCreateRequest,
 
         @Schema(description = "기타 전형 일정 (기타 전형일 때만 입력)")
         @Valid
@@ -31,13 +28,15 @@ public record StageRequest(
 
         @Schema(description = "면접 일정 리스트 (면접 전형일 때만 입력)")
         @Valid
-        List<@NotNull InterviewScheduleCreateRequest> interviewSchedules
+        List<@NotNull InterviewScheduleCreateRequest> interviewSchedules,
+
+        @Schema(description = "지원서 최종 상태 (지원 종료 일 때만 입력)", example = "FINAL_PASS | FINAL_FAIL")
+        ApplicationStatus finalApplicationStatus
 ) {
 
     public NewStage toNewStage() {
         return NewStage.builder()
                 .stageType(stageType)
-                .submissionStatus(submissionStatus)
                 .finalApplicationStatus(finalApplicationStatus)
                 .newEtcSchedules(toNewEtcSchedules())
                 .newInterviewSchedules(toNewInterviewSchedules())
