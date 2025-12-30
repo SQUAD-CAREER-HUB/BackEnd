@@ -15,7 +15,7 @@ import org.squad.careerhub.domain.application.entity.StageType;
 import org.squad.careerhub.domain.application.repository.ApplicationStageJpaRepository;
 import org.squad.careerhub.domain.schedule.entity.Schedule;
 import org.squad.careerhub.domain.schedule.repository.ScheduleJpaRepository;
-import org.squad.careerhub.domain.schedule.service.dto.NewDocumentSchedule;
+import org.squad.careerhub.domain.schedule.service.dto.NewDocsSchedule;
 import org.squad.careerhub.domain.schedule.service.dto.NewEtcSchedule;
 import org.squad.careerhub.domain.schedule.service.dto.NewInterviewSchedule;
 import org.squad.careerhub.global.error.CareerHubException;
@@ -90,21 +90,6 @@ public class ScheduleManager {
         );
     }
 
-    public Schedule createDocumentSchedule(Application app, NewDocumentSchedule dto) {
-        return createSingle(app, StageType.DOCUMENT, stage ->
-                Schedule.register(
-                        app.getAuthor(),
-                        stage,
-                        StageType.DOCUMENT.getDescription(),
-                        null,
-                        dto.scheduleResult(),
-                        dto.submissionStatus(),
-                        app.getDeadline(),
-                        dto.endedAt()
-                )
-        );
-    }
-
     private Schedule createSingle(
             Application app,
             StageType stageType,
@@ -112,6 +97,25 @@ public class ScheduleManager {
     ) {
         ApplicationStage stage = prepareStage(app, stageType);
         Schedule schedule = scheduleFactory.apply(stage);
+
+        return scheduleJpaRepository.save(schedule);
+    }
+
+    public Schedule createDocumentSchedule(Application app, NewDocsSchedule newDocsSchedule) {
+        ApplicationStage stage = getOrCreateStage(app, StageType.DOCUMENT);
+
+        app.updateCurrentStageType(StageType.DOCUMENT);
+
+        Schedule schedule = Schedule.register(
+                app.getAuthor(),
+                stage,
+                StageType.DOCUMENT.getDescription(),
+                null,
+                newDocsSchedule.scheduleResult(),
+                newDocsSchedule.submissionStatus(),
+                app.getDeadline(),
+                app.getDeadline() // 서류 전형 일정은 startedAt와 endedAt이 동일함
+        );
 
         return scheduleJpaRepository.save(schedule);
     }
@@ -161,4 +165,5 @@ public class ScheduleManager {
                         }
                 );
     }
+
 }

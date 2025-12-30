@@ -33,10 +33,12 @@ class ScheduleManagerTest extends TestDoubleSupport {
 
     @Mock
     ScheduleJpaRepository scheduleJpaRepository;
-    @InjectMocks
-    ScheduleManager scheduleManager;
+
     @Mock
     private ApplicationStageJpaRepository applicationStageJpaRepository;
+
+    @InjectMocks
+    ScheduleManager scheduleManager;
 
     private Application mockApplicationWithId(Long applicationId) {
         Application app = mock(Application.class);
@@ -95,7 +97,7 @@ class ScheduleManagerTest extends TestDoubleSupport {
         Application app = mock(Application.class);
 
         assertThatThrownBy(() -> scheduleManager.createInterviewSchedule(app, null))
-                .isInstanceOf(NullPointerException.class);
+            .isInstanceOf(NullPointerException.class);
 
         verify(scheduleJpaRepository, never()).save(any());
         verify(scheduleJpaRepository, never()).saveAll(any());

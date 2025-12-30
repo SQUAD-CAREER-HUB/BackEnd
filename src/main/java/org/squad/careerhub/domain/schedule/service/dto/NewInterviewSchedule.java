@@ -9,7 +9,7 @@ public record NewInterviewSchedule(
         String scheduleName,
         LocalDateTime startedAt,
         String location,
-        ScheduleResult result
+        ScheduleResult scheduleResult
 ) {
 
 }

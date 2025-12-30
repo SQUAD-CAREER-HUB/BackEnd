@@ -9,7 +9,7 @@ public record NewEtcSchedule(
         String scheduleName,
         LocalDateTime startedAt,
         LocalDateTime endedAt,
-        ScheduleResult result
+        ScheduleResult scheduleResult
 ) {
 
 }

@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.time.LocalDateTime;
+import org.squad.careerhub.domain.application.entity.ScheduleResult;
 import org.squad.careerhub.domain.schedule.service.dto.NewEtcSchedule;
 
 @Schema(description = "기타 전형 생성 요청 DTO")
@@ -17,7 +18,11 @@ public record EtcScheduleCreateRequest(
         LocalDateTime startedAt,
 
         @Schema(description = "전형 종료 일시", example = "2025-03-27T14:30:00")
-        LocalDateTime endedAt
+        LocalDateTime endedAt,
+
+        @Schema(description = "전형 결과", example = "PASS")
+        @NotNull(message = "전형 결과는 필수 입력 항목입니다.")
+        ScheduleResult scheduleResult
 ) {
 
     public NewEtcSchedule toNewEtcSchedule() {
@@ -25,6 +30,7 @@ public record EtcScheduleCreateRequest(
                 .scheduleName(scheduleName)
                 .startedAt(startedAt)
                 .endedAt(endedAt)
+                .scheduleResult(scheduleResult)
                 .build();
     }
 
