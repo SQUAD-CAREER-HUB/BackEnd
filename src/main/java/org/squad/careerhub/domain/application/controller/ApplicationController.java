@@ -60,6 +60,8 @@ public class ApplicationController extends ApplicationDocsController {
             @PathVariable Long applicationId,
             @LoginMember Long memberId
     ) {
+        applicationService.updateApplication(request.toUpdateApplication(applicationId), files, memberId);
+
         return ResponseEntity.noContent().build();
     }
 

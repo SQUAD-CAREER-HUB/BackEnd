@@ -69,13 +69,13 @@ public class S3Provider implements FileProvider {
         try {
             String key = extractKeyFromUrl(fileUrl);
 
-            log.info("[AWS] Deleting S3 object - bucket: {}, key: [{}]", bucket, key);
-
             DeleteObjectRequest request = DeleteObjectRequest.builder()
                     .bucket(bucket)
                     .key(fileUrl)
                     .build();
             s3Client.deleteObject(request);
+
+            log.info("[AWS] Deleting S3 object - bucket: {}, key: [{}]", bucket, key);
         } catch (S3Exception e) {
             throw new CareerHubException(ErrorStatus.AWS_S3_ERROR);
         } catch (Exception ex) {
