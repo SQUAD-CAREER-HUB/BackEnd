@@ -32,10 +32,12 @@ public class ApplicationFileManager {
         if (multipartFiles == null || multipartFiles.isEmpty()) {
             return;
         }
-        deleteExistingFiles(application.getId());
 
         List<ApplicationAttachment> newAttachments = uploadS3AndCreateAttachments(application, multipartFiles);
         applicationAttachmentJpaRepository.saveAll(newAttachments); // 추후 성능 문제 시 저장 방법 변경
+
+        // 새 파일 업로드 후 기존 파일 삭제
+        deleteExistingFiles(application.getId());
     }
 
     private List<ApplicationAttachment> uploadS3AndCreateAttachments(
@@ -65,8 +67,9 @@ public class ApplicationFileManager {
                 .map(ApplicationAttachment::getFileUrl)
                 .toList();
 
-        fileProvider.deleteFiles(fileUrls);
+        // FIXME: 에러 발생 시 데이터 정합성 문제가 발생함. 해결해야됨.
         existingAttachments.forEach(ApplicationAttachment::delete);
+        fileProvider.deleteFiles(fileUrls);
     }
 
 }
