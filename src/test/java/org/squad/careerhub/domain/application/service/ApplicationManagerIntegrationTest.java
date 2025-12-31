@@ -81,11 +81,11 @@ class ApplicationManagerIntegrationTest extends IntegrationTestSupport {
                         Application::getJobLocation,
                         Application::getMemo
                 ).containsExactly(
-                        updatedApplication.getJobPostingUrl(),
-                        updatedApplication.getCompany(),
-                        updatedApplication.getPosition(),
-                        updatedApplication.getJobLocation(),
-                        updatedApplication.getMemo()
+                        updateApplication.jobPostingUrl(),
+                        updateApplication.company(),
+                        updateApplication.position(),
+                        updateApplication.jobLocation(),
+                        updateApplication.memo()
                 );
     }
 
