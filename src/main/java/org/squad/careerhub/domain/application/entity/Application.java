@@ -75,7 +75,7 @@ public class Application extends BaseEntity {
         application.jobPostingUrl = jobPostingUrl;
         application.company = requireNonNull(company);
         application.position = requireNonNull(position);
-        application.jobLocation = requireNonNull(jobLocation);
+        application.jobLocation = jobLocation;
         application.currentStageType = requireNonNull(currentStageType);
         application.applicationStatus = currentApplicationStatus;
         application.applicationMethod = requireNonNull(applicationMethod);
