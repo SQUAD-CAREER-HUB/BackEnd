@@ -45,7 +45,8 @@ public class ApplicationService {
     ) {
         applicationPolicyValidator.validateNewStage(newStage, newApplication.finalApplicationStatus());
 
-        Application application = applicationManager.create(newApplication, files, authorId);
+        Application application = applicationManager.create(newApplication, authorId);
+        applicationFileManager.addApplicationFile(application, files);
 
         applicationStageManager.createWithSchedule(application, newStage);
 

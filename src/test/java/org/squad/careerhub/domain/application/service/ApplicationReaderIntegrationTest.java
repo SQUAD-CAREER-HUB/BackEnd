@@ -927,7 +927,7 @@ class ApplicationReaderIntegrationTest extends IntegrationTestSupport {
                 .finalApplicationStatus(status)
                 .build();
 
-        Application app = applicationManager.create(newApplication, List.of(), member.getId());
+        Application app = applicationManager.create(newApplication, member.getId());
         applicationStageManager.createWithSchedule(app, newStage);
         return app;
     }

@@ -58,7 +58,7 @@ class ApplicationServiceUnitTest extends TestDoubleSupport {
         ReflectionTestUtils.setField(application, "id", 1L);
 
         doNothing().when(applicationPolicyValidator).validateNewStage(any(), any());
-        given(applicationManager.create(any(), anyList(), anyLong())).willReturn(application);
+        given(applicationManager.create(any(), anyLong())).willReturn(application);
 
         // when
         Long applicationId = applicationService.createApplication(

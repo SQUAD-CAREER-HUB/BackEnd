@@ -19,7 +19,6 @@ import org.squad.careerhub.global.error.ErrorStatus;
 public class ApplicationManager {
 
     private final MemberReader memberReader;
-    private final ApplicationFileManager applicationFileManager;
     private final ApplicationJpaRepository applicationJpaRepository;
 
     /**
@@ -28,11 +27,11 @@ public class ApplicationManager {
     @Transactional
     public Application create(
             NewApplication newApplication,
-            List<MultipartFile> files,
             Long authorId
     ) {
         Member author = memberReader.find(authorId);
-        Application application = applicationJpaRepository.save(Application.create(
+
+        return applicationJpaRepository.save(Application.create(
                 author,
                 newApplication.jobPostingUrl(),
                 newApplication.company(),
@@ -43,10 +42,6 @@ public class ApplicationManager {
                 newApplication.applicationMethod(),
                 newApplication.deadline()
         ));
-
-        applicationFileManager.addApplicationFile(application, files);
-
-        return application;
     }
 
     @Transactional
