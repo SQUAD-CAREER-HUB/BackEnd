@@ -1,6 +1,8 @@
 package org.squad.careerhub.domain.application.service;
 
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -37,7 +39,7 @@ public class ApplicationFileManager {
         applicationAttachmentJpaRepository.saveAll(newAttachments); // 추후 성능 문제 시 저장 방법 변경
 
         // 새 파일 업로드 후 기존 파일 삭제
-        deleteExistingFiles(application.getId());
+        deleteExistingFiles(application.getId(), newAttachments);
     }
 
     private List<ApplicationAttachment> uploadS3AndCreateAttachments(
@@ -56,20 +58,36 @@ public class ApplicationFileManager {
                 .toList();
     }
 
-    private void deleteExistingFiles(Long applicationId) {
-        List<ApplicationAttachment> existingAttachments = applicationAttachmentJpaRepository.findAllByApplicationIdAndStatus(applicationId, EntityStatus.ACTIVE);
+    private void deleteExistingFiles(Long applicationId, List<ApplicationAttachment> newAttachments) {
+        List<ApplicationAttachment> existingAttachments = applicationAttachmentJpaRepository.findAllByApplicationIdAndStatus(
+                applicationId,
+                EntityStatus.ACTIVE
+        );
 
         if (existingAttachments.isEmpty()) {
             return;
         }
 
-        List<String> fileUrls = existingAttachments.stream()
+        Set<String> newFileUrls = newAttachments.stream()
+                .map(ApplicationAttachment::getFileUrl)
+                .collect(Collectors.toSet());
+
+        // 기존 파일 중 새 파일 목록에 없는 것만 필터링
+        List<ApplicationAttachment> filesToDelete = existingAttachments.stream()
+                .filter(existing -> !newFileUrls.contains(existing.getFileUrl()))
+                .toList();
+
+        if (filesToDelete.isEmpty()) {
+            return;
+        }
+
+        List<String> fileUrlsToDelete = filesToDelete.stream()
                 .map(ApplicationAttachment::getFileUrl)
                 .toList();
 
         // FIXME: 에러 발생 시 데이터 정합성 문제가 발생함. 해결해야됨.
-        existingAttachments.forEach(ApplicationAttachment::delete);
-        fileProvider.deleteFiles(fileUrls);
+        fileProvider.deleteFiles(fileUrlsToDelete);
+        filesToDelete.forEach(ApplicationAttachment::delete);
     }
 
 }
