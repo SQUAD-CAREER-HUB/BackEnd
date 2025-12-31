@@ -75,7 +75,7 @@ public class Application extends BaseEntity {
         application.jobPostingUrl = jobPostingUrl;
         application.company = requireNonNull(company);
         application.position = requireNonNull(position);
-        application.jobLocation = requireNonNull(jobLocation);
+        application.jobLocation = jobLocation;
         application.currentStageType = requireNonNull(currentStageType);
         application.applicationStatus = currentApplicationStatus;
         application.applicationMethod = requireNonNull(applicationMethod);
@@ -85,31 +85,23 @@ public class Application extends BaseEntity {
         return application;
     }
 
-    public void updateApplication(
+    public boolean isDeadlinePassed() {
+        return now().isAfter(this.deadline);
+    }
+
+    public void update(
             String jobPostingUrl,
             String company,
             String position,
             String jobLocation,
-            ApplicationMethod applicationMethod,
-            LocalDateTime deadline,
             String memo
     ) {
         this.jobPostingUrl = jobPostingUrl;
         this.company = requireNonNull(company);
         this.position = requireNonNull(position);
-        this.jobLocation = requireNonNull(jobLocation);
-        this.applicationMethod = requireNonNull(applicationMethod);
-        this.deadline = requireNonNull(deadline);
+        this.jobLocation = jobLocation;
         this.memo = memo;
-    }
 
-    public boolean isDeadlinePassed() {
-        return now().isAfter(this.deadline);
-    }
-
-    // Test를 위한 업데이트 메서드
-    public void updateApplicationStatus(ApplicationStatus applicationStatus) {
-        this.applicationStatus = applicationStatus;
     }
 
     public void updateCurrentStageType(StageType currentStageType) {
@@ -124,4 +116,10 @@ public class Application extends BaseEntity {
             throw new CareerHubException(ErrorStatus.FORBIDDEN_ERROR);
         }
     }
+
+    // Test를 위한 업데이트 메서드
+    public void updateApplicationStatus(ApplicationStatus applicationStatus) {
+        this.applicationStatus = applicationStatus;
+    }
+
 }

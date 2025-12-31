@@ -67,7 +67,7 @@ class FindApplicationIntegrationTest extends IntegrationTestSupport {
                 .applicationMethod(ApplicationMethod.EMAIL)
                 .finalApplicationStatus(ApplicationStatus.IN_PROGRESS)
                 .build();
-        var app = applicationManager.create(newApplicationDto, List.of(), member.getId());
+        var app = applicationManager.create(newApplicationDto, member.getId());
         var docsStage = applicationStageJpaRepository.save(ApplicationStage.create(app, stageType));
         var attachment = applicationAttachmentJpaRepository.save(ApplicationAttachment.create(
                 app,
@@ -147,7 +147,7 @@ class FindApplicationIntegrationTest extends IntegrationTestSupport {
                 .applicationMethod(ApplicationMethod.EMAIL)
                 .finalApplicationStatus(ApplicationStatus.IN_PROGRESS)
                 .build();
-        var app = applicationManager.create(newApplicationDto, List.of(), member.getId());
+        var app = applicationManager.create(newApplicationDto, member.getId());
         var attachment = applicationAttachmentJpaRepository.save(ApplicationAttachment.create(
                 app,
                 "fileUrl",
@@ -304,7 +304,7 @@ class FindApplicationIntegrationTest extends IntegrationTestSupport {
                 .applicationMethod(ApplicationMethod.EMAIL)
                 .finalApplicationStatus(ApplicationStatus.IN_PROGRESS)
                 .build();
-        var app = applicationManager.create(newApplicationDto, List.of(), member.getId());
+        var app = applicationManager.create(newApplicationDto, member.getId());
         var attachment = applicationAttachmentJpaRepository.save(ApplicationAttachment.create(
                 app,
                 "fileUrl",
@@ -401,7 +401,7 @@ class FindApplicationIntegrationTest extends IntegrationTestSupport {
                 .applicationMethod(ApplicationMethod.EMAIL)
                 .finalApplicationStatus(ApplicationStatus.FINAL_PASS)
                 .build();
-        var app = applicationManager.create(newApplicationDto, List.of(), member.getId());
+        var app = applicationManager.create(newApplicationDto, member.getId());
         var attachment = applicationAttachmentJpaRepository.save(ApplicationAttachment.create(
                 app,
                 "fileUrl",

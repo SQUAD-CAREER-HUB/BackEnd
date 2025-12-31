@@ -3,9 +3,6 @@ package org.squad.careerhub.domain.application.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -25,9 +22,6 @@ import org.squad.careerhub.domain.member.entity.SocialProvider;
 import org.squad.careerhub.domain.member.service.MemberReader;
 
 class ApplicationManagerUnitTest extends TestDoubleSupport {
-
-    @Mock
-    ApplicationFileManager applicationFileManager;
 
     @Mock
     ApplicationJpaRepository applicationJpaRepository;
@@ -53,10 +47,9 @@ class ApplicationManagerUnitTest extends TestDoubleSupport {
 
         given(memberReader.find(any())).willReturn(author);
         given(applicationJpaRepository.save(any())).willReturn(application);
-        doNothing().when(applicationFileManager).addApplicationFile(any(), any());
 
         // when
-        var savedApplication = applicationManager.create(newApplicationDto, List.of(), 1L);
+        var savedApplication = applicationManager.create(newApplicationDto, 1L);
 
         assertThat(savedApplication).isNotNull()
                 .extracting(
@@ -82,9 +75,6 @@ class ApplicationManagerUnitTest extends TestDoubleSupport {
                         newApplicationDto.deadline(),
                         null
                 );
-
-        // then
-        verify(applicationFileManager, times(1)).addApplicationFile(any(), any());
     }
 
     private NewApplication createNewApplication() {

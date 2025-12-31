@@ -10,6 +10,7 @@ import org.squad.careerhub.domain.application.repository.dto.BeforeDeadlineAppli
 import org.squad.careerhub.domain.application.service.dto.NewApplication;
 import org.squad.careerhub.domain.application.service.dto.NewStage;
 import org.squad.careerhub.domain.application.service.dto.SearchCondition;
+import org.squad.careerhub.domain.application.service.dto.UpdateApplication;
 import org.squad.careerhub.domain.application.service.dto.response.ApplicationDetailPageResponse;
 import org.squad.careerhub.domain.application.service.dto.response.ApplicationStatisticsResponse;
 import org.squad.careerhub.domain.application.service.dto.response.ApplicationSummaryResponse;
@@ -21,6 +22,7 @@ import org.squad.careerhub.global.support.PageResponse;
 public class ApplicationService {
 
     private final ApplicationManager applicationManager;
+    private final ApplicationFileManager applicationFileManager;
     private final ApplicationReader applicationReader;
     private final ApplicationPolicyValidator applicationPolicyValidator;
     private final ApplicationStageManager applicationStageManager;
@@ -43,7 +45,8 @@ public class ApplicationService {
     ) {
         applicationPolicyValidator.validateNewStage(newStage, newApplication.finalApplicationStatus());
 
-        Application application = applicationManager.create(newApplication, files, authorId);
+        Application application = applicationManager.create(newApplication, authorId);
+        applicationFileManager.addApplicationFile(application, files);
 
         applicationStageManager.createWithSchedule(application, newStage);
 
@@ -68,6 +71,12 @@ public class ApplicationService {
 
     public PageResponse<BeforeDeadlineApplicationResponse> findBeforeDeadlineApplications(Long memberId, Cursor cursor) {
         return applicationReader.findBeforeDeadlineApplications(memberId, cursor);
+    }
+
+    public void updateApplication(UpdateApplication updateApplication, List<MultipartFile> files, Long memberId) {
+        Application application = applicationManager.updateApplication(updateApplication, memberId);
+
+        applicationFileManager.updateApplicationFile(application, files);
     }
 
 }

@@ -11,11 +11,13 @@ import static org.squad.careerhub.global.utils.DateTimeUtils.now;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import java.util.List;
 import org.junit.jupiter.api.Test;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.squad.careerhub.ControllerTestSupport;
 import org.squad.careerhub.domain.application.controller.dto.ApplicationCreateRequest;
+import org.squad.careerhub.domain.application.controller.dto.ApplicationUpdateRequest;
 import org.squad.careerhub.domain.application.controller.dto.DocsStageCreateRequest;
 import org.squad.careerhub.domain.application.controller.dto.JobPostingRequest;
 import org.squad.careerhub.domain.application.controller.dto.StageRequest;
@@ -117,6 +119,39 @@ class ApplicationControllerTest extends ControllerTestSupport {
                 .hasPathSatisfying("$.interviewStageCount", v -> v.assertThat().isEqualTo(response.interviewStageCount()))
                 .hasPathSatisfying("$.etcStageCount", v -> v.assertThat().isEqualTo(response.etcStageCount()))
                 .hasPathSatisfying("$.finalPassedCount", v -> v.assertThat().isEqualTo(response.finalPassedCount()));
+    }
+
+    @TestMember
+    @Test
+    void 지원서_기본_정보와_첨부파일을_업데이트_한다() throws JsonProcessingException {
+        // given
+        var request = new ApplicationUpdateRequest(
+                "https://www.careerhub.com/job/12345",
+                "TechCorp",
+                "Software Engineer",
+                "New York, NY",
+                "memo update"
+        );
+        var file = new MockMultipartFile(
+                "files",
+                "profile.jpg",
+                "image/jpeg",
+                "profile image content".getBytes()
+        );
+        var requestPart = new MockMultipartFile(
+                "request",
+                "request.json",
+                "application/json",
+                objectMapper.writeValueAsString(request).getBytes()
+        );
+
+        // when & then
+        assertThat(mvcTester.perform(multipart(HttpMethod.PATCH, "/v1/applications/{applicationId}", 1L)
+                .file(file)
+                .file(requestPart)
+                .contentType(MediaType.MULTIPART_FORM_DATA)))
+                .apply(print())
+                .hasStatus(HttpStatus.NO_CONTENT);
     }
 
     @TestMember

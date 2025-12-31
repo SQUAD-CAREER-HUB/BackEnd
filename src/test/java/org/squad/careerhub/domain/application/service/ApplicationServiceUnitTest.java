@@ -9,6 +9,7 @@ import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.squad.careerhub.global.utils.DateTimeUtils.now;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -26,6 +27,7 @@ import org.squad.careerhub.domain.application.entity.StageType;
 import org.squad.careerhub.domain.application.entity.SubmissionStatus;
 import org.squad.careerhub.domain.application.service.dto.NewApplication;
 import org.squad.careerhub.domain.application.service.dto.NewStage;
+import org.squad.careerhub.domain.application.service.dto.UpdateApplication;
 import org.squad.careerhub.domain.member.entity.Member;
 import org.squad.careerhub.domain.schedule.service.dto.NewDocsSchedule;
 
@@ -41,6 +43,9 @@ class ApplicationServiceUnitTest extends TestDoubleSupport {
     @Mock
     ApplicationStageManager applicationStageManager;
 
+    @Mock
+    ApplicationFileManager applicationFileManager;
+
     @InjectMocks
     ApplicationService applicationService;
 
@@ -53,7 +58,7 @@ class ApplicationServiceUnitTest extends TestDoubleSupport {
         ReflectionTestUtils.setField(application, "id", 1L);
 
         doNothing().when(applicationPolicyValidator).validateNewStage(any(), any());
-        given(applicationManager.create(any(), anyList(), anyLong())).willReturn(application);
+        given(applicationManager.create(any(), anyLong())).willReturn(application);
 
         // when
         Long applicationId = applicationService.createApplication(
@@ -66,6 +71,46 @@ class ApplicationServiceUnitTest extends TestDoubleSupport {
         // then
         assertThat(applicationId).isEqualTo(1L);
         verify(applicationStageManager, times(1)).createWithSchedule(any(), any());
+    }
+
+    @Test
+    void 지원서_기본_정보와_첨부파일을_업데이트_한다() {
+        // given
+        var mockMember = mock(Member.class);
+        var updateApplication = new UpdateApplication(
+                1L,
+                "https://www.careerhub.com/job/12345",
+                "Naver",
+                "BE",
+                "Seoul, Korea",
+                "memo"
+        );
+        var application = Application.create(
+                mockMember,
+                "https://www.careerhub.com/job/12345",
+                "TechCorp",
+                "Software Engineer",
+                "New York, NY",
+                StageType.INTERVIEW,
+                ApplicationStatus.IN_PROGRESS,
+                ApplicationMethod.EMAIL,
+                now().plusDays(2)
+        );
+        application.update(
+                updateApplication.jobPostingUrl(),
+                updateApplication.company(),
+                updateApplication.position(),
+                updateApplication.jobLocation(),
+                updateApplication.memo()
+        );
+        given(applicationManager.updateApplication(any(), any())).willReturn(application);
+
+        // when
+        applicationService.updateApplication(updateApplication, List.of(), 1L);
+
+        // then
+        verify(applicationManager, times(1)).updateApplication(any(), any());
+        verify(applicationFileManager, times(1)).updateApplicationFile(any(), anyList());
     }
 
 
