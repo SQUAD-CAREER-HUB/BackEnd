@@ -27,7 +27,7 @@ import org.squad.careerhub.global.error.response.ErrorResponse;
 public class JwtFilter extends OncePerRequestFilter {
 
     private static final List<String> EXCLUDE_PATHS = List.of(
-            "/", "/error", "/v1/auth/**", "/oauth2/**",
+            "/", "/health", "/error", "/v1/auth/**", "/oauth2/**",
             "/swagger/**", "/swagger-ui/**", "/v3/api-docs/**"
     );
     private static final AntPathMatcher PATH_MATCHER = new AntPathMatcher();
