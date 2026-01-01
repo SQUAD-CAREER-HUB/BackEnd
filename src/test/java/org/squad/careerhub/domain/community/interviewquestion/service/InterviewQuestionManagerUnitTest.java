@@ -12,37 +12,35 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
+import org.squad.careerhub.TestDoubleSupport;
 import org.squad.careerhub.domain.community.interviewquestion.entity.InterviewQuestion;
 import org.squad.careerhub.domain.community.interviewquestion.repository.InterviewQuestionJpaRepository;
 import org.squad.careerhub.domain.community.interviewquestion.service.dto.UpdateReviewQuestion;
 import org.squad.careerhub.domain.community.interviewreview.entity.InterviewReview;
+import org.squad.careerhub.domain.member.MemberFixture;
 import org.squad.careerhub.domain.member.entity.Member;
 import org.squad.careerhub.domain.member.entity.SocialProvider;
 import org.squad.careerhub.global.entity.EntityStatus;
 import org.squad.careerhub.global.error.CareerHubException;
 import org.squad.careerhub.global.error.ErrorStatus;
 
-@ExtendWith(MockitoExtension.class)
-class InterviewQuestionManagerUnitTest {
-
-    @InjectMocks
-    private InterviewQuestionManager interviewQuestionManager;
+class InterviewQuestionManagerUnitTest extends TestDoubleSupport {
 
     @Mock
-    private InterviewQuestionJpaRepository interviewQuestionJpaRepository;
+    InterviewQuestionJpaRepository interviewQuestionJpaRepository;
 
-    private InterviewReview review;
-    private Member author;
+    @InjectMocks
+    InterviewQuestionManager interviewQuestionManager;
+
+    InterviewReview review;
 
     @BeforeEach
     void setUp() {
-        author = Member.create("test@test.com", SocialProvider.GOOGLE, "socialId123", "테스터", "profile.jpg");
+        var author = MemberFixture.createMember();
         ReflectionTestUtils.setField(author, "id", 1L);
 
         review = InterviewReview.create(author, "카카오", "백엔드", "기술면접", "면접 후기 내용");
@@ -53,7 +51,6 @@ class InterviewQuestionManagerUnitTest {
     void 요청에_없는_기존_질문을_삭제한다() {
         // given
         var reviewId = 1L;
-
         var existingQuestion1 = createQuestion(1L, "기존 질문1");
         var existingQuestion2 = createQuestion(2L, "기존 질문2");
 
