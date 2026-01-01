@@ -20,7 +20,9 @@ public class TestSecurityConfig {
                         session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
-                                "/v1/auth/**"
+                                "/v1/auth/**",
+                                "/health",
+                                "/"
                         ).permitAll()
                         .anyRequest().authenticated()
                 );
