@@ -36,7 +36,7 @@ import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import software.amazon.awssdk.services.s3.model.PutObjectResponse;
 import software.amazon.awssdk.services.s3.model.S3Exception;
 
-class S3ProviderTest extends TestDoubleSupport {
+class S3ProviderUnitTest extends TestDoubleSupport {
 
     @Mock
     private S3Client s3Client;

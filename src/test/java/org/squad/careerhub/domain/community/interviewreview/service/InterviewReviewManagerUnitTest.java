@@ -15,8 +15,7 @@ import org.squad.careerhub.domain.community.interviewreview.entity.InterviewRevi
 import org.squad.careerhub.domain.community.interviewreview.repository.InterviewReviewJpaRepository;
 import org.squad.careerhub.domain.community.interviewreview.service.dto.NewInterviewReview;
 import org.squad.careerhub.domain.community.interviewreview.service.dto.UpdateInterviewReview;
-import org.squad.careerhub.domain.member.entity.Member;
-import org.squad.careerhub.domain.member.entity.SocialProvider;
+import org.squad.careerhub.domain.member.MemberFixture;
 import org.squad.careerhub.domain.member.service.MemberReader;
 import org.squad.careerhub.global.error.CareerHubException;
 
@@ -34,7 +33,7 @@ class InterviewReviewManagerUnitTest extends TestDoubleSupport {
     @Test
     void 면접후기를_생성한다() {
         // given
-        var member = Member.create("email@naver.com", SocialProvider.KAKAO, "socialId", "nickname", "profileImageUrl");
+        var member = MemberFixture.createMember();
         given(memberReader.find(any())).willReturn(member);
 
         var interviewReview = InterviewReview.create(
@@ -74,7 +73,7 @@ class InterviewReviewManagerUnitTest extends TestDoubleSupport {
     @Test
     void 면접후기를_수정한다() {
         // given
-        var member = Member.create("email@naver.com", SocialProvider.KAKAO, "socialId", "nickname", "profileImageUrl");
+        var member = MemberFixture.createMember();
         ReflectionTestUtils.setField(member, "id", 1L);
         var interviewReview = InterviewReview.create(member, "카카오", "백엔드", "온라인", "내용");
 
@@ -103,7 +102,7 @@ class InterviewReviewManagerUnitTest extends TestDoubleSupport {
     @Test
     void 작성자가_아니면_수정_실패() {
         // given
-        var member = Member.create("email@naver.com", SocialProvider.KAKAO, "socialId", "nickname", "profileImageUrl");
+        var member = MemberFixture.createMember();
         ReflectionTestUtils.setField(member, "id", 999999L);
         var interviewReview = InterviewReview.create(member, "카카오", "백엔드", "온라인", "내용");
 
