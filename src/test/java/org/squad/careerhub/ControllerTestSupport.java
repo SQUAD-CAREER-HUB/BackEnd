@@ -18,6 +18,7 @@ import org.squad.careerhub.domain.jobposting.service.JobPostingService;
 import org.squad.careerhub.domain.schedule.controller.ScheduleController;
 import org.squad.careerhub.domain.schedule.service.ScheduleService;
 import org.squad.careerhub.global.security.TestSecurityConfig;
+import org.squad.careerhub.infrastructure.health.HealthCheckController;
 
 @ActiveProfiles("test")
 @Import(TestSecurityConfig.class)
@@ -28,7 +29,8 @@ import org.squad.careerhub.global.security.TestSecurityConfig;
                 JobPostingController.class,
                 QuestionArchiveController.class,
                 JobPostingController.class,
-                ScheduleController.class
+                ScheduleController.class,
+                HealthCheckController.class
         })
 public abstract class ControllerTestSupport {
 
