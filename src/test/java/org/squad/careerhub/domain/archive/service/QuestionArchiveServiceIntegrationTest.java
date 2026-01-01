@@ -23,6 +23,7 @@ import org.squad.careerhub.domain.archive.service.dto.ApplicationQuestionArchive
 import org.squad.careerhub.domain.community.interviewquestion.repository.InterviewQuestionJpaRepository;
 import org.squad.careerhub.domain.community.interviewreview.service.InterviewReviewService;
 import org.squad.careerhub.domain.community.interviewreview.service.dto.NewInterviewReview;
+import org.squad.careerhub.domain.member.MemberFixture;
 import org.squad.careerhub.domain.member.entity.Member;
 import org.squad.careerhub.domain.member.entity.SocialProvider;
 import org.squad.careerhub.domain.member.repository.MemberJpaRepository;
@@ -46,13 +47,7 @@ class QuestionArchiveServiceIntegrationTest extends IntegrationTestSupport {
 
     @BeforeEach
     void setUp() {
-        author = memberJpaRepository.save(Member.create(
-                "test@gmail.com",
-                SocialProvider.KAKAO,
-                "socialId",
-                "TestUser",
-                "profile.png"
-        ));
+        author = memberJpaRepository.save(MemberFixture.createMember());
     }
 
     @Test

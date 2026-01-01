@@ -16,6 +16,7 @@ import org.squad.careerhub.domain.application.entity.ApplicationStatus;
 import org.squad.careerhub.domain.application.entity.StageType;
 import org.squad.careerhub.domain.application.repository.ApplicationJpaRepository;
 import org.squad.careerhub.domain.application.service.dto.NewApplication;
+import org.squad.careerhub.domain.member.MemberFixture;
 import org.squad.careerhub.domain.member.entity.Member;
 import org.squad.careerhub.domain.member.entity.SocialProvider;
 import org.squad.careerhub.domain.member.service.MemberReader;
@@ -35,7 +36,7 @@ class ApplicationManagerUnitTest extends TestDoubleSupport {
 
     @BeforeEach
     void setUp() {
-        author = Member.create("email@gmail.com", SocialProvider.KAKAO, "socialId", "nickname", "profileImageUrl");
+        author = MemberFixture.createMember();
     }
 
     @Test

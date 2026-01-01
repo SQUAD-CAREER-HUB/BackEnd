@@ -35,6 +35,7 @@ import org.squad.careerhub.domain.application.service.dto.response.ApplicationSt
 import org.squad.careerhub.domain.application.service.dto.response.ApplicationSummaryResponse;
 import org.squad.careerhub.domain.application.service.dto.response.DocsStage;
 import org.squad.careerhub.domain.application.service.dto.response.ScheduleStage;
+import org.squad.careerhub.domain.member.MemberFixture;
 import org.squad.careerhub.domain.member.entity.Member;
 import org.squad.careerhub.domain.member.entity.SocialProvider;
 import org.squad.careerhub.domain.member.repository.MemberJpaRepository;
@@ -58,13 +59,7 @@ class ApplicationReaderIntegrationTest extends IntegrationTestSupport {
 
     @BeforeEach
     void setUp() {
-        member = memberJpaRepository.save(Member.create(
-                "test@gmail.com",
-                SocialProvider.KAKAO,
-                "socialId",
-                "TestUser",
-                "profile.png"
-        ));
+        member = memberJpaRepository.save(MemberFixture.createMember());
     }
 
     @Test

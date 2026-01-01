@@ -16,6 +16,7 @@ import org.squad.careerhub.domain.community.interviewreview.entity.SortType;
 import org.squad.careerhub.domain.community.interviewreview.repository.InterviewReviewJpaRepository;
 import org.squad.careerhub.domain.community.interviewreview.service.dto.response.ReviewDetailResponse;
 import org.squad.careerhub.domain.community.interviewreview.service.dto.response.ReviewSummaryResponse;
+import org.squad.careerhub.domain.member.MemberFixture;
 import org.squad.careerhub.domain.member.entity.Member;
 import org.squad.careerhub.domain.member.entity.SocialProvider;
 import org.squad.careerhub.domain.member.repository.MemberJpaRepository;
@@ -37,13 +38,7 @@ class InterviewReviewReaderIntegrationTest extends IntegrationTestSupport {
 
     @BeforeEach
     void setUp() {
-        member = memberJpaRepository.save(Member.create(
-                "test@email.com",
-                SocialProvider.KAKAO,
-                "socialId",
-                "nickname",
-                "profileImageUrl"
-        ));
+        member = memberJpaRepository.save(MemberFixture.createMember());
     }
 
     @Test

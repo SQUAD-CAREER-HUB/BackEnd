@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.Test;
 import org.springframework.transaction.annotation.Transactional;
 import org.squad.careerhub.IntegrationTestSupport;
+import org.squad.careerhub.domain.member.MemberFixture;
 import org.squad.careerhub.domain.member.entity.Member;
 import org.squad.careerhub.domain.member.entity.SocialProvider;
 import org.squad.careerhub.domain.member.repository.MemberJpaRepository;
@@ -22,7 +23,7 @@ class MemberManagerIntegrationTest extends IntegrationTestSupport {
     @Test
     void 회원의_RefreshToken을_업데이트한다() {
         // given
-        var member = Member.create("email", SocialProvider.KAKAO, "socialId", "nickname", "profileImageUrl");
+        var member = MemberFixture.createMember();
         memberJpaRepository.save(member);
 
         assertThat(member.getRefreshToken()).isNull();

@@ -12,6 +12,7 @@ import org.squad.careerhub.domain.community.interviewquestion.entity.InterviewQu
 import org.squad.careerhub.domain.community.interviewquestion.repository.InterviewQuestionJpaRepository;
 import org.squad.careerhub.domain.community.interviewreview.repository.InterviewReviewJpaRepository;
 import org.squad.careerhub.domain.community.interviewreview.service.dto.NewInterviewReview;
+import org.squad.careerhub.domain.member.MemberFixture;
 import org.squad.careerhub.domain.member.entity.Member;
 import org.squad.careerhub.domain.member.entity.SocialProvider;
 import org.squad.careerhub.domain.member.repository.MemberJpaRepository;
@@ -109,13 +110,7 @@ class InterviewReviewManagerIntegrationTest extends IntegrationTestSupport {
     }
 
     private Member createMember() {
-        return memberJpaRepository.save(Member.create(
-                "test@email.com",
-                SocialProvider.KAKAO,
-                "socialId" + System.nanoTime(),
-                "테스터",
-                "profile.jpg"
-        ));
+        return memberJpaRepository.save(MemberFixture.createMember());
     }
 
     private Long createReviewWithQuestions(Member member, List<String> questions) {

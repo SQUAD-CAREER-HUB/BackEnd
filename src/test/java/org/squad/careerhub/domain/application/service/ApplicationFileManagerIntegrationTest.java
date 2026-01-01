@@ -21,6 +21,7 @@ import org.squad.careerhub.domain.application.entity.ApplicationAttachment;
 import org.squad.careerhub.domain.application.repository.ApplicationAttachmentJpaRepository;
 import org.squad.careerhub.domain.application.repository.ApplicationJpaRepository;
 import org.squad.careerhub.domain.application.service.dto.response.FileResponse;
+import org.squad.careerhub.domain.member.MemberFixture;
 import org.squad.careerhub.domain.member.entity.Member;
 import org.squad.careerhub.domain.member.entity.SocialProvider;
 import org.squad.careerhub.domain.member.repository.MemberJpaRepository;
@@ -42,13 +43,7 @@ class ApplicationFileManagerIntegrationTest extends IntegrationTestSupport {
 
     @BeforeEach
     void setUp() {
-        author = memberJpaRepository.save(Member.create(
-                "email",
-                SocialProvider.KAKAO,
-                "socialId",
-                "nickname",
-                "profileImageUrl"
-        ));
+        author = memberJpaRepository.save(MemberFixture.createMember());
     }
 
     @Test

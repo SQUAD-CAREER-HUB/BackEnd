@@ -13,6 +13,7 @@ import org.squad.careerhub.domain.application.ApplicationFixture;
 import org.squad.careerhub.domain.application.entity.Application;
 import org.squad.careerhub.domain.application.repository.ApplicationJpaRepository;
 import org.squad.careerhub.domain.application.service.dto.UpdateApplication;
+import org.squad.careerhub.domain.member.MemberFixture;
 import org.squad.careerhub.domain.member.entity.Member;
 import org.squad.careerhub.domain.member.entity.SocialProvider;
 import org.squad.careerhub.domain.member.repository.MemberJpaRepository;
@@ -32,13 +33,7 @@ class ApplicationManagerIntegrationTest extends IntegrationTestSupport {
 
     @BeforeEach
     void setUp() {
-        testMember = memberJpaRepository.save(Member.create(
-                "email",
-                SocialProvider.KAKAO,
-                "socialId",
-                "nickname",
-                "profileImageUrl")
-        );
+        testMember = memberJpaRepository.save(MemberFixture.createMember());
     }
 
     @Test

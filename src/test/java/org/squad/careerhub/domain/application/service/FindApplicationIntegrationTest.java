@@ -24,6 +24,7 @@ import org.squad.careerhub.domain.application.service.dto.NewApplication;
 import org.squad.careerhub.domain.application.service.dto.response.ApplicationInfoResponse;
 import org.squad.careerhub.domain.application.service.dto.response.ApplicationStageTimeLineListResponse.EtcStageTimeLine;
 import org.squad.careerhub.domain.application.service.dto.response.ApplicationStageTimeLineListResponse.InterviewStageTimeLine;
+import org.squad.careerhub.domain.member.MemberFixture;
 import org.squad.careerhub.domain.member.entity.Member;
 import org.squad.careerhub.domain.member.entity.SocialProvider;
 import org.squad.careerhub.domain.member.service.MemberManager;
@@ -45,13 +46,7 @@ class FindApplicationIntegrationTest extends IntegrationTestSupport {
 
     @BeforeEach
     void setUp() {
-        member = memberManager.create(Member.create(
-                "email",
-                SocialProvider.KAKAO,
-                "socialId",
-                "nickname",
-                "profileImageUrl"
-        ));
+        member = memberManager.create(MemberFixture.createMember());
     }
 
     @Test

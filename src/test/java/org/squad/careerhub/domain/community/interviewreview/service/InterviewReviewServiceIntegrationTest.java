@@ -15,6 +15,7 @@ import org.squad.careerhub.domain.community.interviewreview.entity.InterviewRevi
 import org.squad.careerhub.domain.community.interviewreview.repository.InterviewReviewJpaRepository;
 import org.squad.careerhub.domain.community.interviewreview.service.dto.NewInterviewReview;
 import org.squad.careerhub.domain.community.interviewreview.service.dto.UpdateInterviewReview;
+import org.squad.careerhub.domain.member.MemberFixture;
 import org.squad.careerhub.domain.member.entity.Member;
 import org.squad.careerhub.domain.member.entity.SocialProvider;
 import org.squad.careerhub.domain.member.repository.MemberJpaRepository;
@@ -34,13 +35,7 @@ class InterviewReviewServiceIntegrationTest extends IntegrationTestSupport {
     @Test
     void 면접_후기를_작성한다() {
         // given
-        var member = memberJpaRepository.save(Member.create(
-                "email",
-                SocialProvider.KAKAO,
-                "socialId",
-                "nickname",
-                "profileImageUrl")
-        );
+        var member = memberJpaRepository.save(MemberFixture.createMember());
         var newReview = new NewInterviewReview(
                 "company",
                 "position",

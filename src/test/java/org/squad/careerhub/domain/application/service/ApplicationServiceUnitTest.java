@@ -5,7 +5,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.anyList;
 import static org.mockito.Mockito.anyLong;
-import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -18,14 +17,10 @@ import org.mockito.Mock;
 import org.squad.careerhub.TestDoubleSupport;
 import org.squad.careerhub.domain.application.ApplicationFixture;
 import org.squad.careerhub.domain.application.entity.Application;
-import org.squad.careerhub.domain.application.entity.ScheduleResult;
-import org.squad.careerhub.domain.application.entity.StageType;
-import org.squad.careerhub.domain.application.entity.SubmissionStatus;
 import org.squad.careerhub.domain.application.service.dto.NewApplication;
 import org.squad.careerhub.domain.application.service.dto.NewStage;
 import org.squad.careerhub.domain.application.service.dto.UpdateApplication;
 import org.squad.careerhub.domain.member.entity.Member;
-import org.squad.careerhub.domain.schedule.service.dto.NewDocsSchedule;
 
 @RequiredArgsConstructor
 class ApplicationServiceUnitTest extends TestDoubleSupport {
