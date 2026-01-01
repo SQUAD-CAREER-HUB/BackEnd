@@ -74,11 +74,9 @@ class InterviewQuestionManagerUnitTest {
     }
 
     @Test
-    @DisplayName("기존 질문 내용을 수정한다")
     void 기존_질문_내용을_수정한다() {
         // given
         var reviewId = 1L;
-
         var existingQuestion = createQuestion(1L, "기존 질문");
 
         given(interviewQuestionJpaRepository.findByInterviewReviewIdAndStatus(reviewId, EntityStatus.ACTIVE))
@@ -96,16 +94,13 @@ class InterviewQuestionManagerUnitTest {
     }
 
     @Test
-    @DisplayName("ID가 없는 요청은 새로운 질문을 생성한다")
     void ID가_없는_요청은_새로운_질문을_생성한다() {
         // given
-        Long reviewId = 1L;
-        InterviewReview review = mock(InterviewReview.class);
+        var reviewId = 1L;
+        var interviewReview = mock(InterviewReview.class);
+        var existingQuestion = mock(InterviewQuestion.class);
 
-        // 기존 질문 (DB에 이미 있다고 가정)
-        InterviewQuestion existingQuestion = InterviewQuestion.create(review, "기존 질문");
-        ReflectionTestUtils.setField(existingQuestion, "id", 1L);
-
+        given(existingQuestion.getId()).willReturn(1L);
         given(interviewQuestionJpaRepository.findByInterviewReviewIdAndStatus(reviewId, EntityStatus.ACTIVE))
                 .willReturn(List.of(existingQuestion));
 
@@ -117,10 +112,9 @@ class InterviewQuestionManagerUnitTest {
         );
 
         // when
-        interviewQuestionManager.updateQuestions(requests, reviewId, review);
+        interviewQuestionManager.updateQuestions(requests, reviewId, interviewReview);
 
         // then
-
         // 신규 질문 2개가 저장되었는지 확인
         ArgumentCaptor<List<InterviewQuestion>> captor = ArgumentCaptor.forClass(List.class);
         verify(interviewQuestionJpaRepository).saveAll(captor.capture());
@@ -140,7 +134,6 @@ class InterviewQuestionManagerUnitTest {
     void 삭제_수정_생성이_동시에_처리된다() {
         // given
         var reviewId = 1L;
-
         var toDelete = createQuestion(1L, "삭제될 질문");
         var toUpdate = createQuestion(2L, "수정될 질문");
 
@@ -191,7 +184,6 @@ class InterviewQuestionManagerUnitTest {
     void 빈_요청_목록이면_기존_질문이_모두_삭제된다() {
         // given
         var reviewId = 1L;
-
         var existingQuestion1 = createQuestion(1L, "기존 질문1");
         var existingQuestion2 = createQuestion(2L, "기존 질문2");
 
@@ -211,6 +203,7 @@ class InterviewQuestionManagerUnitTest {
     private InterviewQuestion createQuestion(Long id, String question) {
         var interviewQuestion = InterviewQuestion.create(review, question);
         ReflectionTestUtils.setField(interviewQuestion, "id", id);
+
         return interviewQuestion;
     }
 
