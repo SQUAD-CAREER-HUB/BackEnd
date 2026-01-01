@@ -15,7 +15,6 @@ import org.squad.careerhub.domain.application.repository.ApplicationJpaRepositor
 import org.squad.careerhub.domain.application.service.dto.UpdateApplication;
 import org.squad.careerhub.domain.member.MemberFixture;
 import org.squad.careerhub.domain.member.entity.Member;
-import org.squad.careerhub.domain.member.entity.SocialProvider;
 import org.squad.careerhub.domain.member.repository.MemberJpaRepository;
 import org.squad.careerhub.global.error.CareerHubException;
 import org.squad.careerhub.global.error.ErrorStatus;

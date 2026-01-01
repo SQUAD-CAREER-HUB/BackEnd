@@ -8,8 +8,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.transaction.annotation.Transactional;
 import org.squad.careerhub.IntegrationTestSupport;
 import org.squad.careerhub.domain.member.MemberFixture;
-import org.squad.careerhub.domain.member.entity.Member;
-import org.squad.careerhub.domain.member.entity.SocialProvider;
 import org.squad.careerhub.domain.member.repository.MemberJpaRepository;
 
 @RequiredArgsConstructor

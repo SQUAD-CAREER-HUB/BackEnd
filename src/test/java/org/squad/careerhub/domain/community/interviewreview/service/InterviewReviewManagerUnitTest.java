@@ -16,8 +16,6 @@ import org.squad.careerhub.domain.community.interviewreview.repository.Interview
 import org.squad.careerhub.domain.community.interviewreview.service.dto.NewInterviewReview;
 import org.squad.careerhub.domain.community.interviewreview.service.dto.UpdateInterviewReview;
 import org.squad.careerhub.domain.member.MemberFixture;
-import org.squad.careerhub.domain.member.entity.Member;
-import org.squad.careerhub.domain.member.entity.SocialProvider;
 import org.squad.careerhub.domain.member.service.MemberReader;
 import org.squad.careerhub.global.error.CareerHubException;
 

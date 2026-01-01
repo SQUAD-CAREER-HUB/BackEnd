@@ -3,8 +3,6 @@ package org.squad.careerhub.domain.archive.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.tuple;
 
-import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.BeforeEach;
@@ -12,10 +10,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.transaction.annotation.Transactional;
 import org.squad.careerhub.IntegrationTestSupport;
 import org.squad.careerhub.domain.application.ApplicationFixture;
-import org.squad.careerhub.domain.application.entity.Application;
-import org.squad.careerhub.domain.application.entity.ApplicationMethod;
-import org.squad.careerhub.domain.application.entity.ApplicationStatus;
-import org.squad.careerhub.domain.application.entity.StageType;
 import org.squad.careerhub.domain.application.repository.ApplicationJpaRepository;
 import org.squad.careerhub.domain.archive.entity.QuestionArchive;
 import org.squad.careerhub.domain.archive.repositroy.QuestionArchiveJpaRepository;
@@ -25,7 +19,6 @@ import org.squad.careerhub.domain.community.interviewreview.service.InterviewRev
 import org.squad.careerhub.domain.community.interviewreview.service.dto.NewInterviewReview;
 import org.squad.careerhub.domain.member.MemberFixture;
 import org.squad.careerhub.domain.member.entity.Member;
-import org.squad.careerhub.domain.member.entity.SocialProvider;
 import org.squad.careerhub.domain.member.repository.MemberJpaRepository;
 import org.squad.careerhub.domain.schedule.enums.InterviewType;
 import org.squad.careerhub.global.entity.EntityStatus;

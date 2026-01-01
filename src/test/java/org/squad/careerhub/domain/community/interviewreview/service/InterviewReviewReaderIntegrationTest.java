@@ -18,7 +18,6 @@ import org.squad.careerhub.domain.community.interviewreview.service.dto.response
 import org.squad.careerhub.domain.community.interviewreview.service.dto.response.ReviewSummaryResponse;
 import org.squad.careerhub.domain.member.MemberFixture;
 import org.squad.careerhub.domain.member.entity.Member;
-import org.squad.careerhub.domain.member.entity.SocialProvider;
 import org.squad.careerhub.domain.member.repository.MemberJpaRepository;
 import org.squad.careerhub.global.error.CareerHubException;
 import org.squad.careerhub.global.error.ErrorStatus;

@@ -7,7 +7,6 @@ import org.junit.jupiter.api.Test;
 import org.squad.careerhub.domain.application.ApplicationFixture;
 import org.squad.careerhub.domain.member.MemberFixture;
 import org.squad.careerhub.domain.member.entity.Member;
-import org.squad.careerhub.domain.member.entity.SocialProvider;
 
 class ApplicationTest {
 
