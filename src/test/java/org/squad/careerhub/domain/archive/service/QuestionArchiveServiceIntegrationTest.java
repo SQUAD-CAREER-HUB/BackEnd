@@ -11,6 +11,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.transaction.annotation.Transactional;
 import org.squad.careerhub.IntegrationTestSupport;
+import org.squad.careerhub.domain.application.ApplicationFixture;
 import org.squad.careerhub.domain.application.entity.Application;
 import org.squad.careerhub.domain.application.entity.ApplicationMethod;
 import org.squad.careerhub.domain.application.entity.ApplicationStatus;
@@ -41,11 +42,11 @@ class QuestionArchiveServiceIntegrationTest extends IntegrationTestSupport {
     final QuestionArchiveService questionArchiveService;
     final QuestionArchiveJpaRepository questionArchiveJpaRepository;
 
-    Member member;
+    Member author;
 
     @BeforeEach
     void setUp() {
-        member = memberJpaRepository.save(Member.create(
+        author = memberJpaRepository.save(Member.create(
                 "test@gmail.com",
                 SocialProvider.KAKAO,
                 "socialId",
@@ -57,17 +58,7 @@ class QuestionArchiveServiceIntegrationTest extends IntegrationTestSupport {
     @Test
     void 지원서에_저장된_질문_모음을_조회한다() {
         // given
-        var application = applicationJpaRepository.save(Application.create(
-                member,
-                "jobPostingUrl",
-                "companyName",
-                "positionName",
-                "jobLocation",
-                StageType.INTERVIEW,
-                ApplicationStatus.FINAL_PASS,
-                ApplicationMethod.EMAIL,
-                now().plusDays(2)
-        ));
+        var application = applicationJpaRepository.save(ApplicationFixture.createApplicationDocs(author));
         var newReview = new NewInterviewReview(
                 "company",
                 "position",
@@ -76,7 +67,7 @@ class QuestionArchiveServiceIntegrationTest extends IntegrationTestSupport {
         );
 
         var interviewQuestions = List.of("question1", "question2", "question3");
-        var reviewId = interviewReviewService.createReview(newReview, interviewQuestions, member.getId());
+        var reviewId = interviewReviewService.createReview(newReview, interviewQuestions, author.getId());
         interviewQuestionJpaRepository.findByInterviewReviewIdAndStatus(
                 reviewId,
                 EntityStatus.ACTIVE
@@ -84,7 +75,7 @@ class QuestionArchiveServiceIntegrationTest extends IntegrationTestSupport {
 
         // when
         PageResponse<ApplicationQuestionArchiveResponse> response = questionArchiveService.findArchivedQuestionsByApplication(
-                application.getId(), member.getId(),
+                application.getId(), author.getId(),
                 Cursor.of(null, 10));
 
         // then
@@ -108,17 +99,7 @@ class QuestionArchiveServiceIntegrationTest extends IntegrationTestSupport {
     @Test
     void 커서_페이지네이션_작동을_검증한다() {
         // given
-        var application = applicationJpaRepository.save(Application.create(
-                member,
-                "jobPostingUrl",
-                "companyName",
-                "positionName",
-                "jobLocation",
-                StageType.INTERVIEW,
-                ApplicationStatus.FINAL_PASS,
-                ApplicationMethod.EMAIL,
-                now().plusDays(2)
-        ));
+        var application = applicationJpaRepository.save(ApplicationFixture.createApplicationDocs(author));
         var newReview = new NewInterviewReview(
                 "company",
                 "position",
@@ -132,22 +113,28 @@ class QuestionArchiveServiceIntegrationTest extends IntegrationTestSupport {
                 "question16", "question17", "question18", "question19", "question20",
                 "question21", "question22", "question23", "question24", "question25"
         );
-        var reviewId = interviewReviewService.createReview(newReview, interviewQuestions, member.getId());
+        var reviewId = interviewReviewService.createReview(newReview, interviewQuestions, author.getId());
         interviewQuestionJpaRepository.findByInterviewReviewIdAndStatus(
                 reviewId,
                 EntityStatus.ACTIVE
         ).forEach(question -> questionArchiveJpaRepository.save(QuestionArchive.create(application, question)));
+
         // when
         PageResponse<ApplicationQuestionArchiveResponse> firstPage = questionArchiveService.findArchivedQuestionsByApplication(
-                application.getId(), member.getId(),
+                application.getId(), author.getId(),
                 Cursor.of(null, 10));
+
         PageResponse<ApplicationQuestionArchiveResponse> secondPage = questionArchiveService.findArchivedQuestionsByApplication(
-                application.getId(), member.getId(),
+                application.getId(), author.getId(),
                 Cursor.of(firstPage.nextCursorId(), 10));
+
         PageResponse<ApplicationQuestionArchiveResponse> thirdPage = questionArchiveService.findArchivedQuestionsByApplication(
-                application.getId(), member.getId(),
+                application.getId(), author.getId(),
                 Cursor.of(secondPage.nextCursorId(), 10));
+
         // then
+
+        // 1번째 페이지
         assertThat(firstPage).isNotNull().extracting(
                 PageResponse::hasNext,
                 PageResponse::nextCursorId
@@ -155,12 +142,15 @@ class QuestionArchiveServiceIntegrationTest extends IntegrationTestSupport {
                 true,
                 firstPage.contents().getLast().questionArchiveId()
         );
+
         assertThat(firstPage.contents()).hasSize(10).extracting(
                 ApplicationQuestionArchiveResponse::question
         ).containsExactly(
                 "question25", "question24", "question23", "question22", "question21",
                 "question20", "question19", "question18", "question17", "question16"
         );
+
+        // 2번째 페이지
         assertThat(secondPage).isNotNull().extracting(
                 PageResponse::hasNext,
                 PageResponse::nextCursorId
@@ -168,12 +158,15 @@ class QuestionArchiveServiceIntegrationTest extends IntegrationTestSupport {
                 true,
                 secondPage.contents().getLast().questionArchiveId()
         );
+
         assertThat(secondPage.contents()).hasSize(10).extracting(
                 ApplicationQuestionArchiveResponse::question
         ).containsExactly(
                 "question15", "question14", "question13", "question12", "question11",
                 "question10", "question9", "question8", "question7", "question6"
         );
+
+        // 3번째 페이지
         assertThat(thirdPage).isNotNull().extracting(
                 PageResponse::hasNext,
                 PageResponse::nextCursorId
@@ -181,16 +174,13 @@ class QuestionArchiveServiceIntegrationTest extends IntegrationTestSupport {
                 false,
                 null
         );
+
         assertThat(thirdPage.contents()).hasSize(5).extracting(
                 ApplicationQuestionArchiveResponse::question
         ).containsExactly(
                 "question5", "question4", "question3", "question2", "question1"
         );
 
-    }
-
-    private LocalDateTime now() {
-        return LocalDateTime.now().truncatedTo(ChronoUnit.MICROS);
     }
 
 }

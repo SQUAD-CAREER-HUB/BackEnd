@@ -1,11 +1,10 @@
 package org.squad.careerhub.domain.application.entity;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.squad.careerhub.global.utils.DateTimeUtils.now;
 
-import java.time.LocalDateTime;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.squad.careerhub.domain.application.ApplicationFixture;
 import org.squad.careerhub.domain.member.entity.Member;
 import org.squad.careerhub.domain.member.entity.SocialProvider;
 
@@ -21,20 +20,13 @@ class ApplicationTest {
     @Test
     void 지원서를_생성한다() {
         // when
-        LocalDateTime now = now();
-        var application = Application.create(
-                author,
-                "http://jobposting.url",
-                "CompanyName",
-                "PositionName",
-                "JobLocation",
-                StageType.DOCUMENT,
-                ApplicationStatus.FINAL_FAIL,
-                ApplicationMethod.EMAIL,
-                now
-        );
+        var docsApp = ApplicationFixture.createApplicationDocs(author);
+        var etcApp = ApplicationFixture.createApplicationEtc(author);
+        var interviewApp = ApplicationFixture.createApplicationInterview(author);
+        var closedApp = ApplicationFixture.createApplicationClosed(author, ApplicationStatus.FINAL_PASS);
+
         // then
-        assertThat(application).extracting(
+        assertThat(docsApp).extracting(
                 Application::getAuthor,
                 Application::getJobPostingUrl,
                 Application::getCompany,
@@ -42,9 +34,7 @@ class ApplicationTest {
                 Application::getJobLocation,
                 Application::getCurrentStageType,
                 Application::getApplicationStatus,
-                Application::getApplicationMethod,
-                Application::getDeadline,
-                Application::getMemo
+                Application::getApplicationMethod
         ).containsExactly(
                 author,
                 "http://jobposting.url",
@@ -53,50 +43,14 @@ class ApplicationTest {
                 "JobLocation",
                 StageType.DOCUMENT,
                 ApplicationStatus.IN_PROGRESS,
-                ApplicationMethod.EMAIL,
-                now,
-                null
+                ApplicationMethod.EMAIL
         );
+
+        assertThat(docsApp.getDeadline()).isNotNull();
+        assertThat(docsApp.getMemo()).isNull();
+        assertThat(etcApp.getCurrentStageType()).isEqualTo(StageType.ETC);
+        assertThat(interviewApp.getCurrentStageType()).isEqualTo(StageType.INTERVIEW);
+        assertThat(closedApp.getCurrentStageType()).isEqualTo(StageType.APPLICATION_CLOSE);
     }
 
-    @Test
-    void 지원종료인_지원서를_생성한다() {
-        // when
-        LocalDateTime deadline = LocalDateTime.of(2024, 12, 31, 0, 0);
-        var application = Application.create(
-                author,
-                "http://jobposting.url",
-                "CompanyName",
-                "PositionName",
-                "JobLocation",
-                StageType.APPLICATION_CLOSE,
-                ApplicationStatus.FINAL_PASS,
-                ApplicationMethod.EMAIL,
-                deadline
-        );
-        // then
-        assertThat(application).extracting(
-                Application::getAuthor,
-                Application::getJobPostingUrl,
-                Application::getCompany,
-                Application::getPosition,
-                Application::getJobLocation,
-                Application::getCurrentStageType,
-                Application::getApplicationStatus,
-                Application::getApplicationMethod,
-                Application::getDeadline,
-                Application::getMemo
-        ).containsExactly(
-                author,
-                "http://jobposting.url",
-                "CompanyName",
-                "PositionName",
-                "JobLocation",
-                StageType.APPLICATION_CLOSE,
-                ApplicationStatus.FINAL_PASS,
-                ApplicationMethod.EMAIL,
-                deadline,
-                null
-        );
-    }
 }

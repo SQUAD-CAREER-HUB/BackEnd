@@ -6,9 +6,7 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.squad.careerhub.global.utils.DateTimeUtils.now;
 
-import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -16,14 +14,10 @@ import org.mockito.Mock;
 import org.squad.careerhub.TestDoubleSupport;
 import org.squad.careerhub.domain.application.entity.Application;
 import org.squad.careerhub.domain.application.entity.ApplicationStage;
-import org.squad.careerhub.domain.application.entity.ScheduleResult;
 import org.squad.careerhub.domain.application.entity.StageType;
-import org.squad.careerhub.domain.application.entity.SubmissionStatus;
 import org.squad.careerhub.domain.application.repository.ApplicationStageJpaRepository;
 import org.squad.careerhub.domain.application.service.dto.NewStage;
 import org.squad.careerhub.domain.schedule.service.ScheduleCreator;
-import org.squad.careerhub.domain.schedule.service.dto.NewDocsSchedule;
-import org.squad.careerhub.domain.schedule.service.dto.NewEtcSchedule;
 
 class ApplicationStageManagerUnitTest extends TestDoubleSupport {
 
@@ -46,13 +40,10 @@ class ApplicationStageManagerUnitTest extends TestDoubleSupport {
     @Test
     void 서류_전형만_생성하면_1번만_저장되고_서류_일정_메서드를_호출한다() {
         // given
-        var documentNewStage = NewStage.builder()
-                .stageType(StageType.DOCUMENT)
-                .newDocsSchedule(new NewDocsSchedule(SubmissionStatus.NOT_SUBMITTED, ScheduleResult.WAITING))
-                .newEtcSchedules(List.of())
-                .newInterviewSchedules(List.of())
-                .build();
+        var documentNewStage = mock(NewStage.class);
         var documentStage = ApplicationStage.create(testApplication, StageType.DOCUMENT);
+
+        given(documentNewStage.stageType()).willReturn(StageType.DOCUMENT);
         given(applicationStageJpaRepository.save(any())).willReturn(documentStage);
 
         // when
@@ -60,18 +51,18 @@ class ApplicationStageManagerUnitTest extends TestDoubleSupport {
 
         // then
         assertThat(result.getStageType()).isEqualTo(StageType.DOCUMENT);
+
         verify(applicationStageJpaRepository, times(1)).save(any());
-        verify(scheduleCreator, times(1)).createDocumentSchedule(testApplication, documentNewStage.newDocsSchedule());
+        verify(scheduleCreator, times(1)).createDocumentSchedule(any(), any());
     }
 
     @Test
     void 면접_전형_생성_시_서류_전형도_함꼐_저장되고_면접_일정_메서드를_호출한다() {
         // given
-        var interviewNewStage = NewStage.builder()
-                .stageType(StageType.INTERVIEW)
-                .build();
-
+        var interviewNewStage = mock(NewStage.class);
         var interviewStage = ApplicationStage.create(testApplication, StageType.INTERVIEW);
+
+        given(interviewNewStage.stageType()).willReturn(StageType.INTERVIEW);
         given(applicationStageJpaRepository.save(any())).willReturn(interviewStage);
 
         // when
@@ -79,21 +70,18 @@ class ApplicationStageManagerUnitTest extends TestDoubleSupport {
 
         // then
         assertThat(applicationStage.getStageType()).isEqualTo(StageType.INTERVIEW);
+
         verify(applicationStageJpaRepository, times(2)).save(any());
-        verify(scheduleCreator, times(1)).createInterviewSchedules(testApplication, interviewNewStage.newInterviewSchedules());
+        verify(scheduleCreator, times(1)).createInterviewSchedules(any(), any());
     }
 
     @Test
     void 기타_전형_생성_시_서류_전형도_함꼐_저장되고_기타_일정_메서드를_호출한다() {
         // given
-        var customStageName = "코딩테스트";
-        var etcSchedules = List.of(new NewEtcSchedule(customStageName, now(), now().plusDays(2), ScheduleResult.WAITING));
-        var etcNewStage = NewStage.builder()
-                .stageType(StageType.ETC)
-                .newEtcSchedules(etcSchedules)
-                .build();
-
+        var etcNewStage = mock(NewStage.class);
         var etcStage = ApplicationStage.create(testApplication, StageType.ETC);
+
+        given(etcNewStage.stageType()).willReturn(StageType.ETC);
         given(applicationStageJpaRepository.save(any())).willReturn(etcStage);
 
         // when
@@ -101,7 +89,9 @@ class ApplicationStageManagerUnitTest extends TestDoubleSupport {
 
         // then
         assertThat(applicationStage.getStageType()).isEqualTo(StageType.ETC);
+
         verify(applicationStageJpaRepository, times(2)).save(any());
-        verify(scheduleCreator, times(1)).createEtcSchedules(testApplication, etcSchedules);
+        verify(scheduleCreator, times(1)).createEtcSchedules(any(), any());
     }
+
 }

@@ -7,19 +7,17 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import jakarta.transaction.Transactional;
-import java.time.LocalDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.web.multipart.MultipartFile;
 import org.squad.careerhub.IntegrationTestSupport;
+import org.squad.careerhub.domain.application.ApplicationFixture;
 import org.squad.careerhub.domain.application.entity.Application;
 import org.squad.careerhub.domain.application.entity.ApplicationAttachment;
-import org.squad.careerhub.domain.application.entity.ApplicationMethod;
-import org.squad.careerhub.domain.application.entity.ApplicationStatus;
-import org.squad.careerhub.domain.application.entity.StageType;
 import org.squad.careerhub.domain.application.repository.ApplicationAttachmentJpaRepository;
 import org.squad.careerhub.domain.application.repository.ApplicationJpaRepository;
 import org.squad.careerhub.domain.application.service.dto.response.FileResponse;
@@ -40,11 +38,23 @@ class ApplicationFileManagerIntegrationTest extends IntegrationTestSupport {
     @MockitoBean
     private FileProvider fileProvider;  // S3는 Mock 처리
 
+    Member author;
+
+    @BeforeEach
+    void setUp() {
+        author = memberJpaRepository.save(Member.create(
+                "email",
+                SocialProvider.KAKAO,
+                "socialId",
+                "nickname",
+                "profileImageUrl"
+        ));
+    }
+
     @Test
     void 파일_업데이트_시_기존_파일_삭제_후_새_파일_업로드() {
         // given
-        var member = createMember();
-        var application = createApplication(member);
+        var application = createApplication();
 
         // 기존 파일 2개 저장
         var attachment1 = attachmentRepository.save(ApplicationAttachment.create(application, "old-url-1", "old1.pdf", "PDF"));
@@ -94,8 +104,7 @@ class ApplicationFileManagerIntegrationTest extends IntegrationTestSupport {
     @Test
     void 파일이_null_이거나_비어있으면_아무_작업_안함() {
         // given
-        var member = createMember();
-        var application = createApplication(member);
+        var application = createApplication();
 
         // when
         applicationFileManager.updateApplicationFile(application, null);
@@ -108,8 +117,7 @@ class ApplicationFileManagerIntegrationTest extends IntegrationTestSupport {
     @Test
     void 기존_파일이_없어도_새_파일은_정상_업로드() {
         // given
-        var member = createMember();
-        var application = createApplication(member);
+        var application = createApplication();
 
         var file = new MockMultipartFile(
                 "files", "new.pdf", "application/pdf", "content".getBytes()
@@ -132,28 +140,10 @@ class ApplicationFileManagerIntegrationTest extends IntegrationTestSupport {
         assertThat(attachments).hasSize(1);
     }
 
-    private Member createMember() {
-        return memberJpaRepository.save(Member.create(
-                "email",
-                SocialProvider.KAKAO,
-                "socialId",
-                "nickname",
-                "profileImageUrl"
-        ));
-    }
+    private Application createApplication() {
+        var interviewApp = ApplicationFixture.createApplicationInterview(author);
 
-    private Application createApplication(Member member) {
-        return applicationRepository.save(Application.create(
-                member,
-                "https://naver.com",
-                "네이버",
-                "백엔드",
-                "서울",
-                StageType.INTERVIEW,
-                ApplicationStatus.IN_PROGRESS,
-                ApplicationMethod.EMAIL,
-                LocalDateTime.now()
-        ));
+        return applicationRepository.save(interviewApp);
     }
 
 }

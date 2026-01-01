@@ -1,10 +1,8 @@
 package org.squad.careerhub.domain.application.service;
 
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 import org.squad.careerhub.domain.application.entity.Application;
 import org.squad.careerhub.domain.application.repository.ApplicationJpaRepository;
 import org.squad.careerhub.domain.application.service.dto.NewApplication;
@@ -21,9 +19,6 @@ public class ApplicationManager {
     private final MemberReader memberReader;
     private final ApplicationJpaRepository applicationJpaRepository;
 
-    /**
-     * 지원서와 첨부 파일을 생성합니다.
-     **/
     @Transactional
     public Application create(
             NewApplication newApplication,
