@@ -21,7 +21,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(CareerHubException.class)
     public ResponseEntity<ErrorResponse> handleCustomException(CareerHubException e) {
         ErrorStatus errorStatus = e.getErrorStatus();
-        log.warn("커스텀 예외: 상태코드 - {}, 메세지 - {}", errorStatus.getStatusCode(), errorStatus.getMessage());
+        log.warn("[CareerHubException] : 상태코드 - {}, 메세지 - {}", errorStatus.getStatusCode(), errorStatus.getMessage());
 
         ErrorResponse response = ErrorResponse.builder()
                 .statusCode(errorStatus.getStatusCode())
@@ -33,7 +33,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleException(Exception e) {
-        log.warn("예외 발생: {}", e.getMessage());
+        log.warn("[Exception]: {}", e.getMessage());
 
         int statusCode = INTERNAL_SERVER_ERROR.value();
         ErrorResponse response = ErrorResponse.builder()
@@ -55,7 +55,7 @@ public class GlobalExceptionHandler {
         e.getFieldErrors().forEach(fieldError -> {
             String field = fieldError.getField();
             String errorMessage = fieldError.getDefaultMessage();
-            log.warn("유효성 검사 실패 - 필드: {}, 메시지: {}", field, errorMessage);
+            log.warn("[MethodArgumentNotValidException] 필드: {}, 메시지: {}", field, errorMessage);
             response.addValidation(field, errorMessage);
         });
 
@@ -69,7 +69,7 @@ public class GlobalExceptionHandler {
         String paramType = e.getParameter().getParameterType().getSimpleName();
         String detailMessage = e.getMessage();
         String message = "[" + paramName + "] 파라미터는 " + paramType + " 타입이어야 합니다. 상세: " + detailMessage;
-        log.warn("파라미터 타입 불일치: {}", message);
+        log.warn("[MethodArgumentTypeMismatchException]: {}", message);
 
         ErrorResponse response = ErrorResponse.builder()
                 .statusCode(statusCode)
@@ -85,7 +85,7 @@ public class GlobalExceptionHandler {
         String paramName = e.getParameterName();
         String paramType = e.getParameterType();
         String message = paramType + " 타입의" + " [ " + paramName + " ] " + "파라미터가 누락되었습니다.";
-        log.warn("파라미터 누락: {}", message);
+        log.warn("[MissingServletRequestParameterException]: {}", message);
 
         ErrorResponse response = ErrorResponse.builder()
                 .statusCode(statusCode)
@@ -99,7 +99,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleRequestBodyMissing(HttpMessageNotReadableException ex) {
         int statusCode = BAD_REQUEST.value();
         String message = "요청 바디가 올바르지 않거나 누락되었습니다: " + ex.getMessage();
-        log.warn("RequestBodyException: {}", message);
+        log.warn("[RequestBodyException]: {}", message);
 
         ErrorResponse error = ErrorResponse.builder()
                 .statusCode(statusCode)
@@ -113,7 +113,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleConstraintViolation(HandlerMethodValidationException ex) {
         int statusCode = BAD_REQUEST.value();
         String message = "유효성 검증에 실패하셨습니다.: " + ex.getMessage();
-        log.warn("HandlerMethodValidationException: {}", message);
+        log.warn("[HandlerMethodValidationException]: {}", message);
 
         ErrorResponse error = ErrorResponse.builder()
                 .statusCode(statusCode)

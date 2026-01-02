@@ -75,7 +75,7 @@ public class S3Provider implements FileProvider {
                     .build();
             s3Client.deleteObject(request);
 
-            log.info("[AWS] Deleting S3 object - bucket: {}, key: [{}]", bucket, key);
+            log.info("[AWS] S3 파일 삭제 - bucket: {}, key: [{}]", bucket, key);
         } catch (S3Exception e) {
             throw new CareerHubException(ErrorStatus.AWS_S3_ERROR);
         } catch (Exception ex) {
@@ -98,7 +98,7 @@ public class S3Provider implements FileProvider {
             s3Client.putObject(putObjectRequest, requestBody);
 
         } catch (IOException | S3Exception e) {
-            log.error("[AWS] Failed to upload file to S3: {}", fileName, e);
+            log.error("[AWS] S3 파일 업로드 실패: {}", fileName, e);
             throw new CareerHubException(ErrorStatus.FAILED_TO_UPLOAD_FILE);
         }
     }
@@ -125,7 +125,7 @@ public class S3Provider implements FileProvider {
 
             return keyWithSpaces.substring(1); // 맨 앞 "/" 제거
         } catch (Exception e) {
-            log.warn("[AWS] Invalid S3 URL: {}", imageUrl);
+            log.warn("[AWS] 유효하지 않은 URL: {}", imageUrl);
             throw new CareerHubException(ErrorStatus.INVALID_S3_URL);
         }
     }
