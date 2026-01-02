@@ -1,6 +1,7 @@
 package org.squad.careerhub.domain.application.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.squad.careerhub.domain.application.entity.Application;
@@ -13,6 +14,7 @@ import org.squad.careerhub.global.error.CareerHubException;
 import org.squad.careerhub.global.error.ErrorStatus;
 
 @RequiredArgsConstructor
+@Slf4j
 @Component
 public class ApplicationManager {
 
@@ -26,7 +28,7 @@ public class ApplicationManager {
     ) {
         Member author = memberReader.find(authorId);
 
-        return applicationJpaRepository.save(Application.create(
+        Application application = applicationJpaRepository.save(Application.create(
                 author,
                 newApplication.jobPostingUrl(),
                 newApplication.company(),
@@ -37,6 +39,9 @@ public class ApplicationManager {
                 newApplication.applicationMethod(),
                 newApplication.deadline()
         ));
+        log.debug("[ApplicationManager] 지원서 생성 완료 - applicationId: {}", application.getId());
+
+        return application;
     }
 
     @Transactional
@@ -51,6 +56,8 @@ public class ApplicationManager {
                 updateApplication.jobLocation(),
                 updateApplication.memo()
         );
+
+        log.debug("[ApplicationManager] 지원서 수정 완료 - applicationId: {}", application.getId());
 
         return application;
     }
