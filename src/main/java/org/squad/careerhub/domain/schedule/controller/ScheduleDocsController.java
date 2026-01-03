@@ -15,7 +15,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.squad.careerhub.domain.application.entity.StageType;
 import org.squad.careerhub.domain.schedule.controller.dto.EtcScheduleCreateRequest;
+import org.squad.careerhub.domain.schedule.controller.dto.EtcScheduleUpdateRequest;
 import org.squad.careerhub.domain.schedule.controller.dto.InterviewScheduleCreateRequest;
+import org.squad.careerhub.domain.schedule.controller.dto.InterviewScheduleUpdateRequest;
 import org.squad.careerhub.domain.schedule.service.dto.response.ScheduleListResponse;
 import org.squad.careerhub.domain.schedule.service.dto.response.ScheduleResponse;
 import org.squad.careerhub.global.error.ErrorStatus;
@@ -162,6 +164,121 @@ public abstract class ScheduleDocsController {
                     example = "INTERVIEW,DOCUMENT"
             )
             List<StageType> stageTypes,
+
+            Long memberId
+    );
+
+    @Operation(
+            summary = "면접 일정 수정 - [JWT O]",
+            description = """
+                    ### 면접 일정을 수정합니다.
+                    - applicationId / scheduleId는 PathVariable로 전달합니다.
+                    - scheduleId는 해당 지원서(applicationId)의 면접 전형(StageType=INTERVIEW)에 속한 일정이어야 합니다.
+                    - datetime은 ISO8601(LocalDateTime) 포맷을 사용합니다.
+                    """
+    )
+    @ApiResponse(
+            responseCode = "200",
+            description = "면접 일정 수정 성공",
+            content = @Content(
+                    mediaType = MediaType.APPLICATION_JSON_VALUE,
+                    schema = @Schema(implementation = ScheduleResponse.class)
+            )
+    )
+    @ApiExceptions(values = {
+            ErrorStatus.BAD_REQUEST,
+            ErrorStatus.UNAUTHORIZED_ERROR,
+            ErrorStatus.NOT_FOUND,
+            ErrorStatus.INTERNAL_SERVER_ERROR
+    })
+    public abstract ResponseEntity<ScheduleResponse> updateInterviewSchedule(
+            @Parameter(description = "지원서 ID", required = true, example = "1")
+            @PathVariable Long applicationId,
+
+            @Parameter(description = "일정 ID", required = true, example = "100")
+            @PathVariable Long scheduleId,
+
+            @RequestBody(
+                    description = "면접 일정 수정 요청 바디",
+                    required = true,
+                    content = @Content(
+                            mediaType = MediaType.APPLICATION_JSON_VALUE,
+                            schema = @Schema(implementation = InterviewScheduleUpdateRequest.class)
+                    )
+            )
+            InterviewScheduleUpdateRequest request,
+
+            Long memberId
+    );
+
+    @Operation(
+            summary = "기타 일정 수정 - [JWT O]",
+            description = """
+                    ### 기타 일정을 수정합니다.
+                    - applicationId / scheduleId는 PathVariable로 전달합니다.
+                    - scheduleId는 해당 지원서(applicationId)의 기타 전형(StageType=ETC)에 속한 일정이어야 합니다.
+                    - datetime은 ISO8601(LocalDateTime) 포맷을 사용합니다.
+                    """
+    )
+    @ApiResponse(
+            responseCode = "200",
+            description = "기타 일정 수정 성공",
+            content = @Content(
+                    mediaType = MediaType.APPLICATION_JSON_VALUE,
+                    schema = @Schema(implementation = ScheduleResponse.class)
+            )
+    )
+    @ApiExceptions(values = {
+            ErrorStatus.BAD_REQUEST,
+            ErrorStatus.UNAUTHORIZED_ERROR,
+            ErrorStatus.NOT_FOUND,
+            ErrorStatus.INTERNAL_SERVER_ERROR
+    })
+    public abstract ResponseEntity<ScheduleResponse> updateEtcSchedule(
+            @Parameter(description = "지원서 ID", required = true, example = "1")
+            @PathVariable Long applicationId,
+
+            @Parameter(description = "일정 ID", required = true, example = "100")
+            @PathVariable Long scheduleId,
+
+            @RequestBody(
+                    description = "기타 일정 수정 요청 바디",
+                    required = true,
+                    content = @Content(
+                            mediaType = MediaType.APPLICATION_JSON_VALUE,
+                            schema = @Schema(implementation = EtcScheduleUpdateRequest.class)
+                    )
+            )
+            EtcScheduleUpdateRequest request,
+
+            Long memberId
+    );
+
+    @Operation(
+            summary = "일정 삭제(논리삭제) - [JWT O]",
+            description = """
+                    ### 일정을 논리삭제(status=DELETED) 처리합니다.
+                    - applicationId / scheduleId는 PathVariable로 전달합니다.
+                    - scheduleId는 해당 지원서(applicationId)에 속한 일정이어야 합니다.
+                    - 삭제는 물리 삭제가 아니라 논리삭제이며, 조회 시 ACTIVE만 반환되도록 구성해야 합니다.
+                    """
+    )
+    @ApiResponse(
+            responseCode = "204",
+            description = "일정 삭제 성공 (No Content)"
+    )
+    @ApiExceptions(values = {
+            ErrorStatus.BAD_REQUEST,
+            ErrorStatus.UNAUTHORIZED_ERROR,
+            ErrorStatus.NOT_FOUND,
+            ErrorStatus.INTERNAL_SERVER_ERROR
+    })
+    public abstract ResponseEntity<Void> deleteSchedule(
+            @Parameter(description = "지원서 ID", required = true, example = "1")
+            @PathVariable Long applicationId,
+
+            @Parameter(description = "일정 ID", required = true, example = "100")
+            @PathVariable Long scheduleId,
 
             Long memberId
     );
