@@ -6,6 +6,7 @@ import jakarta.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 import lombok.Builder;
 import org.squad.careerhub.domain.application.entity.ScheduleResult;
+import org.squad.careerhub.domain.schedule.service.dto.UpdateInterviewSchedule;
 
 @Schema(description = "면접 일정 수정 요청 DTO (PATCH – 부분 수정)")
 @Builder
@@ -25,4 +26,12 @@ public record InterviewScheduleUpdateRequest(
         String location
 ) {
 
+    public UpdateInterviewSchedule toUpdateInterviewSchedule() {
+        return UpdateInterviewSchedule.builder()
+                .scheduleName(scheduleName)
+                .startedAt(startedAt)
+                .location(location)
+                .scheduleResult(result == null ? ScheduleResult.WAITING : result)
+                .build();
+    }
 }
