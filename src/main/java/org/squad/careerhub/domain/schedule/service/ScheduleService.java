@@ -7,6 +7,8 @@ import org.squad.careerhub.domain.application.service.ApplicationReader;
 import org.squad.careerhub.domain.schedule.entity.Schedule;
 import org.squad.careerhub.domain.schedule.service.dto.NewEtcSchedule;
 import org.squad.careerhub.domain.schedule.service.dto.NewInterviewSchedule;
+import org.squad.careerhub.domain.schedule.service.dto.UpdateEtcSchedule;
+import org.squad.careerhub.domain.schedule.service.dto.UpdateInterviewSchedule;
 import org.squad.careerhub.domain.schedule.service.dto.response.ScheduleResponse;
 
 @RequiredArgsConstructor
@@ -15,6 +17,7 @@ public class ScheduleService {
 
     private final ScheduleCreator scheduleCreator;
     private final ApplicationReader applicationReader;
+    private final ScheduleUpdater scheduleUpdater;
 
     public ScheduleResponse createInterviewSchedule(
             Long applicationId,
@@ -40,6 +43,39 @@ public class ScheduleService {
         Schedule saved = scheduleCreator.createEtcSchedule(app, newEtcSchedule);
 
         return ScheduleResponse.from(saved);
+    }
+
+    public ScheduleResponse updateInterviewSchedule(
+            Long applicationId,
+            Long scheduleId,
+            UpdateInterviewSchedule dto,
+            Long memberId
+    ) {
+        Application app = applicationReader.findApplication(applicationId);
+        app.validateOwnedBy(memberId);
+
+        Schedule updated = scheduleUpdater.updateInterviewSchedule(app, scheduleId, dto);
+        return ScheduleResponse.from(updated);
+    }
+
+    public ScheduleResponse updateEtcSchedule(
+            Long applicationId,
+            Long scheduleId,
+            UpdateEtcSchedule dto,
+            Long memberId
+    ) {
+        Application app = applicationReader.findApplication(applicationId);
+        app.validateOwnedBy(memberId);
+
+        Schedule updated = scheduleUpdater.updateEtcSchedule(app, scheduleId, dto);
+        return ScheduleResponse.from(updated);
+    }
+
+    public void deleteSchedule(Long applicationId, Long scheduleId, Long memberId) {
+        Application app = applicationReader.findApplication(applicationId);
+        app.validateOwnedBy(memberId);
+
+        scheduleUpdater.deleteSchedule(app, scheduleId);
     }
 
 }
