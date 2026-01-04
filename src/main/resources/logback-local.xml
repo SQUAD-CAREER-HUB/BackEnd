@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
+
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%clr(%d{yyyy-MM-dd HH:mm:ss.SSS}){faint} %clr([%5p]) %clr([%X{traceId:-SYSTEM}]){magenta} %clr([%thread]){blue} %clr(%-40.40logger{39}){cyan} %clr(-){faint} %m%n%wEx</pattern>
+            <charset>utf8</charset>
+        </encoder>
+    </appender>
+
+    <!-- Local 환경: 개발용이므로 Sentry 비활성화 -->
+    <!-- Prod 환경에서만 Sentry 사용 -->
+
+    <logger name="org.squad.careerhub" level="DEBUG"/>
+
+    <logger name="org.springframework" level="INFO"/>
+    <logger name="org.springframework.web" level="DEBUG"/>
+
+    <logger name="org.hibernate.SQL" level="DEBUG"/>
+    <logger name="org.hibernate.type.descriptor.sql.BasicBinder" level="TRACE"/>
+
+    <root level="INFO">
+        <appender-ref ref="STDOUT"/>
+    </root>
+
+</configuration>

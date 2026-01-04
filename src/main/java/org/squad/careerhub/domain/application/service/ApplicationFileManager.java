@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -14,6 +15,7 @@ import org.squad.careerhub.domain.application.service.dto.response.FileResponse;
 import org.squad.careerhub.global.entity.EntityStatus;
 
 @RequiredArgsConstructor
+@Slf4j
 @Component
 public class ApplicationFileManager {
 
@@ -40,6 +42,8 @@ public class ApplicationFileManager {
 
         // 새 파일 업로드 후 기존 파일 삭제
         deleteExistingFiles(application.getId(), newAttachments);
+
+        log.debug("[ApplicationFileManager] 파일 업데이트 완료 - applicationId: {}", application.getId());
     }
 
     private List<ApplicationAttachment> uploadS3AndCreateAttachments(

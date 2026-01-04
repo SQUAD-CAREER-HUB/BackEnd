@@ -2,6 +2,7 @@ package org.squad.careerhub.domain.application.service;
 
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -17,6 +18,7 @@ import org.squad.careerhub.domain.application.service.dto.response.ApplicationSu
 import org.squad.careerhub.global.support.Cursor;
 import org.squad.careerhub.global.support.PageResponse;
 
+@Slf4j
 @RequiredArgsConstructor
 @Service
 public class ApplicationService {
@@ -50,6 +52,8 @@ public class ApplicationService {
 
         applicationStageManager.createWithSchedule(application, newStage);
 
+        log.info("[Application] 지원서 생성 완료 - applicationId: {}, company: {}", application.getId(), newApplication.company());
+
         return application.getId();
     }
 
@@ -58,25 +62,34 @@ public class ApplicationService {
             Cursor cursor,
             Long memberId
     ) {
+        log.debug("[Application] 지원서 목록 조회 - memberId: {}, searchCondition: {}", memberId, searchCondition);
+
         return applicationReader.findApplications(searchCondition, cursor, memberId);
     }
 
     public ApplicationDetailPageResponse findApplication(Long applicationId, Long memberId) {
+        log.debug("[Application] 지원서 상세 조회 - applicationId: {}, memberId: {}", applicationId, memberId);
+
         return applicationReader.findApplication(applicationId, memberId);
     }
 
     public ApplicationStatisticsResponse getApplicationStatic(Long authorId) {
+        log.debug("[Application] 지원서 통계 조회 - memberId: {}", authorId);
+
         return applicationReader.getApplicationStatistics(authorId);
     }
 
     public PageResponse<BeforeDeadlineApplicationResponse> findBeforeDeadlineApplications(Long memberId, Cursor cursor) {
+        log.debug("[Application] 마감 임박 지원서 조회 - memberId: {}", memberId);
+
         return applicationReader.findBeforeDeadlineApplications(memberId, cursor);
     }
 
     public void updateApplication(UpdateApplication updateApplication, List<MultipartFile> files, Long memberId) {
         Application application = applicationManager.updateApplication(updateApplication, memberId);
-
         applicationFileManager.updateApplicationFile(application, files);
+
+        log.info("[Application] 지원서 수정 완료 - applicationId: {}", updateApplication.applicationId());
     }
 
 }

@@ -7,6 +7,7 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.squad.careerhub.domain.community.interviewquestion.entity.InterviewQuestion;
 import org.squad.careerhub.domain.community.interviewquestion.repository.InterviewQuestionJpaRepository;
@@ -17,6 +18,7 @@ import org.squad.careerhub.global.error.CareerHubException;
 import org.squad.careerhub.global.error.ErrorStatus;
 
 @RequiredArgsConstructor
+@Slf4j
 @Component
 public class InterviewQuestionManager {
 
@@ -24,14 +26,18 @@ public class InterviewQuestionManager {
 
     public void createQuestions(List<String> interviewQuestions, InterviewReview review) {
         if (interviewQuestions == null) {
+            log.debug("[InterviewQuestionManager] 생성할 질문 없음 - reviewId: {}", review.getId());
             return;
         }
+        log.debug("[InterviewQuestionManager] 면접 질문 생성 시작 - reviewId: {}, questionCount: {}",
+                review.getId(), interviewQuestions.size());
         List<InterviewQuestion> questions = interviewQuestions.stream()
                 .map(question -> InterviewQuestion.create(review, question))
                 .toList();
 
         // NOTE: saveAll은 개수만큼 save 쿼리를 날림 MVP라 현재는 saveAll로 진행하지만 추후에 성능 이슈 있을 시 성능 개선
         interviewQuestionJpaRepository.saveAll(questions);
+        log.debug("[InterviewQuestionManager] 면접 질문 생성 완료 - reviewId: {}", review.getId());
     }
 
     /**
@@ -49,6 +55,7 @@ public class InterviewQuestionManager {
     public void updateQuestions(List<UpdateReviewQuestion> requests, Long reviewId, InterviewReview review) {
         if (requests == null || requests.isEmpty()) {
             // 요청이 비어있으면 모든 질문 삭제
+            log.debug("[InterviewQuestionManager] 요청이 비어있어 모든 질문 삭제 - reviewId: {}", reviewId);
             deleteQuestionsByReview(reviewId);
             return;
         }
@@ -63,12 +70,16 @@ public class InterviewQuestionManager {
 
         softDeleteUnrequestedQuestions(existingQuestions, requestIds);
         saveNewQuestionsAndUpdateExisting(requests, existingMap, review);
+
+        log.debug("[InterviewQuestionManager] 면접 질문 업데이트 완료 - reviewId: {}", reviewId);
     }
 
     // NOTE: MVP 단계라 현재 반복문으로 삭제 처리, 추후 성능 이슈 있을 시 bulk update 고려
     public void deleteQuestionsByReview(Long reviewId) {
-        interviewQuestionJpaRepository.findByInterviewReviewIdAndStatus(reviewId, EntityStatus.ACTIVE)
-                .forEach(InterviewQuestion::delete);
+        List<InterviewQuestion> questions = interviewQuestionJpaRepository.findByInterviewReviewIdAndStatus(reviewId, EntityStatus.ACTIVE);
+        questions.forEach(InterviewQuestion::delete);
+
+        log.debug("[InterviewQuestionManager] 면접 질문 삭제 완료 - reviewId: {}, deleteCount: {}", reviewId, questions.size());
     }
 
     private Set<Long> extractRequestIds(List<UpdateReviewQuestion> requests) {
