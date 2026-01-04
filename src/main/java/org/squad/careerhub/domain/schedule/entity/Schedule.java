@@ -146,20 +146,20 @@ public class Schedule extends BaseEntity {
                 .build();
     }
 
-    public void update(
-            String scheduleName,
-            String location,
-            ScheduleResult scheduleResult,
-            SubmissionStatus submissionStatus,
-            LocalDateTime startedAt,
-            LocalDateTime endedAt
-    ) {
-        this.scheduleName = requireNonNull(scheduleName);
+    public void updateInterview(String scheduleName, LocalDateTime startedAt, String location,
+            ScheduleResult result) {
+        this.scheduleName = scheduleName;
+        this.startedAt = startedAt;
         this.location = location;
-        this.scheduleResult = requireNonNull(scheduleResult);
-        this.submissionStatus = submissionStatus;
-        this.startedAt = requireNonNull(startedAt);
+        this.scheduleResult = result;
+    }
+
+    public void updateEtc(String scheduleName, LocalDateTime startedAt, LocalDateTime endedAt,
+            ScheduleResult result) {
+        this.scheduleName = scheduleName;
+        this.startedAt = startedAt;
         this.endedAt = endedAt;
+        this.scheduleResult = result;
     }
 
 }
