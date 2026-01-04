@@ -193,7 +193,7 @@ class ScheduleControllerTest extends ControllerTestSupport {
 
         // when & then
         mvcTester.get()
-                .uri("/v1/schedules?from=2025-12-01&to=2025-12-31&companyName=&stageTypes=DOCUMENT&stageTypes=INTERVIEW&submissionStatuses=SUBMITTED&submissionStatuses=NOT_SUBMITTED")
+                .uri("/v1/schedules?from=2025-12-01&to=2025-12-31&companyName=&stageTypes=DOCUMENT&stageTypes=INTERVIEW&submissionStatusList=SUBMITTED&submissionStatusList=NOT_SUBMITTED")
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .assertThat()
