@@ -24,6 +24,7 @@ import org.squad.careerhub.domain.member.entity.Member;
 import org.squad.careerhub.domain.member.repository.MemberJpaRepository;
 import org.squad.careerhub.global.error.CareerHubException;
 import org.squad.careerhub.global.error.ErrorStatus;
+import org.squad.careerhub.global.security.jwt.TokenHasher;
 import org.squad.careerhub.global.security.jwt.dto.TokenResponse;
 
 @RequiredArgsConstructor
@@ -34,15 +35,17 @@ class AuthServiceIntegrationTest extends IntegrationTestSupport {
     final EntityManager entityManager;
 
     Member testMember;
-    String initialRefreshToken;
+    String initialRefreshToken; // 원본 토큰 저장
+    String initialHashedToken; // 해시된 토큰 저장 (비교용)
 
     @BeforeEach
     void setUp() {
         testMember = MemberFixture.createMember();
-        testMember.updateRefreshToken("initial");
+        initialRefreshToken = "test-refresh-token-" + System.currentTimeMillis(); // 원본 토큰
+        initialHashedToken = TokenHasher.hash(initialRefreshToken); // 해시값 (비교용)
+        testMember.updateRefreshToken(initialRefreshToken); // 해시화되어 DB 저장
 
         memberJpaRepository.save(testMember);
-        initialRefreshToken = testMember.getRefreshToken();
     }
 
     @AfterEach
@@ -63,10 +66,13 @@ class AuthServiceIntegrationTest extends IntegrationTestSupport {
         assertThat(tokenResponse).isNotNull()
                 .extracting(TokenResponse::accessToken, TokenResponse::refreshToken)
                 .doesNotContainNull();
-        assertThat(testMember.getRefreshToken()).isEqualTo(tokenResponse.refreshToken());
-        assertThat(initialRefreshToken).isNotEqualTo(tokenResponse.refreshToken());
 
-        memberJpaRepository.deleteById(testMember.getId());
+        // DB에 저장된 해시값이 새로운 토큰의 해시값과 일치하는지 확인
+        String newHashedToken = TokenHasher.hash(tokenResponse.refreshToken());
+        assertThat(testMember.getRefreshToken()).isEqualTo(newHashedToken);
+
+        // 기존 해시값과 다른지 확인
+        assertThat(testMember.getRefreshToken()).isNotEqualTo(initialHashedToken);
     }
 
     @Test
@@ -122,6 +128,7 @@ class AuthServiceIntegrationTest extends IntegrationTestSupport {
 
         // 성공한 요청으로 인해 Refresh Token이 변경되었는지 확인
         Member updatedMember = memberJpaRepository.findById(testMember.getId()).orElseThrow();
-        assertThat(updatedMember.getRefreshToken()).isNotEqualTo(initialRefreshToken);
+        assertThat(updatedMember.getRefreshToken()).isNotEqualTo(initialHashedToken);
     }
 }
+

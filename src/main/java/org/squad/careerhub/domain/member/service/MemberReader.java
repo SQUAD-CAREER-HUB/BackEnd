@@ -10,6 +10,7 @@ import org.squad.careerhub.domain.member.repository.MemberJpaRepository;
 import org.squad.careerhub.global.entity.EntityStatus;
 import org.squad.careerhub.global.error.CareerHubException;
 import org.squad.careerhub.global.error.ErrorStatus;
+import org.squad.careerhub.global.security.jwt.TokenHasher;
 
 @RequiredArgsConstructor
 @Component
@@ -42,7 +43,8 @@ public class MemberReader {
     public Member findByRefreshTokenWithLock(String refreshToken) {
         // NOTE: refreshToken index 필요성 검토
         try {
-            return memberJpaRepository.findByRefreshTokenAndStatusWithLock(refreshToken, EntityStatus.ACTIVE)
+            String hashedToken = TokenHasher.hash(refreshToken);
+            return memberJpaRepository.findByRefreshTokenAndStatusWithLock(hashedToken, EntityStatus.ACTIVE)
                     .orElseThrow(() -> new CareerHubException(ErrorStatus.NOT_FOUND_ACTIVE_MEMBER_BY_REFRESH_TOKEN));
         } catch (PessimisticLockException e) {
             throw new CareerHubException(ErrorStatus.CONCURRENT_REQUESTS_LIMIT_EXCEEDED);
