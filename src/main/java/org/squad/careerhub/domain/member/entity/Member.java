@@ -11,6 +11,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.squad.careerhub.global.entity.BaseEntity;
+import org.squad.careerhub.global.security.jwt.TokenHasher;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -56,7 +57,8 @@ public class Member extends BaseEntity {
     }
 
     public void updateRefreshToken(String refreshToken) {
-        this.refreshToken = requireNonNull(refreshToken);
+        requireNonNull(refreshToken);
+        this.refreshToken = TokenHasher.hash(refreshToken);
     }
 
     public void clearRefreshToken() {
