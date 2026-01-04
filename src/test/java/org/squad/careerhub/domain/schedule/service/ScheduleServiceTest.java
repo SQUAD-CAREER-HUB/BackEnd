@@ -332,7 +332,6 @@ class ScheduleServiceTest extends TestDoubleSupport {
         Long memberId = 1L;
 
         ScheduleListResponse expected = ScheduleListResponse.from(List.of(
-                // 너희 ScheduleItem 생성자/record에 맞춰서 넣어줘
                 new ScheduleItem(
                         100L,
                         10L,
