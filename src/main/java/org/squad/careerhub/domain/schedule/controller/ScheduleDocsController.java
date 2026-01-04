@@ -23,6 +23,7 @@ import org.squad.careerhub.domain.schedule.controller.dto.InterviewScheduleUpdat
 import org.squad.careerhub.domain.schedule.enums.ResultCriteria;
 import org.squad.careerhub.domain.schedule.service.dto.response.ScheduleListResponse;
 import org.squad.careerhub.domain.schedule.service.dto.response.ScheduleResponse;
+import org.squad.careerhub.global.annotation.LoginMember;
 import org.squad.careerhub.global.error.ErrorStatus;
 import org.squad.careerhub.global.swagger.ApiExceptions;
 
@@ -68,6 +69,7 @@ public abstract class ScheduleDocsController {
             )
             InterviewScheduleCreateRequest request,
 
+            @LoginMember
             Long memberId
     );
 
@@ -111,6 +113,7 @@ public abstract class ScheduleDocsController {
             )
             EtcScheduleCreateRequest request,
 
+            @LoginMember
             Long memberId
     );
 
@@ -177,6 +180,7 @@ public abstract class ScheduleDocsController {
             @RequestParam
             List<StageType> stageTypes,
 
+            @LoginMember
             Long memberId,
 
             @Parameter(
@@ -236,6 +240,7 @@ public abstract class ScheduleDocsController {
             )
             InterviewScheduleUpdateRequest request,
 
+            @LoginMember
             Long memberId
     );
 
@@ -279,6 +284,7 @@ public abstract class ScheduleDocsController {
             )
             EtcScheduleUpdateRequest request,
 
+            @LoginMember
             Long memberId
     );
 
@@ -308,6 +314,7 @@ public abstract class ScheduleDocsController {
             @Parameter(description = "일정 ID", required = true, example = "100")
             @PathVariable Long scheduleId,
 
+            @LoginMember
             Long memberId
     );
 }
