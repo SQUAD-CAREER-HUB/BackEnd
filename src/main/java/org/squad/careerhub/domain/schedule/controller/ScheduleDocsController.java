@@ -121,7 +121,7 @@ public abstract class ScheduleDocsController {
                     - from/to는 YYYY-MM-DD 형식이며 필수입니다.
                     - companyName으로 기업명을 필터링합니다. (현재 파라미터 필수)
                     - stageTypes로 전형 단계(서류/면접/기타 등)를 필터링합니다. (현재 파라미터 필수)
-                    - submissionStatuses로 서류 상태(미제출/제출 등)를 필터링할 수 있습니다. (선택)
+                    - submissionStatusList 서류 상태(미제출/제출 등)를 필터링할 수 있습니다. (선택)
                     - resultCriteria(결과 기준)로 다음을 필터링할 수 있습니다. (선택)
                       - STAGE_PASS: 전형 합격(해당 '일정'이 합격인 것만)
                       - FINAL_PASS: 최종 합격(해당 지원서의 '모든 일정')
@@ -185,7 +185,7 @@ public abstract class ScheduleDocsController {
                     example = "SUBMITTED"
             )
             @RequestParam(required = false)
-            List<SubmissionStatus> submissionStatuses,
+            List<SubmissionStatus> submissionStatusList,
 
             @Parameter(
                     description = "결과 기준 필터(선택). STAGE_PASS | FINAL_PASS | FINAL_FAIL",

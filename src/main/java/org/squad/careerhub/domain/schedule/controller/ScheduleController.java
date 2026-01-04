@@ -77,13 +77,13 @@ public class ScheduleController extends ScheduleDocsController {
             @RequestParam(required = false)
             List<StageType> stageTypes,
             @LoginMember Long memberId,
-            @RequestParam(required = false) List<SubmissionStatus> submissionStatuses,
+            @RequestParam(required = false) List<SubmissionStatus> submissionStatusList,
             @RequestParam(required = false) ResultCriteria resultCriteria
 
     ) {
         return ResponseEntity.ok(
                 scheduleService.getSchedule(from, to, companyName, stageTypes,
-                        submissionStatuses, resultCriteria, memberId)
+                        submissionStatusList, resultCriteria, memberId)
         );
     }
 
