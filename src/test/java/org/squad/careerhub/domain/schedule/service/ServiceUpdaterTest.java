@@ -175,7 +175,7 @@ public class ServiceUpdaterTest extends TestDoubleSupport {
     }
 
     @Test
-    void 일정_삭제_시_ETC_STAGEType으로_ACTIVE_스케줄을_조회하고_delete를_호출한다() {
+    void 일정_삭제_시_schedule_id기준으로_ACTIVE_스케줄을_조회하고_delete를_호출한다() {
         // given
         Long appId = 10L;
         Long scheduleId = 300L;
@@ -186,8 +186,8 @@ public class ServiceUpdaterTest extends TestDoubleSupport {
         Schedule schedule = mock(Schedule.class);
 
         given(scheduleJpaRepository
-                .findByIdAndApplicationStage_Application_IdAndApplicationStage_StageTypeAndStatus(
-                        scheduleId, appId, StageType.ETC, EntityStatus.ACTIVE
+                .findByIdAndApplicationStage_Application_IdAndStatus(
+                        scheduleId, appId, EntityStatus.ACTIVE
                 ))
                 .willReturn(Optional.of(schedule));
 
@@ -196,8 +196,8 @@ public class ServiceUpdaterTest extends TestDoubleSupport {
 
         // then
         verify(scheduleJpaRepository)
-                .findByIdAndApplicationStage_Application_IdAndApplicationStage_StageTypeAndStatus(
-                        scheduleId, appId, StageType.ETC, EntityStatus.ACTIVE
+                .findByIdAndApplicationStage_Application_IdAndStatus(
+                        scheduleId, appId, EntityStatus.ACTIVE
                 );
         verify(schedule).delete();
     }
