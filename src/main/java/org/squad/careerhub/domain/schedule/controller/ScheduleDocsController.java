@@ -13,11 +13,14 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.squad.careerhub.domain.application.entity.StageType;
+import org.squad.careerhub.domain.application.entity.SubmissionStatus;
 import org.squad.careerhub.domain.schedule.controller.dto.EtcScheduleCreateRequest;
 import org.squad.careerhub.domain.schedule.controller.dto.EtcScheduleUpdateRequest;
 import org.squad.careerhub.domain.schedule.controller.dto.InterviewScheduleCreateRequest;
 import org.squad.careerhub.domain.schedule.controller.dto.InterviewScheduleUpdateRequest;
+import org.squad.careerhub.domain.schedule.enums.ResultCriteria;
 import org.squad.careerhub.domain.schedule.service.dto.response.ScheduleListResponse;
 import org.squad.careerhub.domain.schedule.service.dto.response.ScheduleResponse;
 import org.squad.careerhub.global.error.ErrorStatus;
@@ -115,12 +118,15 @@ public abstract class ScheduleDocsController {
             summary = "캘린더 통합 일정 조회 - [JWT O]",
             description = """
                     ### 캘린더에 표시할 일정을 통합 조회합니다.
-                    - 공고 마감(서류 전형 마감 단계), 면접 전형(모든 면접), 기타 전형(모든 기타 일정)을 합쳐서 반환합니다.
                     - from/to는 YYYY-MM-DD 형식이며 필수입니다.
-                    - 기업이름으로 특정 기업만 필터링할 수 있습니다.
-                    - categories로 일정 분류(공고마감/면접/기타)를 필터링할 수 있습니다. (미전달 시 전체)
-                    - 결과는 datetime 오름차순으로 정렬됩니다.
-                    - 권장: from~to는 월 뷰 기준 31일 이내로 요청하세요.
+                    - companyName으로 기업명을 필터링합니다. (현재 파라미터 필수)
+                    - stageTypes로 전형 단계(서류/면접/기타 등)를 필터링합니다. (현재 파라미터 필수)
+                    - submissionStatuses로 서류 상태(미제출/제출 등)를 필터링할 수 있습니다. (선택)
+                    - resultCriteria(결과 기준)로 다음을 필터링할 수 있습니다. (선택)
+                      - STAGE_PASS: 전형 합격(해당 '일정'이 합격인 것만)
+                      - FINAL_PASS: 최종 합격(해당 지원서의 '모든 일정')
+                      - FINAL_FAIL: 최종 불합격(해당 지원서의 '모든 일정')
+                    - 결과는 startedAt 기준 오름차순 정렬로 반환됩니다.
                     """
     )
     @ApiResponse(
@@ -140,32 +146,54 @@ public abstract class ScheduleDocsController {
             @Parameter(
                     description = "조회 시작 날짜 (YYYY-MM-DD, 필수)",
                     required = true,
-                    example = "2025-12-01"
+                    example = "2026-01-01"
             )
+            @RequestParam
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
             LocalDate from,
 
             @Parameter(
                     description = "조회 종료 날짜 (YYYY-MM-DD, 필수)",
                     required = true,
-                    example = "2025-12-31"
+                    example = "2026-01-31"
             )
+            @RequestParam
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
             LocalDate to,
 
             @Parameter(
-                    description = "회사명",
-                    example = "구글코리아"
+                    description = "기업명 필터 (현재 필수 파라미터)",
+                    required = false,
+                    example = "네이버"
             )
+            @RequestParam
             String companyName,
 
             @Parameter(
-                    description = "일정 분류 필터(선택, 미전달 시 전체)",
-                    example = "INTERVIEW,DOCUMENT"
+                    description = "전형 단계 필터 (현재 필수 파라미터). 예: INTERVIEW,ETC,DOCUMENT",
+                    required = false,
+                    example = "INTERVIEW,ETC"
             )
+            @RequestParam
             List<StageType> stageTypes,
 
-            Long memberId
+            Long memberId,
+
+            @Parameter(
+                    description = "서류 상태 필터(선택). 예: NOT_SUBMITTED,SUBMITTED",
+                    required = false,
+                    example = "SUBMITTED"
+            )
+            @RequestParam(required = false)
+            List<SubmissionStatus> submissionStatuses,
+
+            @Parameter(
+                    description = "결과 기준 필터(선택). STAGE_PASS | FINAL_PASS | FINAL_FAIL",
+                    required = false,
+                    example = "STAGE_PASS"
+            )
+            @RequestParam(required = false)
+            ResultCriteria resultCriteria
     );
 
     @Operation(

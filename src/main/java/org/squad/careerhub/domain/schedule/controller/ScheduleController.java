@@ -18,10 +18,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.squad.careerhub.domain.application.entity.StageType;
+import org.squad.careerhub.domain.application.entity.SubmissionStatus;
 import org.squad.careerhub.domain.schedule.controller.dto.EtcScheduleCreateRequest;
 import org.squad.careerhub.domain.schedule.controller.dto.EtcScheduleUpdateRequest;
 import org.squad.careerhub.domain.schedule.controller.dto.InterviewScheduleCreateRequest;
 import org.squad.careerhub.domain.schedule.controller.dto.InterviewScheduleUpdateRequest;
+import org.squad.careerhub.domain.schedule.enums.ResultCriteria;
 import org.squad.careerhub.domain.schedule.service.ScheduleService;
 import org.squad.careerhub.domain.schedule.service.dto.response.ScheduleListResponse;
 import org.squad.careerhub.domain.schedule.service.dto.response.ScheduleResponse;
@@ -70,13 +72,19 @@ public class ScheduleController extends ScheduleDocsController {
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
             @RequestParam
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to,
-            @RequestParam
+            @RequestParam(required = false)
             String companyName,
-            @RequestParam
+            @RequestParam(required = false)
             List<StageType> stageTypes,
-            @LoginMember Long memberId
+            @LoginMember Long memberId,
+            @RequestParam(required = false) List<SubmissionStatus> submissionStatuses,
+            @RequestParam(required = false) ResultCriteria resultCriteria
+
     ) {
-        return ResponseEntity.ok(ScheduleListResponse.mock());
+        return ResponseEntity.ok(
+                scheduleService.getSchedule(from, to, companyName, stageTypes,
+                        submissionStatuses, resultCriteria, memberId)
+        );
     }
 
     @Override
