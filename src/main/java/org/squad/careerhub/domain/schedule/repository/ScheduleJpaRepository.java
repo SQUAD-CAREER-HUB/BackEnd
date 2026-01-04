@@ -19,4 +19,10 @@ public interface ScheduleJpaRepository extends JpaRepository<Schedule, Long> {
             StageType stageType,
             EntityStatus status
     );
+
+    Optional<Schedule> findByIdAndApplicationStage_Application_IdAndStatus(
+            Long id,
+            Long applicationId,
+            EntityStatus status
+    );
 }

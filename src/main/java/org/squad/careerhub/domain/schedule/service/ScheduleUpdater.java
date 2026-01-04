@@ -39,10 +39,9 @@ public class ScheduleUpdater {
 
     public void deleteSchedule(Application app, Long scheduleId) {
         Schedule schedule = scheduleJpaRepository
-                .findByIdAndApplicationStage_Application_IdAndApplicationStage_StageTypeAndStatus(
+                .findByIdAndApplicationStage_Application_IdAndStatus(
                         scheduleId,
                         app.getId(),
-                        StageType.ETC,
                         EntityStatus.ACTIVE
                 )
                 .orElseThrow(() -> new CareerHubException(ErrorStatus.NOT_FOUND));
