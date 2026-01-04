@@ -2,8 +2,10 @@ package org.squad.careerhub.domain.member.entity;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.squad.careerhub.global.security.jwt.TokenHasher.hash;
 
 import org.junit.jupiter.api.Test;
+import org.squad.careerhub.global.security.jwt.TokenHasher;
 
 class MemberTest {
 
@@ -64,7 +66,7 @@ class MemberTest {
         member.updateRefreshToken(newToken);
 
         // then
-        assertThat(member.getRefreshToken()).isEqualTo(newToken);
+        assertThat(member.getRefreshToken()).isEqualTo(hash(newToken));
     }
 
     @Test

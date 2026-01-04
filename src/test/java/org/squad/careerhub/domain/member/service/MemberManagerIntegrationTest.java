@@ -1,6 +1,7 @@
 package org.squad.careerhub.domain.member.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.squad.careerhub.global.security.jwt.TokenHasher.hash;
 
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
@@ -9,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.squad.careerhub.IntegrationTestSupport;
 import org.squad.careerhub.domain.member.MemberFixture;
 import org.squad.careerhub.domain.member.repository.MemberJpaRepository;
+import org.squad.careerhub.global.security.jwt.TokenHasher;
 
 @RequiredArgsConstructor
 @Transactional
@@ -34,7 +36,7 @@ class MemberManagerIntegrationTest extends IntegrationTestSupport {
 
         // then
         var updatedMember = memberJpaRepository.findById(member.getId()).orElseThrow();
-        assertThat(updatedMember.getRefreshToken()).isEqualTo(newRefreshToken);
+        assertThat(updatedMember.getRefreshToken()).isEqualTo(hash(newRefreshToken));
     }
 
 }

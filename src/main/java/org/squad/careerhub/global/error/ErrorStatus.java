@@ -15,7 +15,9 @@ public enum ErrorStatus {
     DUPLICATE        (409, "이미 존재하는 리소스입니다."),
 
     // MEMBER
-    NOT_FOUND_MEMBER (404, "회원을 찾을 수 없습니다."),
+    NOT_FOUND_MEMBER                         (404, "회원을 찾을 수 없습니다."),
+    NOT_FOUND_ACTIVE_MEMBER_BY_REFRESH_TOKEN (404, "요청하신 Refresh Token 으로 활성화 된 회원을 찾을 수 없습니다."),
+
 
     // APPLICATION
     INVALID_DOCS_STAGE_RULE               (400, "지원서 생성 시 전형 단계가 서류 전형일 경우에만 서류 전형 정보를 입력할 수 있습니다."),
@@ -49,9 +51,10 @@ public enum ErrorStatus {
     UNSUPPORTED_OAUTH_PROVIDER (400, "지원하지 않는 OAuth 제공자입니다."),
 
     // JWT
-    INVALID_TOKEN        (401, "유효하지 않은 JWT 토큰입니다."),
-    INVALID_SOCIAL_TOKEN (401, "유효하지 않은 소셜 토큰입니다."),
-    NOT_FOUND_TOKEN      (404, "토큰을 찾을 수 없습니다."),
+    INVALID_TOKEN                      (401, "유효하지 않은 JWT 토큰입니다."),
+    INVALID_SOCIAL_TOKEN               (401, "유효하지 않은 소셜 토큰입니다."),
+    NOT_FOUND_TOKEN                    (404, "토큰을 찾을 수 없습니다."),
+    CONCURRENT_REQUESTS_LIMIT_EXCEEDED (429, "동시에 여러 토큰 재발급 요청이 감지되었습니다. 잠시 후 다시 시도해주세요."),
 
     // AWS
     INVALID_FILE_EXTENSION (400, "지원하지 않는 파일 확장자입니다."),
@@ -68,7 +71,7 @@ public enum ErrorStatus {
     FORBIDDEN_ERROR        (403, "접근 권한이 없습니다."),
     INTERNAL_SERVER_ERROR  (500, "서버 내부 에러"),
 
-   ;
+    ;
 
     private final int statusCode;
     private final String message;
