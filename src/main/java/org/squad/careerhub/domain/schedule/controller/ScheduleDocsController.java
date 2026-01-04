@@ -162,7 +162,7 @@ public abstract class ScheduleDocsController {
             LocalDate to,
 
             @Parameter(
-                    description = "기업명 필터 (현재 필수 파라미터)",
+                    description = "기업명 필터",
                     required = false,
                     example = "네이버"
             )
@@ -170,7 +170,7 @@ public abstract class ScheduleDocsController {
             String companyName,
 
             @Parameter(
-                    description = "전형 단계 필터 (현재 필수 파라미터). 예: INTERVIEW,ETC,DOCUMENT",
+                    description = "전형 단계 필터. 예: INTERVIEW,ETC,DOCUMENT",
                     required = false,
                     example = "INTERVIEW,ETC"
             )
