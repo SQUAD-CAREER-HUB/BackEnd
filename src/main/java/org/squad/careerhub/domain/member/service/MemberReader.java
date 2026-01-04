@@ -25,4 +25,9 @@ public class MemberReader {
         return memberJpaRepository.findBySocialProviderAndSocialIdAndStatus(provider, socialId, EntityStatus.ACTIVE);
     }
 
+    public Member findByRefreshToken(String refreshToken) {
+        return memberJpaRepository.findByRefreshTokenAndStatus(refreshToken, EntityStatus.ACTIVE)
+                .orElseThrow(() -> new CareerHubException(ErrorStatus.NOT_FOUND_MEMBER));
+    }
+
 }

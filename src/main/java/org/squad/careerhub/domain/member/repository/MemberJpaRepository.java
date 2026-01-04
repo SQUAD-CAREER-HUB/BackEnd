@@ -22,5 +22,5 @@ public interface MemberJpaRepository extends JpaRepository<Member, Long> {
     );
 
     Optional<Member> findByIdAndStatus(Long memberId, EntityStatus entityStatus);
-
+    Optional<Member> findByRefreshTokenAndStatus(String refreshToken, EntityStatus entityStatus);
 }
