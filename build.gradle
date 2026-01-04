@@ -70,6 +70,10 @@ dependencies {
 	// Logging
 	implementation 'net.logstash.logback:logstash-logback-encoder:7.4'
 
+	// Sentry
+	implementation 'io.sentry:sentry-spring-boot-starter-jakarta:7.20.1'
+	implementation 'io.sentry:sentry-logback:7.20.1'
+
 	// Firebase
 	implementation 'com.google.firebase:firebase-admin:9.5.0'
 
@@ -83,6 +87,15 @@ dependencies {
 
 	// CRAWLING
 	implementation "org.jsoup:jsoup:1.21.2"
+
+	// Sentry
+	implementation 'io.sentry:sentry-spring-boot-starter-jakarta:7.20.1'
+	implementation 'io.sentry:sentry-logback:7.20.1'
+
+	// Netty DNS (MacOS)
+	if (System.getProperty("os.name").toLowerCase().contains("mac")) {
+		runtimeOnly "io.netty:netty-resolver-dns-native-macos:4.1.128.Final:osx-aarch_64"
+	}
 }
 
 tasks.named('test') {
