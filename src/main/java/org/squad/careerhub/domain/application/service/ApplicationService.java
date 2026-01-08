@@ -94,15 +94,15 @@ public class ApplicationService {
     @Transactional(readOnly = true)
     public ApplicationCreationStatisticsResponse getApplicationCreationStatistics(
             Long memberId,
-            Integer weekCount,
-            Integer monthCount
+            int weekCount,
+            int monthCount
     ) {
         log.debug("[Application] 주간/월간 생성 통계 조회 - memberId: {}, weekCount: {}, monthCount: {}",
                 memberId, weekCount, monthCount);
 
         // 기본값 설정
-        int weeks = (weekCount < 0 || weekCount > 12 ) ? weekCount : 6;
-        int months = (monthCount < 0 || monthCount > 12) ? monthCount : 6;
+        int weeks = (weekCount > 0 && weekCount <= 12 ) ? weekCount : 6;
+        int months = (monthCount > 0 && monthCount <= 12) ? monthCount : 6;
 
         return applicationReader.getApplicationCreationStatistics(memberId, weeks, months);
     }
