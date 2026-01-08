@@ -22,6 +22,7 @@ import org.squad.careerhub.domain.application.entity.StageResult;
 import org.squad.careerhub.domain.application.entity.StageType;
 import org.squad.careerhub.domain.application.entity.SubmissionStatus;
 import org.squad.careerhub.domain.application.repository.dto.BeforeDeadlineApplicationResponse;
+import org.squad.careerhub.domain.application.service.dto.response.ApplicationCreationStatisticsResponse;
 import org.squad.careerhub.domain.application.service.dto.response.ApplicationDetailPageResponse;
 import org.squad.careerhub.domain.application.service.dto.response.ApplicationStatisticsResponse;
 import org.squad.careerhub.domain.application.service.dto.response.ApplicationSummaryResponse;
@@ -291,4 +292,44 @@ public abstract class ApplicationDocsController {
             Long memberId
     );
 
+    @Operation(
+            summary = "주간/월간 생성된 지원서 통계 조회 - JWT O",
+            description = """
+                    ## 최근 N주/N개월간 생성된 지원서 개수를 조회합니다.<br><br>
+                    
+                    - **[주간 통계]**<br>
+                      - weekCount: 조회할 주 개수 (기본값: 6주)<br>
+                      - 이번 주(월~일)가 제일 마지막<br>
+                      - 기간 형식: "MM.DD - MM.DD"<br><br>
+                      
+                    - **[월간 통계]**<br>
+                      - monthCount: 조회할 월 개수 (기본값: 6개월)<br>
+                      - 이번 달이 제일 마지막<br>
+                      - 기간 형식: "YYYY.MM"<br><br>
+                      
+                    - **[사용 예시]**<br>
+                      - 기본: /v1/applications/statistics/creation (6주, 6개월)<br>
+                      - 4주간: /v1/applications/statistics/creation?weekCount=4<br>
+                      - 12개월간: /v1/applications/statistics/creation?monthCount=12<br>
+                      - 커스텀: /v1/applications/statistics/creation?weekCount=8&monthCount=3<br>
+                    """
+    )
+    @ApiExceptions(values = {
+            UNAUTHORIZED_ERROR,
+            FORBIDDEN_ERROR,
+            INTERNAL_SERVER_ERROR
+    })
+    public abstract ResponseEntity<ApplicationCreationStatisticsResponse> getApplicationCreationStatistics(
+            @Parameter(
+                    description = "조회할 주 개수 (기본값: 6주, 최소: 1, 최대: 52)",
+                    example = "6"
+            )
+            int weekCount,
+            @Parameter(
+                    description = "조회할 월 개수 (기본값: 6개월, 최소: 1, 최대: 24)",
+                    example = "6"
+            )
+            int monthCount,
+            Long memberId
+    );
 }

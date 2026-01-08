@@ -1,5 +1,6 @@
 package org.squad.careerhub.domain.application.repository;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.squad.careerhub.domain.application.entity.Application;
@@ -12,6 +13,12 @@ public interface ApplicationJpaRepository extends JpaRepository<Application, Lon
     Optional<Application> findByIdAndAuthorId(Long id, Long authorId);
     boolean existsByIdAndAuthorId(Long applicationId, Long authorId);
 
+    int countByAuthorIdAndCreatedAtGreaterThanEqualAndCreatedAtLessThanAndStatus(
+            Long authorId,
+            LocalDateTime startDate,
+            LocalDateTime endDate,
+            EntityStatus status
+    );
     int countByAuthorIdAndStatus(Long authorId, EntityStatus status);
     int countByAuthorIdAndCurrentStageTypeAndStatus(Long authorId, StageType stageType, EntityStatus status);
     int countByAuthorIdAndApplicationStatusAndStatus(Long authorId, ApplicationStatus applicationStatus, EntityStatus status);
