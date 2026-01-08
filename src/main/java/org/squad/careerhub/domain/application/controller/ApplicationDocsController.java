@@ -321,12 +321,12 @@ public abstract class ApplicationDocsController {
     })
     public abstract ResponseEntity<ApplicationCreationStatisticsResponse> getApplicationCreationStatistics(
             @Parameter(
-                    description = "조회할 주 개수 (기본값: 6주, 최소: 1, 최대: 52)",
+                    description = "조회할 주 개수 (기본값: 6주, 최소: 1, 최대: 12)",
                     example = "6"
             )
             int weekCount,
             @Parameter(
-                    description = "조회할 월 개수 (기본값: 6개월, 최소: 1, 최대: 24)",
+                    description = "조회할 월 개수 (기본값: 6개월, 최소: 1, 최대: 12)",
                     example = "6"
             )
             int monthCount,
