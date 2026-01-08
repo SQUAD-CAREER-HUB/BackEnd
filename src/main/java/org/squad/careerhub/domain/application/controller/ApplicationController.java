@@ -22,6 +22,7 @@ import org.squad.careerhub.domain.application.entity.SubmissionStatus;
 import org.squad.careerhub.domain.application.repository.dto.BeforeDeadlineApplicationResponse;
 import org.squad.careerhub.domain.application.service.ApplicationService;
 import org.squad.careerhub.domain.application.service.dto.SearchCondition;
+import org.squad.careerhub.domain.application.service.dto.response.ApplicationCreationStatisticsResponse;
 import org.squad.careerhub.domain.application.service.dto.response.ApplicationDetailPageResponse;
 import org.squad.careerhub.domain.application.service.dto.response.ApplicationStatisticsResponse;
 import org.squad.careerhub.domain.application.service.dto.response.ApplicationSummaryResponse;
@@ -133,4 +134,19 @@ public class ApplicationController extends ApplicationDocsController {
         return ResponseEntity.ok(response);
     }
 
+    @Override
+    @GetMapping("/v1/applications/statistics/creation")
+    public ResponseEntity<ApplicationCreationStatisticsResponse> getApplicationCreationStatistics(
+            @RequestParam(defaultValue = "6") int weekCount,
+            @RequestParam(defaultValue = "6") int monthCount,
+            @LoginMember Long memberId
+    ) {
+        ApplicationCreationStatisticsResponse response = applicationService.getApplicationCreationStatistics(
+                memberId,
+                weekCount,
+                monthCount
+        );
+
+        return ResponseEntity.ok(response);
+    }
 }

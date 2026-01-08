@@ -2,6 +2,8 @@ package org.squad.careerhub.domain.application.service;
 
 import static org.squad.careerhub.global.utils.DateTimeUtils.now;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
 import lombok.RequiredArgsConstructor;
@@ -16,6 +18,7 @@ import org.squad.careerhub.domain.application.repository.ApplicationJpaRepositor
 import org.squad.careerhub.domain.application.repository.ApplicationQueryDslRepository;
 import org.squad.careerhub.domain.application.repository.dto.BeforeDeadlineApplicationResponse;
 import org.squad.careerhub.domain.application.service.dto.SearchCondition;
+import org.squad.careerhub.domain.application.service.dto.response.ApplicationCreationStatisticsResponse;
 import org.squad.careerhub.domain.application.service.dto.response.ApplicationDetailPageResponse;
 import org.squad.careerhub.domain.application.service.dto.response.ApplicationInfoResponse;
 import org.squad.careerhub.domain.application.service.dto.response.ApplicationStageTimeLineListResponse;
@@ -139,9 +142,74 @@ public class ApplicationReader {
     public boolean existByIdAndAuthorId(Long applicationId, Long memberId) {
         return applicationJpaRepository.existsByIdAndAuthorId(applicationId, memberId);
     }
+    /**
+     * 주간/월간 생성된 지원서 통계 조회
+     * @param memberId 회원 ID
+     * @param weekCount 주간 통계 개수 (기본값 6주)
+     * @param monthCount 월간 통계 개수 (기본값 6개월)
+     */
+    public ApplicationCreationStatisticsResponse getApplicationCreationStatistics(
+            Long memberId,
+            int weekCount,
+            int monthCount
+    ) {
+        LocalDateTime now = now();
 
-    private <T> boolean hasNextPage(List<T> applications, int limit) {
-        return applications.size() > limit;
+        // 주간 통계
+        List<ApplicationCreationStatisticsResponse.WeeklyStatistics> weeklyStats = new ArrayList<>();
+        for (int i = weekCount - 1; i >= 0; i--) {
+            LocalDateTime weekStart = now.minusWeeks(i).with(java.time.DayOfWeek.MONDAY).toLocalDate().atStartOfDay();
+            LocalDateTime weekEnd = weekStart.plusWeeks(1);
+
+            long count = applicationJpaRepository.countByAuthorIdAndCreatedAtGreaterThanEqualAndCreatedAtLessThanAndStatus(
+                    memberId,
+                    weekStart,
+                    weekEnd,
+                    EntityStatus.ACTIVE
+            );
+
+            String period = String.format("%02d.%02d - %02d.%02d",
+                    weekStart.getMonthValue(), weekStart.getDayOfMonth(),
+                    weekEnd.minusDays(1).getMonthValue(), weekEnd.minusDays(1).getDayOfMonth());
+
+            weeklyStats.add(ApplicationCreationStatisticsResponse.WeeklyStatistics.builder()
+                    .period(period)
+                    .count((int) count)
+                    .isCurrentWeek(i == 0)
+                    .build());
+        }
+
+        // 월간 통계
+        List<ApplicationCreationStatisticsResponse.MonthlyStatistics> monthlyStats = new ArrayList<>();
+        for (int i = monthCount - 1; i >= 0; i--) {
+            LocalDateTime monthStart = now.minusMonths(i).withDayOfMonth(1).toLocalDate().atStartOfDay();
+            LocalDateTime monthEnd = monthStart.plusMonths(1);
+
+            long count = applicationJpaRepository.countByAuthorIdAndCreatedAtGreaterThanEqualAndCreatedAtLessThanAndStatus(
+                    memberId,
+                    monthStart,
+                    monthEnd,
+                    EntityStatus.ACTIVE
+            );
+
+            String period = String.format("%d.%02d",
+                    monthStart.getYear(), monthStart.getMonthValue());
+
+            monthlyStats.add(ApplicationCreationStatisticsResponse.MonthlyStatistics.builder()
+                    .period(period)
+                    .count((int) count)
+                    .isCurrentMonth(i == 0)
+                    .build());
+        }
+
+        return ApplicationCreationStatisticsResponse.builder()
+                .weeklyStatistics(weeklyStats)
+                .monthlyStatistics(monthlyStats)
+                .build();
+    }
+
+    private <T> boolean hasNextPage(List<T> data, int limit) {
+        return data.size() > limit;
     }
 
     // 현재 페이지 데이터만 추출 (limit 개수만큼)

@@ -12,6 +12,7 @@ import org.squad.careerhub.domain.application.service.dto.NewApplication;
 import org.squad.careerhub.domain.application.service.dto.NewStage;
 import org.squad.careerhub.domain.application.service.dto.SearchCondition;
 import org.squad.careerhub.domain.application.service.dto.UpdateApplication;
+import org.squad.careerhub.domain.application.service.dto.response.ApplicationCreationStatisticsResponse;
 import org.squad.careerhub.domain.application.service.dto.response.ApplicationDetailPageResponse;
 import org.squad.careerhub.domain.application.service.dto.response.ApplicationStatisticsResponse;
 import org.squad.careerhub.domain.application.service.dto.response.ApplicationSummaryResponse;
@@ -90,4 +91,19 @@ public class ApplicationService {
         log.info("[Application] 지원서 수정 완료 - applicationId: {}", updateApplication.applicationId());
     }
 
+    @Transactional(readOnly = true)
+    public ApplicationCreationStatisticsResponse getApplicationCreationStatistics(
+            Long memberId,
+            Integer weekCount,
+            Integer monthCount
+    ) {
+        log.debug("[Application] 주간/월간 생성 통계 조회 - memberId: {}, weekCount: {}, monthCount: {}",
+                memberId, weekCount, monthCount);
+
+        // 기본값 설정
+        int weeks = (weekCount < 0 || weekCount > 12 ) ? weekCount : 6;
+        int months = (monthCount < 0 || monthCount > 12) ? monthCount : 6;
+
+        return applicationReader.getApplicationCreationStatistics(memberId, weeks, months);
+    }
 }
