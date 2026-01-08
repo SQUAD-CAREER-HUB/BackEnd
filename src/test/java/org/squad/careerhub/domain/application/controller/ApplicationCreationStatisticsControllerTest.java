@@ -2,6 +2,7 @@ package org.squad.careerhub.domain.application.controller;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 
@@ -19,7 +20,7 @@ class ApplicationCreationStatisticsControllerTest extends ControllerTestSupport 
     void 주간_월간_생성_통계를_기본값_6주_6개월_으로_조회한다() {
         // given
         ApplicationCreationStatisticsResponse response = createMockResponse(6, 6);
-        given(applicationService.getApplicationCreationStatistics(any(), any(), any()))
+        given(applicationService.getApplicationCreationStatistics(any(), anyInt(), anyInt()))
                 .willReturn(response);
 
         // when & then
@@ -42,7 +43,7 @@ class ApplicationCreationStatisticsControllerTest extends ControllerTestSupport 
     void 주간_통계를_커스텀_4주_으로_조회한다() {
         // given
         ApplicationCreationStatisticsResponse response = createMockResponse(4, 6);
-        given(applicationService.getApplicationCreationStatistics(any(), eq(4), any()))
+        given(applicationService.getApplicationCreationStatistics(any(), anyInt(), anyInt()))
                 .willReturn(response);
 
         // when & then
@@ -64,7 +65,7 @@ class ApplicationCreationStatisticsControllerTest extends ControllerTestSupport 
     void 월간_통계를_커스텀_12개월_으로_조회한다() {
         // given
         ApplicationCreationStatisticsResponse response = createMockResponse(6, 12);
-        given(applicationService.getApplicationCreationStatistics(any(), any(), eq(12)))
+        given(applicationService.getApplicationCreationStatistics(any(), anyInt(), anyInt()))
                 .willReturn(response);
 
         // when & then
@@ -185,7 +186,7 @@ class ApplicationCreationStatisticsControllerTest extends ControllerTestSupport 
                 .monthlyStatistics(monthlyStats)
                 .build();
 
-        given(applicationService.getApplicationCreationStatistics(any(), any(), any()))
+        given(applicationService.getApplicationCreationStatistics(any(), anyInt(), anyInt()))
                 .willReturn(response);
 
         // when & then
