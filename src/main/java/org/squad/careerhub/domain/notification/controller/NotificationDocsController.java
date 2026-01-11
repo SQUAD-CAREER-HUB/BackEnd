@@ -78,6 +78,7 @@ public abstract class NotificationDocsController {
     @ApiExceptions(values = {
             ErrorStatus.UNAUTHORIZED_ERROR,
             ErrorStatus.NOT_FOUND,
+            ErrorStatus.FORBIDDEN_MODIFY,
             ErrorStatus.INTERNAL_SERVER_ERROR
     })
     public abstract ResponseEntity<Void> readNotification(
@@ -86,7 +87,9 @@ public abstract class NotificationDocsController {
                     required = true,
                     example = "101"
             )
+            @PathVariable("notificationId")
             Long notificationId,
+            @Parameter(hidden = true)
             Long memberId
     );
 
@@ -117,6 +120,7 @@ public abstract class NotificationDocsController {
                     )
             )
             NotificationTokenRegisterRequest request,
+            @Parameter(hidden = true)
             Long memberId
     );
 
@@ -136,6 +140,7 @@ public abstract class NotificationDocsController {
     @ApiExceptions(values = {
             ErrorStatus.UNAUTHORIZED_ERROR,
             ErrorStatus.NOT_FOUND,
+            ErrorStatus.FORBIDDEN_DELETE,
             ErrorStatus.INTERNAL_SERVER_ERROR
     })
     public abstract ResponseEntity<Void> deleteNotificationToken(
@@ -144,7 +149,9 @@ public abstract class NotificationDocsController {
                     required = true,
                     example = "10"
             )
+            @PathVariable("tokenId")
             Long tokenId,
+            @Parameter(hidden = true)
             Long memberId
     );
 
@@ -186,7 +193,6 @@ public abstract class NotificationDocsController {
                     )
             )
             NotificationPreferenceUpdateRequest request,
-
             @Parameter(hidden = true) Long memberId
     );
 
