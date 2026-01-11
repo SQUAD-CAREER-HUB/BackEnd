@@ -1,5 +1,6 @@
 package org.squad.careerhub.domain.notification.service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -41,7 +42,6 @@ public class NotificationCreator {
                 .orElse(true);
 
         if (!enabled) {
-            // 정책: "생성/전송 모두 스킵" (원하면 저장만 하고 전송만 스킵으로 변경 가능)
             throw new CareerHubException(ErrorStatus.BAD_REQUEST);
         }
 
@@ -66,9 +66,21 @@ public class NotificationCreator {
             return NotificationResponse.from(saved);
         }
 
-        // 여러 디바이스 지원: 모두 발송
+        int successCount = 0;
+
         for (NotificationToken d : devices) {
-            pushSender.send(d.getToken(), saved.getTitle(), saved.getBody(), saved.getLinkUrl());
+            try {
+                pushSender.send(d.getToken(), saved.getTitle(), saved.getBody(),
+                        saved.getLinkUrl());
+                successCount++;
+            } catch (Exception e) {
+                log.warn("[NotificationCreator] push send failed. tokenId={}, memberId={}",
+                        d.getId(), memberId, e);
+            }
+        }
+
+        if (successCount > 0) {
+            saved.markSent(LocalDateTime.now());
         }
 
         return NotificationResponse.from(saved);
