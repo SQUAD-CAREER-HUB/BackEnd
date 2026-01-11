@@ -47,7 +47,7 @@ public class NotificationService {
      */
     @Transactional(readOnly = true)
     public NotificationPageResponse getMyNotifications(Long cursorId, int size, Long memberId) {
-        int safeSize = Math.min(Math.max(size, 1), 10);
+        int safeSize = Math.min(Math.max(size, 1), 20);
         return notificationReader.getMyNotifications(memberId, cursorId, safeSize);
     }
 

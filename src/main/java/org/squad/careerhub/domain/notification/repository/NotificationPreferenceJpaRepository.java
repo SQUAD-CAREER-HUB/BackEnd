@@ -23,4 +23,12 @@ public interface NotificationPreferenceJpaRepository extends
             NotificationPlatform platform,
             EntityStatus status
     );
+
+
+    Optional<NotificationPreference> findByMemberIdAndPlatformAndEventAndStatus(
+            Long memberId,
+            NotificationPlatform platform,
+            NotificationEvent event,
+            EntityStatus entityStatus
+    );
 }

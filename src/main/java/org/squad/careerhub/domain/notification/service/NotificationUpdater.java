@@ -55,7 +55,12 @@ public class NotificationUpdater {
 
     public void updatePreference(Long memberId, UpdatePreference preference) {
         NotificationPreference pref = notificationPreferenceJpaRepository
-                .findByMemberIdAndEventAndStatus(memberId, preference.event(), EntityStatus.ACTIVE)
+                .findByMemberIdAndPlatformAndEventAndStatus(
+                        memberId,
+                        preference.platform(),
+                        preference.event(),
+                        EntityStatus.ACTIVE
+                )
                 .orElseGet(
                         () -> NotificationPreference.create(
                                 memberId,
