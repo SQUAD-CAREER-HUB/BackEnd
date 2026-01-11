@@ -108,6 +108,7 @@ public class NotificationController extends NotificationDocsController {
             @PathVariable("tokenId") Long tokenId,
             @LoginMember Long memberId
     ) {
+        notificationService.deleteNotificationToken(memberId, tokenId);
         return ResponseEntity.noContent().build();
     }
 
@@ -117,6 +118,6 @@ public class NotificationController extends NotificationDocsController {
             @LoginMember Long memberId
     ) {
         notificationService.sendTest(memberId, platform);
-        return ResponseEntity.accepted().build(); // 202
+        return ResponseEntity.accepted().build();
     }
 }

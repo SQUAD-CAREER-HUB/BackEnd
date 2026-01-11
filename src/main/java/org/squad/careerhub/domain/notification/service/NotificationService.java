@@ -90,6 +90,13 @@ public class NotificationService {
                 memberId, notificationId);
     }
 
+    @Transactional
+    public void deleteNotificationToken(Long tokenId, Long memberId) {
+        notificationUpdater.deleteNotificationToken(tokenId, memberId);
+        log.info("[NotificationService] deleteNotificationToken done. memberId={}, tokenId={}",
+                memberId, tokenId);
+    }
+
     @Transactional(readOnly = true)
     public NotificationPreferenceListResponse getPreferences(
             Long memberId,

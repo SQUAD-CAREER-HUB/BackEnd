@@ -80,4 +80,22 @@ public class NotificationUpdater {
         }
         n.delete();
     }
+
+    public void deleteNotificationToken(Long tokenId, Long memberId) {
+        int updated = notificationDeviceJpaRepository.softDeleteByIdAndMemberId(
+                memberId,
+                tokenId,
+                EntityStatus.ACTIVE,
+                EntityStatus.DELETED);
+
+        if (updated > 0) {
+            return; // 204
+        }
+
+        boolean exists = notificationDeviceJpaRepository.existsById(tokenId);
+        if (!exists) {
+            throw new CareerHubException(ErrorStatus.NOT_FOUND);
+        }
+        throw new CareerHubException(ErrorStatus.FORBIDDEN_DELETE);
+    }
 }
