@@ -5,7 +5,7 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public enum TargetType {
+public enum SourceType {
     APPLICATION("지원서"),
     TASK("지원서 기타 항목"),
     INTERVIEW("면접"),
